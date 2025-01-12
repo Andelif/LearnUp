@@ -6,8 +6,8 @@ Connect Tutors and Guardians Seamlessly with LearnUp.
 | Name              | Roll Number  | Email                              | Role        |
 |:-----------------:|:------------:|:----------------------------------:|:-----------:|
 |  Hridita Alam     | 20220104056  | hriditaalam1@gmail.com             |Lead         | 
-| SK Ali Ahnaf      | 20220104055  | andelif.cse.20220104052@aust.edu   |Frontend     |
-| Andelif Hossain   | 20220104052  |                                    |Backend      |
+| SK Ali Ahnaf      | 20220104055  | ahnaf.cse.20220104055@aust.edu     |Frontend     |
+| Andelif Hossain   | 20220104052  | andelif.cse.20220104052@aust.edu   |Backend      |
 
 
 ## Project Overview
