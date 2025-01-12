@@ -54,7 +54,7 @@ TutorConnect is designed for:
 ---
 
 
-## [Figma Link](https://www.figma.com/proto/Fzj0GcPvfdRMbjPLvjbcrd/LearnUp?node-id=0-1&t=HvbIqYblqhOTVu1d-1)
+## [Figma Link](https://www.figma.com/design/Fzj0GcPvfdRMbjPLvjbcrd/LearnUp?m=auto&t=xquyMiVgqsoUJdpw-1)
    
 ---
 
