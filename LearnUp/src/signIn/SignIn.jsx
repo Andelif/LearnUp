@@ -50,13 +50,13 @@ const SignIn = () => {
             {/* Login Form */}
             <label className="input-label">Phone/Email</label>
             <div className="input-group">
-              <AiOutlineMail className="input-icon" />
+              
               <input type="text" className="input-field" placeholder="Enter your email" />
             </div>
 
             <label className="input-label">Password</label>
             <div className="input-group">
-              <AiOutlineLock className="input-icon" />
+              
               <input
                 type={passwordVisible ? "text" : "password"}
                 className="input-field"
