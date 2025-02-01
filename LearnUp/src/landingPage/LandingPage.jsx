@@ -11,14 +11,16 @@ const LandingPage = () => {
     { id: 6, name: "Arts", icon: "🎨" },
     { id: 7, name: "BSC", icon: "🔬" },
   ];
+
+  const handleSignUp = () => {
+    navigate('/signup');
+}
+
   return (
     <div className="landing-container">
-      {/* Header */}
-      
-      
       {/* Hero Section */}
       <section className="hero-section">
-        <h2>Find the Best Tutors for Your Learning Needs!</h2>
+        <h1>Find the Best Tutors for Your Learning Needs!</h1>
         <p>Search by Subject, Location, or Tutor Name</p>
         <input type="text" placeholder="Search tutors..." className="search-bar" />
         <div className="hero-buttons">
@@ -26,10 +28,10 @@ const LandingPage = () => {
           <button className="btn-dark">Become a Tutor</button>
         </div>
       </section>
-      
-      {/* Why Choose LearnUp */}
+
+      {/* Features Section */}
       <section className="features-section">
-        <h3>Why Choose LearnUp?</h3>
+        <h2>Why Choose LearnUp?</h2>
         <div className="features-grid">
           <div className="feature-box">✔ Verified Tutors</div>
           <div className="feature-box">✔ Flexible Scheduling</div>
@@ -37,34 +39,54 @@ const LandingPage = () => {
           <div className="feature-box">✔ Affordable & Transparent</div>
         </div>
       </section>
+
+      {/* Categories Section */}
       <section className="categories-section">
-      <h2 className="section-title">Explore Tuition Categories</h2>
-      <div className="categories-grid">
-        {categories.map((category) => (
-          <div key={category.id} className="category-box">
-            <span className="category-icon">{category.icon}</span>
-            <p className="category-name">{category.name}</p>
-          </div>
-        ))}
-      </div>
-    </section>
-      {/* How It Works */}
+        <h2 className="section-title">Explore Tuition Categories</h2>
+        <div className="categories-grid">
+          {categories.map((category) => (
+            <div key={category.id} className="category-box">
+              <span className="category-icon">{category.icon}</span>
+              <p className="category-name">{category.name}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
+      {/* How It Works Section */}
       <section className="how-it-works">
-        <h3>How It Works?</h3>
+        <h2>How It Works?</h2>
         <div className="steps-grid">
           <div className="step-box">1. Search for a tutor</div>
           <div className="step-box">2. Check tutor profiles & reviews</div>
           <div className="step-box">3. Book a session & start learning</div>
         </div>
       </section>
-      
-      {/* Call to Action */}
-      <section className="cta-section">
-        <h3>Join LearnUp Today!</h3>
-        <button className="cta-button">Sign Up</button>
+
+      {/* Testimonials Section */}
+      <section className="testimonials-section">
+        <h2>What Our Students Say</h2>
+        <div className="testimonials-grid">
+          <div className="testimonial">
+            <p>"LearnUp helped me find the perfect tutor. My grades have improved tremendously!"</p>
+            <span>- Sarah M.</span>
+          </div>
+          <div className="testimonial">
+            <p>"A fantastic platform with verified tutors. Highly recommended!"</p>
+            <span>- James T.</span>
+          </div>
+        </div>
       </section>
-      
-      
+
+      {/* Join LearnUp Section */}
+      <section className="join-learnup">
+        <h2>Join LearnUp Today!</h2>
+        <p>Take the next step in your learning journey. Whether you're a student looking for the perfect tutor or an expert wanting to share knowledge, LearnUp is the place for you.</p>
+        <div className="join-options">
+          <button className="btn-light">Join as a Student</button>
+          <button className="btn-dark">Join as a Tutor</button>
+        </div>
+      </section>
     </div>
   );
 };
