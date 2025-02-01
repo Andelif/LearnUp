@@ -14,17 +14,7 @@ const LandingPage = () => {
   return (
     <div className="landing-container">
       {/* Header */}
-      <header className="header">
-        <h1 className="logo">LearnUp</h1>
-        <nav className="nav-links">
-          <a href="#">Home</a>
-          <a href="#">Find Tutors</a>
-          <a href="#">How It Works</a>
-          <a href="#">About Us</a>
-          <a href="#">Contact</a>
-        </nav>
-        <button className="sign-in-btn">Sign In</button>
-      </header>
+      
       
       {/* Hero Section */}
       <section className="hero-section">
@@ -74,16 +64,7 @@ const LandingPage = () => {
         <button className="cta-button">Sign Up</button>
       </section>
       
-      {/* Footer */}
-      <footer className="footer">
-        <p>&copy; 2024 LearnUp. All Rights Reserved.</p>
-        <div className="footer-links">
-          <a href="#">About Us</a>
-          <a href="#">FAQ</a>
-          <a href="#">Privacy Policy</a>
-          <a href="#">Terms of Service</a>
-        </div>
-      </footer>
+      
     </div>
   );
 };
