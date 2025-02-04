@@ -14,11 +14,11 @@ return new class extends Migration
     public function up()
     {
         Schema::create('admins', function (Blueprint $table) {
-            $table->id('AdminID'); // This will be the UserID (FK)
+            $table->id('AdminID'); 
             $table->unsignedBigInteger('user_id')->unique(); // Foreign key to users table
             $table->string('full_name');
-            $table->string('address');
-            $table->string('contact_number');
+            $table->string('address')->nullable();
+            $table->string('contact_number')->nullable();
             $table->boolean('permission_req')->default(false);
             $table->integer('match_made')->default(0);
             $table->string('task_assigned')->nullable();

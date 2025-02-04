@@ -14,19 +14,19 @@ return new class extends Migration
     public function up()
     {
         Schema::create('tutors', function (Blueprint $table) {
-            $table->id('TutorID'); // This will be the UserID (FK)
-            $table->unsignedBigInteger('user_id')->unique(); // Foreign key to users table
-            $table->string('full_name');
-            $table->string('address');
-            $table->string('contact_number');
-            $table->enum('gender', ['Male', 'Female', 'Other']);
-            $table->integer('preferred_salary');
-            $table->string('qualification');
-            $table->integer('experience');
-            $table->string('currently_studying_in');
-            $table->string('preferred_location');
-            $table->string('preferred_time');
-            $table->boolean('availability')->default(true);
+            $table->id('TutorID'); 
+            $table->unsignedBigInteger('user_id'); // Foreign key to users table
+            $table->string('full_name'); 
+            $table->string('address')->nullable(); 
+            $table->string('contact_number')->nullable(); 
+            $table->enum('gender', ['Male', 'Female', 'Other'])->nullable(); 
+            $table->integer('preferred_salary')->nullable(); 
+            $table->string('qualification')->nullable(); 
+            $table->integer('experience')->nullable(); 
+            $table->string('currently_studying_in')->nullable(); 
+            $table->string('preferred_location')->nullable(); 
+            $table->string('preferred_time')->nullable(); 
+            $table->boolean('availability')->default(true); 
             $table->timestamps();
     
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');

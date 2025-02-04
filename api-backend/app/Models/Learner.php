@@ -9,17 +9,18 @@ class Learner extends Model
 {
     use HasFactory;
 
-    protected $primaryKey = 'LearnerID'; // This is UserID (FK)
-    public $incrementing = false; // Since it's a FK from User
+    protected $primaryKey = 'LearnerID';
+    public $incrementing = true; 
 
     protected $fillable = [
-        'LearnerID', 'full_name', 'guardian_full_name', 'contact_number', 
+        'user_id', 'full_name', 'guardian_full_name', 'contact_number', 
         'guardian_contact_number', 'gender', 'address'
     ];
 
+    // Foreign key relationship with User model
     public function user()
     {
-        return $this->belongsTo(User::class, 'LearnerID');
+        return $this->belongsTo(User::class, 'user_id'); 
     }
 
     public function tuitionRequests()

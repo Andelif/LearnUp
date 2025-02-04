@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\User;
+use App\Models\Learner;
+use App\Models\Tutor;
+use App\Models\Admin;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
@@ -13,7 +16,7 @@ class UserController extends Controller
 {
     use HasApiTokens;
 
-    // ✅ Register a new user
+    // Register a new user
     public function register(Request $request)
     {
         // Validate input
@@ -28,13 +31,40 @@ class UserController extends Controller
             return response()->json(['errors' => $validator->errors()], 400);
         }
 
-        // Create new user
+        
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
             'role' => $request->role,
         ]);
+
+        
+        if ($user->role === 'learner') {
+            Learner::create([
+                'user_id' => $user->id, // Foreign key
+                'full_name' => $request->name, 
+                
+            ]);
+        }
+
+
+        if ($user->role === 'tutor') {
+            Tutor::create([
+                'user_id' => $user->id, // Foreign key
+                'full_name' => $request->name, 
+                
+            ]);
+        }
+
+
+        if ($user->role === 'admin') {
+            Admin::create([
+                'user_id' => $user->id, // Foreign key
+                'full_name' => $request->name, 
+            ]);
+        }
+
 
         // Generate API Token
         $token = $user->createToken('auth_token')->plainTextToken;
@@ -46,7 +76,7 @@ class UserController extends Controller
         ], 201);
     }
 
-    // ✅ Login user
+    // Login user
     public function login(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -76,13 +106,13 @@ class UserController extends Controller
         ]);
     }
 
-    // ✅ Get authenticated user
+    // Get authenticated user
     public function getUser(Request $request)
     {
         return response()->json($request->user());
     }
 
-    // ✅ Logout user
+    // Logout user
     public function logout(Request $request)
     {
         $request->user()->tokens()->delete();

@@ -9,16 +9,16 @@ class Admin extends Model
 {
     use HasFactory;
 
-    protected $primaryKey = 'AdminID'; // This is UserID (FK)
-    public $incrementing = false;
+    protected $primaryKey = 'AdminID'; 
+    public $incrementing = true;
 
     protected $fillable = [
-        'AdminID', 'full_name', 'address', 'contact_number', 
+        'user_id', 'full_name', 'address', 'contact_number', 
         'permission_req', 'match_made', 'task_assigned'
     ];
 
     public function user()
     {
-        return $this->belongsTo(User::class, 'AdminID');
+        return $this->belongsTo(User::class, 'user_id');
     }
 }
