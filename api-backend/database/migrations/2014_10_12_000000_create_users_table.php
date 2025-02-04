@@ -22,6 +22,10 @@ return new class extends Migration
             $table->rememberToken();
             $table->timestamps();
         });
+
+        Schema::table('users', function (Blueprint $table) {
+            $table->enum('role', ['learner', 'tutor', 'admin'])->default('learner');
+        });
     }
 
     /**
