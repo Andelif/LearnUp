@@ -22,7 +22,7 @@ return new class extends Migration
             $table->enum('gender', ['Male', 'Female', 'Other'])->nullable(); 
             $table->integer('preferred_salary')->nullable(); 
             $table->string('qualification')->nullable(); 
-            $table->integer('experience')->nullable(); 
+            $table->string('experience')->nullable(); 
             $table->string('currently_studying_in')->nullable(); 
             $table->string('preferred_location')->nullable(); 
             $table->string('preferred_time')->nullable(); 

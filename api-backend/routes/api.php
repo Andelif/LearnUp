@@ -8,6 +8,7 @@ use App\Http\Controllers\TuitionRequestController;
 use App\Http\Controllers\ApplicationController;
 use App\Http\Controllers\MessageController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\AdminController;
 
 // Authentication Routes
 
@@ -20,6 +21,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/logout', [UserController::class, 'logout']);
     Route::resource('learners', LearnerController::class);
     Route::resource('tutors', TutorController::class);
+    Route::resource('admins', AdminController::class);
     Route::resource('tuition-requests', TuitionRequestController::class);
     Route::resource('applications', ApplicationController::class);
     Route::resource('messages', MessageController::class);
