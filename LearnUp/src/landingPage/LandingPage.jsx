@@ -54,14 +54,36 @@ const LandingPage = () => {
       </section>
 
       {/* How It Works Section */}
+
       <section className="how-it-works">
-        <h2>How It Works?</h2>
-        <div className="steps-grid">
-          <div className="step-box">1. Search for a tutor</div>
-          <div className="step-box">2. Check tutor profiles & reviews</div>
-          <div className="step-box">3. Book a session & start learning</div>
-        </div>
-      </section>
+  <h2>
+    The ways <span className="highlight">Parents/Students</span> can connect with us.
+  </h2>
+  <div className="steps-container">
+    <div className="curve-line"></div> {/* Dashed curved line */}
+    <div className="step">
+      <div className="step-icon">👤</div>
+      <h3>Create Profile</h3>
+      <p>Create a profile to get more learning benefits from our website.</p>
+    </div>
+    <div className="step">
+      <div className="step-icon">📝</div>
+      <h3>Submit Requirements</h3>
+      <p>Fill up expected tutor requirements & submit the request.</p>
+    </div>
+    <div className="step">
+      <div className="step-icon">📄</div>
+      <h3>Get Tutors' CV</h3>
+      <p>Based on your requirements, we will provide some experienced tutors' CVs.</p>
+    </div>
+    <div className="step">
+      <div className="step-icon">⭐</div>
+      <h3>Select Your Tutor</h3>
+      <p>Evaluate suggested tutors & start learning with your favorite one.</p>
+    </div>
+  </div>
+</section>
+
 
       {/* Testimonials Section */}
       <section className="testimonials-section">
