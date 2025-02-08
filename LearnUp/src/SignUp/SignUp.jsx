@@ -1,102 +1,180 @@
-import React, { useState } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
+import { storeContext } from "../context/contextProvider";
 import "./SignUp.css";
 
 const SignUp = () => {
+  const [formData, setFormData] = useState({
+    name: "",
+    phone: "",
+    email: "",
+    gender: "male",
+    password: "",
+    password_confirmation: "",
+    role: "learner",
+  });
   const [passwordVisible, setPasswordVisible] = useState(false);
   const [rePasswordVisible, setRePasswordVisible] = useState(false);
-  const [selectedRole, setSelectedRole] = useState("parent");
-  const navigate=useNavigate();
+  const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
+  const navigate = useNavigate();
+  const url = useContext(storeContext);
+
+  // Ensure base URL is correct
+  const [apiBaseUrl, setApiBaseUrl] = useState("");
+
+  useEffect(() => {
+    setApiBaseUrl(import.meta.env.VITE_API_BASE_URL || "http://localhost:8000");
+  }, []);
+
   const handleSignIn = () => {
-    navigate('/signIn');
-}
+    navigate("/signIn");
+  };
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
+    setSuccess("");
+    console.log("Submitting form data:", formData);
+
+    try {
+      const response = await axios.post(`${apiBaseUrl}/api/register`, formData, {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        withCredentials: true,
+      });
+
+      setSuccess("Registration successful! Redirecting...");
+      setTimeout(() => navigate("/signIn"), 2000);
+    } catch (err) {
+      if (err.response?.data?.errors) {
+        const errorMessages = Object.values(err.response.data.errors).flat().join(" ");
+        setError(errorMessages);
+      } else {
+        setError("Registration failed. Please try again.");
+      }
+    }
+  };
+
   return (
     <div className="signup-container">
-
-      {/* Main Content */}
       <div className="main-content-wrapper">
-        {/* Illustration 
-        <div className="illustration">
-          <img src="src/assets/illustration.png" alt="Illustration" />
-        </div>  */}
-
-        {/* Signup Form */}
         <div className="signup-card">
           <h2>
             <span>Join</span> Us
           </h2>
           <p>Sign up to find or offer tuitions.</p>
 
-          {/* Role Selection */}
           <div className="user-selection">
             <button
-              className={`user-btn ${selectedRole === "parent" ? "active" : ""}`}
-              onClick={() => setSelectedRole("parent")}
+              className={`user-btn ${formData.role === "learner" ? "active" : ""}`}
+              onClick={() => setFormData({ ...formData, role: "learner" })}
             >
-              Parent or Student
+              Learner
             </button>
             <button
-              className={`user-btn ${selectedRole === "tutor" ? "active" : ""}`}
-              onClick={() => setSelectedRole("tutor")}
+              className={`user-btn ${formData.role === "tutor" ? "active" : ""}`}
+              onClick={() => setFormData({ ...formData, role: "tutor" })}
             >
               Tutor
             </button>
           </div>
 
-          {/* Signup Form Fields */}
           <div className="form-fields">
-            <label className="input-label">Name</label>
-            <input type="text" className="input-field" placeholder="Enter your name" />
-
-            <label className="input-label">Phone</label>
-            <input type="text" className="input-field" placeholder="Enter your phone number" />
-
-            <label className="input-label">Email</label>
-            <input type="email" className="input-field" placeholder="Enter your email" />
-
-            <label className="input-label">Gender</label>
-            <select className="input-field">
-              <option value="male">Male</option>
-              <option value="female">Female</option>
-              <option value="other">Other</option>
-            </select>
-
-            <label className="input-label">Password</label>
-            <div className="input-group">
+            <form onSubmit={handleSubmit}>
+              <label className="input-label">Name</label>
               <input
-                type={passwordVisible ? "text" : "password"}
+                type="text"
+                name="name"
                 className="input-field"
-                placeholder="Enter your password"
+                placeholder="Enter your name"
+                value={formData.name}
+                onChange={handleChange}
+                required
               />
-              <span
-                className="password-toggle"
-                onClick={() => setPasswordVisible(!passwordVisible)}
-              >
-                {passwordVisible ? <FaEyeSlash /> : <FaEye />}
-              </span>
-            </div>
 
-            <label className="input-label">Re-enter Password</label>
-            <div className="input-group">
+              <label className="input-label">Phone</label>
               <input
-                type={rePasswordVisible ? "text" : "password"}
+                type="text"
+                name="phone"
                 className="input-field"
-                placeholder="Confirm your password"
+                placeholder="Enter your phone number"
+                value={formData.phone}
+                onChange={handleChange}
+                required
               />
-              <span
-                className="password-toggle"
-                onClick={() => setRePasswordVisible(!rePasswordVisible)}
+
+              <label className="input-label">Email</label>
+              <input
+                type="email"
+                name="email"
+                className="input-field"
+                placeholder="Enter your email"
+                value={formData.email}
+                onChange={handleChange}
+                required
+              />
+
+              <label className="input-label">Gender</label>
+              <select
+                name="gender"
+                className="input-field"
+                value={formData.gender}
+                onChange={handleChange}
               >
-                {rePasswordVisible ? <FaEyeSlash /> : <FaEye />}
-              </span>
-            </div>
+                <option value="male">Male</option>
+                <option value="female">Female</option>
+                <option value="other">Other</option>
+              </select>
 
-            <button className="signup-button">Sign Up</button>
+              <label className="input-label">Password</label>
+              <div className="input-group">
+                <input
+                  type={passwordVisible ? "text" : "password"}
+                  name="password"
+                  className="input-field"
+                  placeholder="Enter your password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  required
+                />
+                <span className="password-toggle" onClick={() => setPasswordVisible(!passwordVisible)}>
+                  {passwordVisible ? <FaEyeSlash /> : <FaEye />}
+                </span>
+              </div>
 
-            <p className="login-option">
-              Already have an account? <a href="#" onClick={handleSignIn}>Sign in</a>
-            </p>
+              <label className="input-label">Re-enter Password</label>
+              <div className="input-group">
+                <input
+                  type={rePasswordVisible ? "text" : "password"}
+                  name="password_confirmation"
+                  className="input-field"
+                  placeholder="Confirm your password"
+                  value={formData.password_confirmation}
+                  onChange={handleChange}
+                  required
+                />
+                <span className="password-toggle" onClick={() => setRePasswordVisible(!rePasswordVisible)}>
+                  {rePasswordVisible ? <FaEyeSlash /> : <FaEye />}
+                </span>
+              </div>
+
+              {error && <p className="error">{error}</p>}
+              {success && <p className="success">{success}</p>}
+
+              <button className="signup-button" type="submit">Sign Up</button>
+
+              <p className="login-option">
+                Already have an account? <a href="#" onClick={handleSignIn}>Sign in</a>
+              </p>
+            </form>
           </div>
         </div>
       </div>
