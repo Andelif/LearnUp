@@ -24,7 +24,6 @@ const NavBar = () => {
       <nav className="nav-links">
         <Link to="/">Home</Link>
         <Link>Find Tutors</Link>
-        <Link>How It Works</Link>
         <Link>About Us</Link>
         <Link>Contact</Link>
         <Link to="/dashboard">Dashboard</Link>
