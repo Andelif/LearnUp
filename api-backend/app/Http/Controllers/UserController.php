@@ -31,6 +31,10 @@ class UserController extends Controller
             return response()->json(['errors' => $validator->errors()], 400);
         }
 
+        if (User::where('email', $request->email)->exists()) {
+            return response()->json(['message' => 'A user with this email already exists'], 400);
+        }
+
         
         $user = User::create([
             'name' => $request->name,
@@ -46,22 +50,17 @@ class UserController extends Controller
                 'full_name' => $request->name, 
                 
             ]);
-        }
-
-
-        if ($user->role === 'tutor') {
+        }elseif ($user->role === 'tutor') {
             Tutor::create([
                 'user_id' => $user->id, // Foreign key
                 'full_name' => $request->name, 
                 
             ]);
-        }
-
-
-        if ($user->role === 'admin') {
+        }elseif ($user->role === 'admin') {
             Admin::create([
                 'user_id' => $user->id, // Foreign key
-                'full_name' => $request->name, 
+                'full_name' => $request->name,
+                
             ]);
         }
 
@@ -71,7 +70,7 @@ class UserController extends Controller
 
         return response()->json([
             'message' => 'User registered successfully',
-            'user' => $user,
+            'user' => $user->only(['id', 'name', 'email', 'role']),
             'token' => $token
         ], 201);
     }
@@ -108,9 +107,9 @@ class UserController extends Controller
 
     // Get authenticated user
     public function getUser(Request $request)
-    {
-        return response()->json($request->user());
-    }
+{
+    return response()->json($request->user()->only(['id', 'name', 'email', 'role']));
+}
 
     // Logout user
     public function logout(Request $request)

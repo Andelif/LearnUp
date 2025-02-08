@@ -77,7 +77,7 @@ const SignUp = () => {
               className={`user-btn ${formData.role === "learner" ? "active" : ""}`}
               onClick={() => setFormData({ ...formData, role: "learner" })}
             >
-              Parent or Student
+              Learner
             </button>
             <button
               className={`user-btn ${formData.role === "tutor" ? "active" : ""}`}

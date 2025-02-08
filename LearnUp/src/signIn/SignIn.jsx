@@ -88,7 +88,7 @@ const SignIn = () => {
 
             {/* Login Form */}
             <form onSubmit={handleSubmit}>
-              <label className="input-label">Phone/Email</label>
+              <label className="input-label">Email</label>
               <input
                 type="text"
                 name="email"

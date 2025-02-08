@@ -20,7 +20,7 @@ return new class extends Migration
             $table->text('subjects');
             $table->integer('asked_salary');
             $table->string('curriculum');
-            $table->integer('days');
+            $table->string('days');
             $table->timestamps();
     
             $table->foreign('learner_id')->references('LearnerID')->on('learners')->onDelete('cascade');
