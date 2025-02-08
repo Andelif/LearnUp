@@ -171,19 +171,31 @@ body {
      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
      margin: 20px 0;
    }
-   
-   section:first-child {
-     background: linear-gradient(135deg, #8f60bd, #74499e);
-     color: white;
-   }
-   
-   section:nth-child(odd):not(:first-child) {
-     background: white;
-   }
-   
-   section:nth-child(even) {
-     background: whitesmoke;
-   }
+  
+   .img-banner {
+    position: relative;
+    width: 100%;
+    max-width: 1200px; /* Adjust as needed */
+    margin: auto;
+  }
+  
+  .img-container {
+    width: 100%;
+    display: block; /* Ensures no extra spacing below the image */
+  }
+  
+  .banner-p {
+    position: absolute;
+    top: 50%; 
+    left: 50%;
+    transform: translate(-100%, -80%); /* Centers the text */
+    color: white;
+    font-size: 5vh; /* Adjust as needed */
+    font-weight: bold;
+    text-align: center;
+    padding: 10px;
+    
+  }
    
    /* Section Titles */
    h2 {
@@ -195,7 +207,7 @@ body {
    
    /* Hero Section */
    .hero-section {
-     background: linear-gradient(135deg, #8f60bd, #74499e);
+     background: linear-gradient(120deg,rgb(106, 30, 85), rgb(166, 77, 121));
      color: white;
    }
    
@@ -316,7 +328,8 @@ body {
    }
    
    .step-box {
-     background: white;
+     background:rgb(106, 30, 85);
+     color: white;
      padding: 20px;
      border-radius: 12px;
      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);

@@ -1,4 +1,7 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
+import { storeContext } from "../context/contextProvider";
+import { useContext } from "react";
 import "./LandingPage.css";
 
 const LandingPage = () => {
@@ -11,6 +14,8 @@ const LandingPage = () => {
     { id: 6, name: "Arts", icon: "🎨" },
     { id: 7, name: "BSC", icon: "🔬" },
   ];
+  const { user } = useContext(storeContext);
+  const navigate=useNavigate();
 
   const handleSignUp = () => {
     navigate('/signup');
@@ -18,14 +23,29 @@ const LandingPage = () => {
 
   return (
     <div className="landing-container">
-      {/* Hero Section */}
+      {/* Hero Section 
       <section className="hero-section">
         <h1>Find the Best Tutors for Your Learning Needs!</h1>
         <p>Search by Subject, Location, or Tutor Name</p>
         <input type="text" placeholder="Search tutors..." className="search-bar" />
         <div className="hero-buttons">
           <button className="btn-light">Find a Tutor</button>
-          <button className="btn-dark">Become a Tutor</button>
+          
+        </div>
+      </section>
+      */}
+      <div className="img-banner">
+      <img  className="img-container" src="src/assets/banner.png" alt="" />
+      <p className="banner-p">Welcome to LearnUp,{user?.name || "Guest"}!</p> 
+      </div>
+      
+      <section className="hero-section">
+        <h1>Find the Best Tutors for Your Learning Needs!</h1>
+        <p>Search by Subject, Location, or Tutor Name</p>
+        <input type="text" placeholder="Search tutors..." className="search-bar" />
+        <div className="hero-buttons">
+          <button className="btn-light">Find a Tutor</button>
+          
         </div>
       </section>
 
@@ -83,8 +103,8 @@ const LandingPage = () => {
         <h2>Join LearnUp Today!</h2>
         <p>Take the next step in your learning journey. Whether you're a student looking for the perfect tutor or an expert wanting to share knowledge, LearnUp is the place for you.</p>
         <div className="join-options">
-          <button className="btn-light">Join as a Student</button>
-          <button className="btn-dark">Join as a Tutor</button>
+          <button className="btn-light" onClick={handleSignUp}>Join as a Student</button>
+          <button className="btn-dark" onClick={handleSignUp}>Join as a Tutor</button>
         </div>
       </section>
     </div>
