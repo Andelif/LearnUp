@@ -34,7 +34,7 @@ const SignUp = () => {
               className={`user-btn ${selectedRole === "parent" ? "active" : ""}`}
               onClick={() => setSelectedRole("parent")}
             >
-              Parent or Student
+              Learner
             </button>
             <button
               className={`user-btn ${selectedRole === "tutor" ? "active" : ""}`}

@@ -31,24 +31,10 @@ const SignIn = () => {
             </h2>
             <p>Sign in to Continue your Journey.</p>
 
-            {/* User Selection */}
-            <div className="user-selection">
-              <button
-                className={`user-btn ${selectedUser === "parent" ? "active" : ""}`}
-                onClick={() => setSelectedUser("parent")}
-              >
-                Parents or Student
-              </button>
-              <button
-                className={`user-btn ${selectedUser === "tutor" ? "active" : ""}`}
-                onClick={() => setSelectedUser("tutor")}
-              >
-                Tutor
-              </button>
-            </div>
+            
 
             {/* Login Form */}
-            <label className="input-label">Phone/Email</label>
+            <label className="input-label">Email</label>
             <div className="input-group">
               
               <input type="text" className="input-field" placeholder="Enter your email" />

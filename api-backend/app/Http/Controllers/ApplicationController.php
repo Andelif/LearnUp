@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Application;
+use Illuminate\Support\Facades\Auth;
 
 class ApplicationController extends Controller
 {
@@ -14,13 +15,20 @@ class ApplicationController extends Controller
 
     public function store(Request $request)
     {
+        $user = Auth::user();
+        if (!$user || $user->role !== 'tutor') {
+            return response()->json(['message' => 'Unauthorized: Only tutors can apply for tuition requests'], 403);
+        }
+
         $request->validate([
-            'tution_id' => 'required|exists:tuition_requests,TutionID',
-            'learner_id' => 'required|exists:learners,LearnerID',
-            'tutor_id' => 'required|exists:tutors,TutorID',
+            'tuition_id' => 'required|exists:tuition_requests,id',
         ]);
 
-        $application = Application::create($request->all());
+        $application = Application::create([
+            'tuition_id' => $request->tuition_id,
+            'tutor_id' => $user->id, // Associate application with authenticated tutor
+        ]);
+
         return response()->json([
             'message' => 'Application submitted successfully',
             'application' => $application
@@ -32,16 +40,16 @@ class ApplicationController extends Controller
         return response()->json(Application::findOrFail($id));
     }
 
-    public function update(Request $request, $id)
-    {
-        $application = Application::findOrFail($id);
-        $application->update($request->all());
-        return response()->json($application);
-    }
-
     public function destroy($id)
     {
-        Application::destroy($id);
+        $user = Auth::user();
+        $application = Application::findOrFail($id);
+
+        if (!$user || $user->id !== $application->tutor_id) {
+            return response()->json(['message' => 'Unauthorized: Only the tutor who applied can delete this application'], 403);
+        }
+
+        $application->delete();
         return response()->json(['message' => 'Application deleted successfully']);
     }
 }
