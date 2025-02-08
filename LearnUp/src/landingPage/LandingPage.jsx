@@ -57,7 +57,7 @@ const LandingPage = () => {
 
       <section className="how-it-works">
   <h2>
-    The ways <span className="highlight">Parents/Students</span> can connect with us.
+    The ways <span className="highlight">Learners</span> can connect with us.
   </h2>
   <div className="steps-container">
     <div className="curve-line"></div> {/* Dashed curved line */}
@@ -85,20 +85,37 @@ const LandingPage = () => {
 </section>
 
 
-      {/* Testimonials Section */}
-      <section className="testimonials-section">
-        <h2>What Our Students Say</h2>
-        <div className="testimonials-grid">
-          <div className="testimonial">
-            <p>"LearnUp helped me find the perfect tutor. My grades have improved tremendously!"</p>
-            <span>- Sarah M.</span>
-          </div>
-          <div className="testimonial">
-            <p>"A fantastic platform with verified tutors. Highly recommended!"</p>
-            <span>- James T.</span>
-          </div>
-        </div>
-      </section>
+<section className="tutor-steps">
+  <h2>
+    The ways <span className="highlight">Tutors</span> can connect with us.
+  </h2>
+  <div className="steps-container">
+    <div className="curve-line"></div> 
+    <div className="step">
+      <div className="step-icon">👤</div>
+      <h3>Create Profile</h3>
+      <p>Create your profile in minutes with sign up information.</p>
+    </div>
+    <div className="step">
+      <div className="step-icon">✔️</div> 
+      <h3>Complete Profile</h3>
+      <p>Make your profile at least 80% to get fast responses.</p>
+    </div>
+    <div className="step">
+      <div className="step-icon">🔍</div>  
+      <h3>Apply for Tuition Job</h3>
+      <p>Visit “Job Board” daily & apply for desired tuition jobs.</p>
+    </div>
+    <div className="step">
+      <div className="step-icon">🎓</div>  
+      <h3>Start Tutoring</h3>
+      <p>Be confident in the first meet & start tutoring.</p>
+    </div>
+  </div>
+</section>
+
+
+
 
       {/* Join LearnUp Section */}
       <section className="join-learnup">
