@@ -16,11 +16,14 @@ const SignIn = () => {
   const [selectedUser, setSelectedUser] = useState("parent");
   const [error, setError] = useState("");
   const navigate = useNavigate();
-
+  
   // Set API Base URL
   const [apiBaseUrl, setApiBaseUrl] = useState("");
+  const url=import.meta.env.VITE_API_BASE_URL;
+
   useEffect(() => {
     setApiBaseUrl(import.meta.env.VITE_API_BASE_URL || "http://localhost:8000");
+    console.log(url);
   }, []);
 
   // Handle form input change
@@ -45,10 +48,11 @@ const SignIn = () => {
       setToken(token);
       localStorage.setItem("token", token);
       localStorage.setItem("user", JSON.stringify(user));
-      
+      console.log(response);
       navigate("/");
     } catch (err) {
       if (err.response?.data?.message) {
+        console.error(err.response); 
         setError(err.response.data.message);
       } else {
         setError("Login failed. Please try again.");
