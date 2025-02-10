@@ -1,0 +1,31 @@
+/* Make sure HTML and Body take full height */
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  /* Ensure app container stretches the full viewport */
+  .app-container {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+  
+  /* Push footer to the bottom */
+  .main-content {
+    flex: 1;
+    padding: 20px; /* Add spacing for better layout */
+  }
+  
+  /* Footer styles */
+  .footer {
+    background: #333;
+    color: white;
+    text-align: center;
+    padding: 15px;
+    width: 100%;
+  }
+  
