@@ -1,0 +1,44 @@
+.find-tutors-container {
+    max-width: 500px;
+    margin: 30px auto;
+    padding: 20px;
+    background: #f9f9f9;
+    border-radius: 10px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  .find-tutors-container h2 {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+  
+  .find-tutors-form label {
+    display: block;
+    margin-bottom: 10px;
+    font-weight: bold;
+  }
+  
+  .find-tutors-form input,
+  .find-tutors-form textarea {
+    width: 100%;
+    padding: 8px;
+    margin-top: 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+  }
+  
+  .find-tutors-form button {
+    width: 100%;
+    padding: 10px;
+    margin-top: 15px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .find-tutors-form button:hover {
+    background-color: #0056b3;
+  }
+  

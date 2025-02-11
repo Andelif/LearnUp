@@ -1,14 +1,19 @@
 import "./Dashboard.css";
-import { useState } from "react";
+import { useContext, useState,useEffect } from "react";
 import { FaEnvelope, FaCalendarAlt, FaFileInvoice } from "react-icons/fa";
+import { storeContext } from "../context/contextProvider";
 
 const Dashboard = () => {
   const [userType, setUserType] = useState("tutor");
-
-  const toggleUserType = () => {
-    setUserType((prevType) => (prevType === "tutor" ? "guardian" : "tutor"));
-  };
-
+  const {user}=useContext(storeContext);
+  useEffect(() => {
+    if (user?.role === "tutor") {
+      setUserType("tutor");
+    } else if (user?.role === "learner") {
+      setUserType("learner"); 
+    }
+  }, [user?.role]);
+  
   return (
     <div className="dashboard-container">
       
@@ -18,8 +23,8 @@ const Dashboard = () => {
       <aside className="sidebar">
         <div className="profile-section">
           <img src="https://via.placeholder.com/80" alt="Profile" className="profile-pic" />
-          <h3>Andelif Hossain</h3>
-          <p>user@gmail.com</p>
+          <h3>{user?.name}</h3>
+          <p>{user?.email}</p>
           
         </div>
       </aside>
@@ -31,12 +36,7 @@ const Dashboard = () => {
       <main className="dashboard-main">
 
         
-        <div className="switch-user">
-        <button className="user-switch-btn" onClick={toggleUserType}>
-        Switch to {userType === "tutor" ? "Guardian" : "Tutor"} View
-      </button>
-        </div>
-        
+       
 
         <div className="stats-container">
           <div className="stat-box"> 

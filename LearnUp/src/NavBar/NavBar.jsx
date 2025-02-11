@@ -23,7 +23,7 @@ const NavBar = () => {
       <h1 className="logo">LearnUp</h1>
       <nav className="nav-links">
         <Link to="/">Home</Link>
-        <Link>Find Tutors</Link>
+        {user?.role === "learner" && <Link to="/find-tutors">Find Tutors</Link>}
         <Link>About Us</Link>
         <Link>Contact</Link>
         <Link to="/dashboard">Dashboard</Link>
