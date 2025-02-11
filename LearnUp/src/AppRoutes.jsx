@@ -8,6 +8,7 @@ import PrivacyPolicy from "./PrivacyPolicy/PrivacyPolicy";
 
 import FindTutors from "./FindTutors/FindTutors";
 import FAQ from './FAQ/FAQ';
+import TermsAndConditions from './TermsAndConditions/TermsAndConditions';
 
 
 const AppRoutes = () => {
@@ -19,9 +20,12 @@ const AppRoutes = () => {
     <Route path="/dashboard" element={<Dashboard />} />
     <Route path="/privacy-policy" element={<PrivacyPolicy />} />
 
+    <Route path="/find-tutors" element={<FindTutors/>} /> 
+    <Route path="/FAQ" element={<FAQ />} />
+    <Route path="/TermsAndConditions" element={<TermsAndConditions />} />
      <Route path="/find-tutors" element={<FindTutors/>} /> 
 
-    <Route path="/FAQ" element={<FAQ />} />
+    
    </Routes>
   )
 }
