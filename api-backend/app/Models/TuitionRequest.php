@@ -12,7 +12,7 @@ class TuitionRequest extends Model
     protected $primaryKey = 'TutionID';
 
     protected $fillable = [
-        'learner_id', 'class', 'subjects', 'asked_salary', 'curriculum', 'days'
+        'learner_id', 'class', 'subjects', 'asked_salary', 'curriculum', 'days','location',
     ];
 
     public function learner()
