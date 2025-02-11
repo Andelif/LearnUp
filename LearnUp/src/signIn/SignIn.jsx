@@ -48,16 +48,22 @@ const SignIn = () => {
       });
 
       const { token, user } = response.data;
+      if (!token) {
+        setError("Authentication failed! No token received.");
+        return;
+      }
+
       setUser(user);
-      console.log(user);
       setToken(token);
+
+
       localStorage.setItem("token", token);
       localStorage.setItem("user", JSON.stringify(user));
+
       console.log(response);
-      if (user.role === "learner") {
-        navigate("/dashboard"); // Learner sees guardian's dashboard
-      } else if (user.role === "tutor") {
-        navigate("/dashboard"); // Tutor sees tutor dashboard
+
+      if (user.role === "learner" || user.role === "tutor") {
+        navigate("/dashboard"); 
       } else {
         navigate("/"); // Redirect to home if role is unknown
       }

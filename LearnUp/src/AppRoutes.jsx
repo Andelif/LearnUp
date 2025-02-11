@@ -19,7 +19,7 @@ const AppRoutes = () => {
     <Route path="/dashboard" element={<Dashboard />} />
     <Route path="/privacy-policy" element={<PrivacyPolicy />} />
 
-    {/* <Route path="/find-tutors" element={<FindTutors/>} /> */}
+     <Route path="/find-tutors" element={<FindTutors/>} /> 
 
     <Route path="/FAQ" element={<FAQ />} />
    </Routes>
