@@ -6,6 +6,7 @@ import SignUp from './SignUp/SignUp';
 import Dashboard from './Dashboard/Dashboard';
 import PrivacyPolicy from "./PrivacyPolicy/PrivacyPolicy";
 import FAQ from './FAQ/FAQ';
+import TermsAndConditions from './TermsAndConditions/TermsAndConditions';
 
 const AppRoutes = () => {
   return (
@@ -16,6 +17,8 @@ const AppRoutes = () => {
     <Route path="/dashboard" element={<Dashboard />} />
     <Route path="/privacy-policy" element={<PrivacyPolicy />} />
     <Route path="/FAQ" element={<FAQ />} />
+    <Route path="/TermsAndConditions" element={<TermsAndConditions />} />
+    
     
 
     
