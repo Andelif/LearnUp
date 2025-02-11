@@ -22,7 +22,8 @@ return new class extends Migration
             $table->string('curriculum');
             $table->string('days');
             $table->timestamps();
-    
+            $table->string('location');
+           
             $table->foreign('learner_id')->references('LearnerID')->on('learners')->onDelete('cascade');
         });
     }

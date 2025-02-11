@@ -1,3 +1,11 @@
+
+.toast-container{
+  z-index: 9999 !important; /* Adjust as needed */
+  position: fixed;
+  top: 10px;
+  right: 10px;
+}
+
 /* Make sure HTML and Body take full height */
 html, body {
     height: 100%;
@@ -29,3 +37,4 @@ html, body {
     width: 100%;
   }
   
+
