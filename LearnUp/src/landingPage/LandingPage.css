@@ -45,11 +45,11 @@
   
   .banner-p {
     position: absolute;
-    top: 50%; 
+    top: 70%; 
     left: 50%;
     transform: translate(-100%, -80%); /* Centers the text */
     color: white;
-    font-size: 5vh; /* Adjust as needed */
+    font-size: 4vh; /* Adjust as needed */
     font-weight: bold;
     text-align: center;
     padding: 10px;
