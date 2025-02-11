@@ -5,7 +5,8 @@ import SignIn from './signIn/SignIn';
 import SignUp from './SignUp/SignUp';
 import Dashboard from './Dashboard/Dashboard';
 import PrivacyPolicy from "./PrivacyPolicy/PrivacyPolicy";
-
+import FindTutors from "./FindTutors/FindTutors";
+ 
 const AppRoutes = () => {
   return (
     <Routes>
@@ -14,7 +15,7 @@ const AppRoutes = () => {
     <Route path="/signup" element={<SignUp />} />
     <Route path="/dashboard" element={<Dashboard />} />
     <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-
+    {/* <Route path="/find-tutors" element={<FindTutors/>} /> */}
     
   </Routes>
   )

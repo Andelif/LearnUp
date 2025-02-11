@@ -17,7 +17,7 @@ const SignIn = () => {
   const [error, setError] = useState("");
   const navigate = useNavigate();
   
-  // Set API Base URL
+  
   const [apiBaseUrl, setApiBaseUrl] = useState("");
   const url=import.meta.env.VITE_API_BASE_URL;
 
@@ -45,11 +45,18 @@ const SignIn = () => {
 
       const { token, user } = response.data;
       setUser(user);
+      console.log(user);
       setToken(token);
       localStorage.setItem("token", token);
       localStorage.setItem("user", JSON.stringify(user));
       console.log(response);
-      navigate("/");
+      if (user.role === "learner") {
+        navigate("/dashboard"); // Learner sees guardian's dashboard
+      } else if (user.role === "tutor") {
+        navigate("/dashboard"); // Tutor sees tutor dashboard
+      } else {
+        navigate("/"); // Redirect to home if role is unknown
+      }
     } catch (err) {
       if (err.response?.data?.message) {
         console.error(err.response); 

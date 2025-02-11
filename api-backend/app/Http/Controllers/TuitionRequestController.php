@@ -26,6 +26,7 @@ class TuitionRequestController extends Controller
             'asked_salary' => 'required|numeric',
             'curriculum' => 'required|string',
             'days' => 'required|string',
+            'location'=>'required|string',
         ]);
 
         $tuitionRequest = TuitionRequest::create([
@@ -35,6 +36,7 @@ class TuitionRequestController extends Controller
             'asked_salary' => $request->asked_salary,
             'curriculum' => $request->curriculum,
             'days' => $request->days,
+            'location'=>$request->location,
         ]);
 
         return response()->json([
