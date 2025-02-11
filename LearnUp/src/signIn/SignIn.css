@@ -195,4 +195,9 @@
 .signup-link{
     color: #460956;
     font-weight: bold;
+    margin-left: .3rem;
+}
+
+.signup-link:hover{
+  cursor:pointer;
 }

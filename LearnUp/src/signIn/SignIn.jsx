@@ -28,6 +28,10 @@ const SignIn = () => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  const handleSignUp = () => {
+    navigate('/signup');
+}
+
   // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -76,7 +80,7 @@ const SignIn = () => {
                 className={`user-btn ${selectedUser === "parent" ? "active" : ""}`}
                 onClick={() => setSelectedUser("parent")}
               >
-                Parent or Student
+                Learner
               </button>
               <button
                 className={`user-btn ${selectedUser === "tutor" ? "active" : ""}`}
@@ -121,11 +125,11 @@ const SignIn = () => {
 
               <button className="login-button" type="submit">Sign In</button>
             </form>
-
+            <br></br>
             <div className="or-divider"><span>Or</span></div>
 
             <div className="signup-option">
-              Don't have an account? <a href="/signup" className="signup-link" onClick={() => navigate("/signup")}>Sign Up</a>
+              Don't have an account? <a className="signup-link" onClick={handleSignUp}> Sign Up</a>
             </div>
           </div>
         </div>
