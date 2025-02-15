@@ -1,0 +1,131 @@
+/* General styles for the entire page */
+.about-us-container {
+  font-family: Arial, sans-serif;
+  max-width: 1200px;
+  padding: 20px;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: #f9f9f9; /* Light gray background for a clean look */
+  color: #333; /* Dark gray text for better readability */
+}
+
+h1, h2 {
+  color: #333; /* Neutral color for headings */
+}
+
+h1 {
+  text-align: center;
+  font-size: 2.5rem;
+}
+
+h2 {
+  font-size: 2rem;
+  margin-top: 20px;
+}
+
+.intro, .motivation, .goals {
+  background-color: white;
+  border-radius: 8px;
+  padding: 20px;
+  margin: 20px 0;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.intro p, .motivation p {
+  line-height: 1.6;
+  color: #555; /* Slightly lighter text color for better readability */
+}
+
+.goals ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.goals li {
+  padding: 12px;
+  background-color: #ecf0f1; /* Soft background for list items */
+  border-radius: 5px;
+  margin-bottom: 10px;
+}
+
+.goals li:hover {
+  background-color: #dfe6e9; /* Subtle hover effect */
+}
+
+/* Footer Styles */
+.learnup-footer {
+  background-color: #ffffff; /* Change the background to white */
+  color: #333;
+  padding: 40px 0;
+  border-top: 1px solid #ddd; /* A subtle border for separation */
+}
+
+.learnup-footer-content {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.learnup-footer-info,
+.learnup-footer-links,
+.learnup-footer-company-info {
+  flex: 1;
+  margin: 10px;
+  min-width: 250px;
+}
+.learnup-footer-info h3 {
+  font-size: 1.3rem;
+  margin-bottom: 10px;
+  color: #333;
+  text-align: center;
+}
+
+.learnup-footer-links h4,
+.learnup-footer-company-info h4 {
+  font-size: 1.3rem;
+  margin-bottom: 10px;
+  color: #333; /* Dark color for footer headings */
+}
+
+.learnup-footer-info p,
+.learnup-footer-links a,
+.learnup-footer-company-info p {
+  font-size: 1rem;
+  color: #555; /* Slightly lighter text color for readability */
+  text-decoration: none; /* Remove underline from links */
+}
+
+.learnup-footer-links ul,
+.learnup-footer-company-info ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+.learnup-footer-links li,
+.learnup-footer-company-info li {
+  margin-bottom: 10px;
+}
+
+.learnup-footer-links a,
+.learnup-footer-company-info a {
+  color: #2980b9; /* Use a professional blue color for links */
+}
+
+.learnup-footer-links a:hover,
+.learnup-footer-company-info a:hover {
+  color: #f39c12; /* Gold accent for hover effect */
+}
+
+/* Bottom Copyright Section */
+.learnup-footer-bottom {
+  text-align: center;
+  background-color: #ecf0f1; /* Light gray background for the bottom */
+  padding: 20px;
+}
+
+.learnup-footer-bottom p {
+  font-size: 1rem;
+  color: #555;
+}

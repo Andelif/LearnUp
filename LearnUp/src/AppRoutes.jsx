@@ -5,12 +5,15 @@ import SignIn from './signIn/SignIn';
 import SignUp from './SignUp/SignUp';
 import Dashboard from './Dashboard/Dashboard';
 import PrivacyPolicy from "./PrivacyPolicy/PrivacyPolicy";
-
 import FindTutors from "./FindTutors/FindTutors";
 import FAQ from './FAQ/FAQ';
 import TermsAndConditions from './TermsAndConditions/TermsAndConditions';
+
 import JobBoard from './JobBoard/JobBoard';
 import JobDetails from './JobDetails/JobDetails';
+
+import AboutUs from './AboutUs/AboutUs';
+
 
 
 const AppRoutes = () => {
@@ -21,7 +24,7 @@ const AppRoutes = () => {
     <Route path="/signup" element={<SignUp />} />
     <Route path="/dashboard" element={<Dashboard />} />
     <Route path="/privacy-policy" element={<PrivacyPolicy />} />
-
+    <Route path="/AboutUs" element={<AboutUs />} />
     <Route path="/find-tutors" element={<FindTutors/>} /> 
     <Route path="/FAQ" element={<FAQ />} />
     <Route path="/TermsAndConditions" element={<TermsAndConditions />} />
