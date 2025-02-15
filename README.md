@@ -12,7 +12,7 @@ Connect Tutors and Guardians Seamlessly with LearnUp.
 
 ## Project Overview
 
-**TutorConnect** is a platform where guardians can search for suitable tutors for their children, and tutors can find tuition opportunities that match their preferences. With intuitive features and a clean interface, our platform streamlines the process of connecting tutors and guardians, ensuring a better learning experience for students.
+**LearnUp** is a platform where guardians can search for suitable tutors for their children, and tutors can find tuition opportunities that match their preferences. With intuitive features and a clean interface, our platform streamlines the process of connecting tutors and guardians, ensuring a better learning experience for students.
 
 ## Title
 
@@ -20,7 +20,7 @@ Connect Tutors and Guardians Seamlessly with LearnUp.
 
 ## Short Description
 
-TutorConnect is a tutor-searching and tuition-finding platform that allows:
+LearnUp is a tutor-searching and tuition-finding platform that allows:
 
 - **Guardians** to find the most suitable tutors for their children based on subject, grade, and location.
 * **Tutors** to discover tuitions that match their preferences, availability, and expertise.
@@ -46,7 +46,7 @@ The platform offers a clean and user-friendly experience, empowering users to ea
 
 ## Target Audience  
 
-TutorConnect is designed for:  
+LearnUp is designed for:  
 - **Guardians**: Parents or guardians seeking qualified tutors for their children.  
 - **Tutors**: Individuals or professionals looking for tutoring opportunities that align with their skills.  
 - **Students**: Those looking to improve academic performance with personalized support.  
