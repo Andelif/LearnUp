@@ -2,6 +2,7 @@ import "./Dashboard.css";
 import { useContext, useState,useEffect } from "react";
 import { FaEnvelope, FaCalendarAlt, FaFileInvoice } from "react-icons/fa";
 import { storeContext } from "../context/contextProvider";
+import { Link } from "react-router-dom";
 
 const Dashboard = () => {
   const [userType, setUserType] = useState("tutor");
@@ -26,6 +27,9 @@ const Dashboard = () => {
           <h3>{user?.name}</h3>
           <p>{user?.email}</p>
           
+        </div>
+        <div>
+          <Link to="/jobBoard">Job Board</Link>
         </div>
       </aside>
 

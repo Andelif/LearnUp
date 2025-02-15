@@ -9,6 +9,8 @@ import PrivacyPolicy from "./PrivacyPolicy/PrivacyPolicy";
 import FindTutors from "./FindTutors/FindTutors";
 import FAQ from './FAQ/FAQ';
 import TermsAndConditions from './TermsAndConditions/TermsAndConditions';
+import JobBoard from './JobBoard/JobBoard';
+import JobDetails from './JobDetails/JobDetails';
 
 
 const AppRoutes = () => {
@@ -23,7 +25,9 @@ const AppRoutes = () => {
     <Route path="/find-tutors" element={<FindTutors/>} /> 
     <Route path="/FAQ" element={<FAQ />} />
     <Route path="/TermsAndConditions" element={<TermsAndConditions />} />
-     <Route path="/find-tutors" element={<FindTutors/>} /> 
+    <Route path="/jobBoard" element={<JobBoard/>} /> 
+    <Route path="/jobs/:id" element={<JobDetails/>} /> 
+
 
     
    </Routes>

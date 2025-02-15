@@ -17,7 +17,7 @@ class TuitionRequestController extends Controller
     {
         $user = Auth::user();
         if (!$user || $user->role !== 'learner') {
-            return response()->json(['message' => 'Unauthorized: Only learners can create tuition requests'], 403);
+            return response()->json(['message' => 'Unauthorized! Please login to continue'], 403);
         }
 
         $request->validate([

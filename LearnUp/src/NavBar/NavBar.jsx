@@ -24,9 +24,9 @@ const NavBar = () => {
       <nav className="nav-links">
         <Link to="/">Home</Link>
         {user?.role === "learner" && <Link to="/find-tutors">Find Tutors</Link>}
-        <Link>About Us</Link>
+        <Link to="/jobBoard">JobBoard</Link>
         <Link>Contact</Link>
-        <Link to="/dashboard">Dashboard</Link>
+        {(user?.role === "learner" || user?.role==="tutor") && <Link to="/dashboard">Dashboard</Link>}
       </nav>
 
       {user ? (
