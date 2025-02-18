@@ -17,7 +17,7 @@ html, body, #root {
 /* Push footer to the bottom */
 .main-content {
   flex: 1;
-  padding: 20px;
+ 
 }
 
 /* Footer should always stay at bottom */

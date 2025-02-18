@@ -13,17 +13,19 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('applications', function (Blueprint $table) {
-            $table->id('ApplicationID');
-            $table->unsignedBigInteger('tution_id'); // Foreign key to tuition_requests table
-            $table->unsignedBigInteger('learner_id'); // Foreign key to learners table
-            $table->unsignedBigInteger('tutor_id'); // Foreign key to tutors table
-            $table->timestamps();
-    
-            $table->foreign('tution_id')->references('TutionID')->on('tuition_requests')->onDelete('cascade');
-            $table->foreign('learner_id')->references('LearnerID')->on('learners')->onDelete('cascade');
-            $table->foreign('tutor_id')->references('TutorID')->on('tutors')->onDelete('cascade');
-        });
+        DB::statement("
+        CREATE TABLE applications (
+            ApplicationID BIGINT AUTO_INCREMENT PRIMARY KEY,
+            tution_id BIGINT NOT NULL, -- Foreign key to tuition_requests table
+            learner_id BIGINT NOT NULL, -- Foreign key to learners table
+            tutor_id BIGINT NOT NULL, -- Foreign key to tutors table
+            created_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            FOREIGN KEY (tution_id) REFERENCES tuition_requests(TutionID) ON DELETE CASCADE,
+            FOREIGN KEY (learner_id) REFERENCES learners(LearnerID) ON DELETE CASCADE,
+            FOREIGN KEY (tutor_id) REFERENCES tutors(TutorID) ON DELETE CASCADE
+        ) ENGINE=InnoDB;
+    ");
     }
 
     /**

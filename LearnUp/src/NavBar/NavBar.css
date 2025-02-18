@@ -6,12 +6,14 @@
     background: linear-gradient(135deg, #9e7dc2, #a731c5);
     color: #fff;
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+   
   }
   
   .logo {
     font-size: 26px;
     font-weight: bold;
     color: #fff;
+    
   }
   
   .nav-links a {

@@ -66,11 +66,12 @@
 /* Sidebar */
 .sidebar {
   width: 280px;
-  background-color: #0d6efd;
+  background-color: #273a59;
   color: white;
   padding: 20px;
   display: flex;
   flex-direction: column;
+ 
 }
 
 .sidebar h2 {
@@ -81,6 +82,11 @@
 .sidebar p {
   font-size: 14px;
   line-height: 1.5;
+}
+.sidebar Link {
+  font-size: 14px;
+  line-height: 1.5;
+  color: #8c9db7;
 }
 
 /* Job Board */

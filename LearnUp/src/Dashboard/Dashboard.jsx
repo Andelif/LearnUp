@@ -29,7 +29,7 @@ const Dashboard = () => {
           
         </div>
         <div>
-          <Link to="/jobBoard">Job Board</Link>
+          <Link to="/jobBoard" className="sidebar-link">Job Board</Link>
         </div>
       </aside>
 

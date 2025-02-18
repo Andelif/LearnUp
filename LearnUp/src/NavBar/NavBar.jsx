@@ -8,6 +8,9 @@ const NavBar = () => {
   const { user, setUser, setToken } = useContext(storeContext);
   const [showDropdown, setShowDropdown] = useState(false);
   const navigate = useNavigate();
+  const handleClick=()=>{
+    navigate("/");
+  }
 
   const handleLogout = () => {
     setUser(null);
@@ -20,12 +23,12 @@ const NavBar = () => {
 
   return (
     <header className="header">
-      <h1 className="logo">LearnUp</h1>
+      <h1 className="logo" onClick={handleClick}>LearnUp</h1>
       <nav className="nav-links">
         <Link to="/">Home</Link>
         {user?.role === "learner" && <Link to="/find-tutors">Find Tutors</Link>}
         <Link to="/jobBoard">JobBoard</Link>
-        <Link>Contact</Link>
+        
         {(user?.role === "learner" || user?.role==="tutor") && <Link to="/dashboard">Dashboard</Link>}
       </nav>
 

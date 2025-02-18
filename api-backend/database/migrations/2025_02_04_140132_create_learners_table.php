@@ -2,7 +2,7 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB;
 
 return new class extends Migration
 {
@@ -13,19 +13,19 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('learners', function (Blueprint $table) {
-            $table->id('LearnerID'); 
-            $table->unsignedBigInteger('user_id'); // Foreign key to users table
-            $table->string('full_name'); 
-            $table->string('guardian_full_name')->nullable(); 
-            $table->string('contact_number')->nullable(); 
-            $table->string('guardian_contact_number')->nullable(); 
-            $table->enum('gender', ['Male', 'Female', 'Other'])->nullable(); 
-            $table->text('address')->nullable(); 
-            $table->timestamps();
-    
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
-        });
+        DB::statement("CREATE TABLE learners (
+            LearnerID BIGINT AUTO_INCREMENT PRIMARY KEY,
+            user_id BIGINT unsigned NOT NULL,
+            full_name VARCHAR(255),
+            guardian_full_name VARCHAR(255) NULL,
+            contact_number VARCHAR(255) NULL,
+            guardian_contact_number VARCHAR(255) not NULL,
+            gender ENUM('Male', 'Female', 'Other') not NULL,
+            address TEXT not NULL,
+            created_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+        )");
     }
 
     /**
@@ -35,6 +35,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('learners');
+        DB::statement("DROP TABLE IF EXISTS learners");
     }
 };
