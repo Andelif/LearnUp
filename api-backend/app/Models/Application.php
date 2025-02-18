@@ -2,31 +2,34 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Model;
 
 class Application extends Model
 {
-    use HasFactory;
-
     protected $primaryKey = 'ApplicationID';
+    public $incrementing = true;
 
-    protected $fillable = [
-        'tution_id', 'learner_id', 'tutor_id'
-    ];
-
-    public function tuitionRequest()
+    // Create a new application
+    public static function createApplication($data)
     {
-        return $this->belongsTo(TuitionRequest::class, 'tution_id');
+        DB::insert("INSERT INTO applications (tuition_id, learner_id, tutor_id) VALUES (?, ?, ?)", [
+            $data['tuition_id'],
+            $data['learner_id'],
+            $data['tutor_id']
+        ]);
+        return DB::getPdo()->lastInsertId();
     }
 
-    public function learner()
+    // Fetch application by ID
+    public static function findById($application_id)
     {
-        return $this->belongsTo(Learner::class, 'learner_id');
+        return DB::select("SELECT * FROM applications WHERE ApplicationID = ?", [$application_id])[0] ?? null;
     }
 
-    public function tutor()
+    // Get all applications for a tutor
+    public static function getApplicationsByTutor($tutor_id)
     {
-        return $this->belongsTo(Tutor::class, 'tutor_id');
+        return DB::select("SELECT * FROM applications WHERE tutor_id = ?", [$tutor_id]);
     }
 }

@@ -3,9 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Learner;
-use App\Models\User;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class LearnerController extends Controller
 {
@@ -16,70 +15,72 @@ class LearnerController extends Controller
             return response()->json(['message' => 'Unauthorized: You are not a learner'], 403);
         }
         
-        return response()->json(Learner::all());
+        $learners = DB::select("SELECT * FROM learners");
+        return response()->json($learners);
     }
 
     public function store(Request $request)
     {
         $user = Auth::user();
         if (!$user || $user->role !== 'learner') {
-            return response()->json(['message' => 'Unauthorized: You are not a learner'], 403);
+            return response()->json(['message' => 'Unauthorized'], 403);
         }
         
-        $request->validate([
-            'full_name' => 'required|string|max:255',
-            'guardian_full_name' => 'nullable|string|max:255',
-            'contact_number' => 'nullable|string|max:15',
-            'gender' => 'nullable|string|in:Male,Female,Other',
-            'address' => 'nullable|string|max:255',
+        DB::insert("REPLACE INTO learners (user_id, full_name, guardian_full_name, contact_number, gender, address) VALUES (?, ?, ?, ?, ?, ?)", [
+            $user->id,
+            $request->full_name,
+            $request->guardian_full_name,
+            $request->contact_number,
+            $request->gender,
+            $request->address
         ]);
 
-        $learner = Learner::updateOrCreate(
-            ['user_id' => $user->id],
-            $request->all()
-        );
-
-        return response()->json([
-            'message' => 'Learner profile updated successfully',
-            'learner' => $learner
-        ], 201);
+        return response()->json(['message' => 'Learner profile updated successfully'], 201);
     }
 
     public function show($id)
     {
         $user = Auth::user();
-        $learner = Learner::findOrFail($id);
-
-        if (!$user || $user->id !== $learner->user_id) {
-            return response()->json(['message' => 'Unauthorized: You are not allowed to view this profile'], 403);
+        $learner = DB::select("SELECT * FROM learners WHERE id = ?", [$id]);
+        
+        if (!$learner || $user->id !== $learner[0]->user_id) {
+            return response()->json(['message' => 'Unauthorized'], 403);
         }
-
-        return response()->json($learner);
+        
+        return response()->json($learner[0]);
     }
 
     public function update(Request $request, $id)
     {
         $user = Auth::user();
-        $learner = Learner::findOrFail($id);
-
-        if (!$user || $user->id !== $learner->user_id) {
-            return response()->json(['message' => 'Unauthorized: You cannot update this profile'], 403);
+        $learner = DB::select("SELECT * FROM learners WHERE id = ?", [$id]);
+        
+        if (!$learner || $user->id !== $learner[0]->user_id) {
+            return response()->json(['message' => 'Unauthorized'], 403);
         }
+        
+        DB::update("UPDATE learners SET full_name = ?, guardian_full_name = ?, contact_number = ?, gender = ?, address = ? WHERE id = ?", [
+            $request->full_name,
+            $request->guardian_full_name,
+            $request->contact_number,
+            $request->gender,
+            $request->address,
+            $id
+        ]);
 
-        $learner->update($request->all());
-        return response()->json($learner);
+        return response()->json(['message' => 'Learner profile updated successfully']);
     }
 
     public function destroy($id)
     {
         $user = Auth::user();
-        $learner = Learner::findOrFail($id);
-
-        if (!$user || $user->id !== $learner->user_id) {
-            return response()->json(['message' => 'Unauthorized: You cannot delete this profile'], 403);
+        $learner = DB::select("SELECT * FROM learners WHERE id = ?", [$id]);
+        
+        if (!$learner || $user->id !== $learner[0]->user_id) {
+            return response()->json(['message' => 'Unauthorized'], 403);
         }
-
-        $learner->delete();
+        
+        DB::delete("DELETE FROM learners WHERE id = ?", [$id]);
         return response()->json(['message' => 'Learner profile deleted successfully']);
     }
 }

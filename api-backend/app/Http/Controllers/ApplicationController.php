@@ -3,14 +3,15 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Application;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 
 class ApplicationController extends Controller
 {
     public function index()
     {
-        return response()->json(Application::all());
+        $applications = DB::select("SELECT * FROM applications");
+        return response()->json($applications);
     }
 
     public function store(Request $request)
@@ -24,32 +25,12 @@ class ApplicationController extends Controller
             'tuition_id' => 'required|exists:tuition_requests,id',
         ]);
 
-        $application = Application::create([
-            'tuition_id' => $request->tuition_id,
-            'tutor_id' => $user->id, // Associate application with authenticated tutor
+        DB::insert("INSERT INTO applications (tuition_id, tutor_id) VALUES (?, ?)", [
+            $request->tuition_id,
+            $user->id
         ]);
 
-        return response()->json([
-            'message' => 'Application submitted successfully',
-            'application' => $application
-        ], 201);
-    }
-
-    public function show($id)
-    {
-        return response()->json(Application::findOrFail($id));
-    }
-
-    public function destroy($id)
-    {
-        $user = Auth::user();
-        $application = Application::findOrFail($id);
-
-        if (!$user || $user->id !== $application->tutor_id) {
-            return response()->json(['message' => 'Unauthorized: Only the tutor who applied can delete this application'], 403);
-        }
-
-        $application->delete();
-        return response()->json(['message' => 'Application deleted successfully']);
+        return response()->json(['message' => 'Application submitted successfully'], 201);
     }
 }
+

@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Admin;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 
 class AdminController extends Controller
@@ -14,7 +14,8 @@ class AdminController extends Controller
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 
-        return response()->json(Admin::all());
+        $admins = DB::select("SELECT * FROM admins");
+        return response()->json($admins);
     }
 
     public function store(Request $request)
@@ -30,38 +31,45 @@ class AdminController extends Controller
             'permission_req' => 'nullable|boolean',
         ]);
 
-        $admin = Admin::updateOrCreate(
-            ['user_id' => Auth::id()],
-            $request->all()
-        );
+        DB::insert("INSERT INTO admins (user_id, full_name, address, contact_number, permission_req) VALUES (?, ?, ?, ?, ?)", [
+            Auth::id(),
+            $request->full_name,
+            $request->address,
+            $request->contact_number,
+            $request->permission_req
+        ]);
 
-        return response()->json([
-            'message' => 'Admin profile updated successfully',
-            'admin' => $admin
-        ], 201);
+        return response()->json(['message' => 'Admin profile updated successfully'], 201);
     }
 
     public function show($id)
     {
-        $admin = Admin::findOrFail($id);
-
-        if (Auth::id() !== $admin->user_id && Auth::user()->role !== 'admin') {
+        $admin = DB::select("SELECT * FROM admins WHERE id = ?", [$id]);
+        
+        if (!$admin || (Auth::id() !== $admin[0]->user_id && Auth::user()->role !== 'admin')) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 
-        return response()->json($admin);
+        return response()->json($admin[0]);
     }
 
     public function update(Request $request, $id)
     {
-        $admin = Admin::findOrFail($id);
-
-        if (Auth::id() !== $admin->user_id) {
+        $admin = DB::select("SELECT * FROM admins WHERE id = ?", [$id]);
+        
+        if (!$admin || Auth::id() !== $admin[0]->user_id) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 
-        $admin->update($request->all());
-        return response()->json($admin);
+        DB::update("UPDATE admins SET full_name = ?, address = ?, contact_number = ?, permission_req = ? WHERE id = ?", [
+            $request->full_name,
+            $request->address,
+            $request->contact_number,
+            $request->permission_req,
+            $id
+        ]);
+
+        return response()->json(['message' => 'Admin updated successfully']);
     }
 
     public function destroy($id)
@@ -70,7 +78,7 @@ class AdminController extends Controller
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 
-        Admin::destroy($id);
+        DB::delete("DELETE FROM admins WHERE id = ?", [$id]);
         return response()->json(['message' => 'Admin deleted successfully']);
     }
 }

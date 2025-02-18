@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\Tutor;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class TutorController extends Controller
 {
@@ -14,7 +14,8 @@ class TutorController extends Controller
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 
-        return response()->json(Tutor::all());
+        $tutors = DB::select("SELECT * FROM tutors");
+        return response()->json($tutors);
     }
 
     public function store(Request $request)
@@ -22,61 +23,65 @@ class TutorController extends Controller
         if (Auth::user()->role !== 'tutor') {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
-
-        $request->validate([
-            'full_name' => 'required|string|max:255',
-            'address' => 'required|string|max:255',
-            'contact_number' => 'required|string|max:15',
-            'gender' => 'required|string|in:Male,Female,Other',
-            'preferred_salary' => 'nullable|numeric|min:0',
-            'qualification' => 'required|string|max:255',
-            'experience' => 'required|string|max:255',
-            'currently_studying_in' => 'required|string|max:255',
+        
+        DB::insert("REPLACE INTO tutors (user_id, full_name, address, contact_number, gender, preferred_salary, qualification, experience, currently_studying_in) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", [
+            Auth::id(),
+            $request->full_name,
+            $request->address,
+            $request->contact_number,
+            $request->gender,
+            $request->preferred_salary,
+            $request->qualification,
+            $request->experience,
+            $request->currently_studying_in
         ]);
 
-        $tutor = Tutor::updateOrCreate(
-            ['user_id' => Auth::id()],
-            $request->all()
-        );
-
-        return response()->json([
-            'message' => 'Tutor profile updated successfully',
-            'tutor' => $tutor
-        ], 201);
+        return response()->json(['message' => 'Tutor profile updated successfully'], 201);
     }
 
     public function show($id)
     {
-        $tutor = Tutor::findOrFail($id);
+        $tutor = DB::select("SELECT * FROM tutors WHERE id = ?", [$id]);
 
-        if (Auth::id() !== $tutor->user_id && Auth::user()->role !== 'admin') {
+        if (!$tutor || (Auth::id() !== $tutor[0]->user_id && Auth::user()->role !== 'admin')) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 
-        return response()->json($tutor);
+        return response()->json($tutor[0]);
     }
 
     public function update(Request $request, $id)
     {
-        $tutor = Tutor::findOrFail($id);
+        $tutor = DB::select("SELECT * FROM tutors WHERE id = ?", [$id]);
 
-        if (Auth::id() !== $tutor->user_id) {
+        if (!$tutor || Auth::id() !== $tutor[0]->user_id) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 
-        $tutor->update($request->all());
-        return response()->json($tutor);
+        DB::update("UPDATE tutors SET full_name = ?, address = ?, contact_number = ?, gender = ?, preferred_salary = ?, qualification = ?, experience = ?, currently_studying_in = ? WHERE id = ?", [
+            $request->full_name,
+            $request->address,
+            $request->contact_number,
+            $request->gender,
+            $request->preferred_salary,
+            $request->qualification,
+            $request->experience,
+            $request->currently_studying_in,
+            $id
+        ]);
+
+        return response()->json(['message' => 'Tutor profile updated successfully']);
     }
 
     public function destroy($id)
     {
-        $tutor = Tutor::findOrFail($id);
+        $tutor = DB::select("SELECT * FROM tutors WHERE id = ?", [$id]);
 
-        if (Auth::id() !== $tutor->user_id && Auth::user()->role !== 'admin') {
+        if (!$tutor || (Auth::id() !== $tutor[0]->user_id && Auth::user()->role !== 'admin')) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 
-        $tutor->delete();
-        return response()->json(['message' => 'Tutor deleted successfully']);
+        DB::delete("DELETE FROM tutors WHERE id = ?", [$id]);
+        return response()->json(['message' => 'Tutor profile deleted successfully']);
     }
 }

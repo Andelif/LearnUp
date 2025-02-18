@@ -17,7 +17,7 @@ return new class extends Migration
             TutorID BIGINT AUTO_INCREMENT PRIMARY KEY,
             user_id BIGINT unsigned NOT NULL,
             full_name VARCHAR(255),
-            address VARCHAR(255) not NULL,
+            address VARCHAR(255)  NULL,
             contact_number VARCHAR(255) not NULL,
             gender ENUM('Male', 'Female', 'Other') not NULL,
             preferred_salary INT NULL,

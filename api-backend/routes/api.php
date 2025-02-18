@@ -21,13 +21,23 @@ Route::get('/tuition-requests/{id}', [TuitionRequestController::class, 'show']);
 Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/user', [UserController::class, 'getUser']);
     Route::post('/logout', [UserController::class, 'logout']);
+
     Route::resource('learners', LearnerController::class);
     Route::resource('tutors', TutorController::class);
     Route::resource('admins', AdminController::class);
+
     Route::post('/tuition-requests', [TuitionRequestController::class, 'store']); 
     Route::put('/tuition-requests/{id}', [TuitionRequestController::class, 'update']);
     Route::delete('/tuition-requests/{id}', [TuitionRequestController::class, 'destroy']);
+
+
     Route::resource('applications', ApplicationController::class);
-    Route::resource('messages', MessageController::class);
+    //Route::resource('messages', MessageController::class);
     Route::resource('notifications', NotificationController::class);
+
+    // Notification Routes
+    // Route::get('/notifications', [NotificationController::class, 'index']);  
+    // Route::post('/notifications', [NotificationController::class, 'store']); 
+    // Route::put('/notifications/{id}/read', [NotificationController::class, 'markAsRead']); 
+    // Route::delete('/notifications/{id}', [NotificationController::class, 'destroy']); 
 });

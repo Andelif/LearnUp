@@ -3,121 +3,125 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\User;
-use App\Models\Learner;
-use App\Models\Tutor;
-use App\Models\Admin;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 use Laravel\Sanctum\HasApiTokens;
+use App\Models\User; 
 
 class UserController extends Controller
 {
     use HasApiTokens;
 
-    // Register a new user
-    public function register(Request $request)
-    {
-        // Validate input
-        $validator = Validator::make($request->all(), [
-            'name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users',
-            'password' => 'required|min:6',
-            'role' => 'required|string|in:learner,tutor,admin'
-        ]);
+    
 
-        if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 400);
-        }
+public function register(Request $request)
+{
+    // Validate input
+    $validator = Validator::make($request->all(), [
+        'name' => 'required|string|max:255',
+        'email' => 'required|email|unique:users',
+        'password' => 'required|min:6',
+        'role' => 'required|string|in:learner,tutor,admin'
+    ]);
 
-        if (User::where('email', $request->email)->exists()) {
-            return response()->json(['message' => 'A user with this email already exists'], 400);
-        }
-
-        
-        $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
-            'role' => $request->role,
-        ]);
-
-        
-        if ($user->role === 'learner') {
-            Learner::create([
-                'user_id' => $user->id, // Foreign key
-                'full_name' => $request->name, 
-                
-            ]);
-        }elseif ($user->role === 'tutor') {
-            Tutor::create([
-                'user_id' => $user->id, // Foreign key
-                'full_name' => $request->name, 
-                
-            ]);
-        }elseif ($user->role === 'admin') {
-            Admin::create([
-                'user_id' => $user->id, // Foreign key
-                'full_name' => $request->name,
-                
-            ]);
-        }
-
-
-        // Generate API Token
-        $token = $user->createToken('auth_token')->plainTextToken;
-
-        return response()->json([
-            'message' => 'User registered successfully',
-            'user' => $user->only(['id', 'name', 'email', 'role']),
-            'token' => $token
-        ], 201);
+    if ($validator->fails()) {
+        return response()->json(['errors' => $validator->errors()], 400);
     }
+
+    // Check if email already exists
+    $existingUser = DB::select("SELECT * FROM users WHERE email = ?", [$request->email]);
+    if (!empty($existingUser)) {
+        return response()->json(['message' => 'A user with this email already exists'], 400);
+    }
+
+    // Insert user into database
+    DB::insert("INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)", [
+        $request->name, 
+        $request->email, 
+        Hash::make($request->password), 
+        $request->role
+    ]);
+
+    // Get the newly created user
+    $user = DB::select("SELECT * FROM users WHERE email = ?", [$request->email])[0];
+
+    // Insert into role-specific tables
+    if ($request->role === 'learner') {
+        DB::insert("INSERT INTO learners (user_id, full_name) VALUES (?, ?)", [$user->id, $request->name]);
+    } elseif ($request->role === 'tutor') {
+        DB::insert("INSERT INTO tutors (user_id, full_name) VALUES (?, ?)", [$user->id, $request->name]);
+    } elseif ($request->role === 'admin') {
+        DB::insert("INSERT INTO admins (user_id, full_name) VALUES (?, ?)", [$user->id, $request->name]);
+    }
+
+    // Now use Eloquent for token creation
+    $userModel = User::find($user->id); // Load the user with Eloquent
+    $token = $userModel->createToken('auth_token')->plainTextToken;
+
+    return response()->json([
+        'message' => 'User registered successfully',
+        'user' => [
+            'id' => $user->id,
+            'name' => $user->name,
+            'email' => $user->email,
+            'role' => $user->role,
+        ],
+        'token' => $token
+    ], 201);
+}
+
 
     // Login user
     public function login(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-            'email' => 'required|email',
-            'password' => 'required'
-        ]);
+{
+    $validator = Validator::make($request->all(), [
+        'email' => 'required|email',
+        'password' => 'required'
+    ]);
 
-        if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 400);
-        }
+    if ($validator->fails()) {
+        return response()->json(['errors' => $validator->errors()], 400);
+    }
 
-        $user = User::where('email', $request->email)->first();
-
-        if (!$user || !Hash::check($request->password, $user->password)) {
-            throw ValidationException::withMessages([
-                'email' => ['The provided credentials are incorrect.']
-            ]);
-        }
-
-        // Generate API Token
-        $token = $user->createToken('auth_token')->plainTextToken;
-
-        return response()->json([
-            'user' => $user,
-            'token' => $token,
-            'message' => 'Login successful'
+    $user = DB::select("SELECT * FROM users WHERE email = ?", [$request->email]);
+    if (empty($user) || !Hash::check($request->password, $user[0]->password)) {
+        throw ValidationException::withMessages([
+            'email' => ['The provided credentials are incorrect.']
         ]);
     }
 
+    $user = $user[0]; // Get the first result from the array of stdClass objects
+
+    // Use Eloquent to create the token
+    $userModel = User::find($user->id); // Load the user with Eloquent
+    $token = $userModel->createToken('auth_token')->plainTextToken;
+
+    return response()->json([
+        'user' => $user,
+        'token' => $token,
+        'message' => 'Login successful'
+    ]);
+}
+
+
     // Get authenticated user
     public function getUser(Request $request)
-{
-    return response()->json($request->user()->only(['id', 'name', 'email', 'role']));
-}
+    {
+        $user = $request->user();
+        return response()->json([
+            'id' => $user->id,
+            'name' => $user->name,
+            'email' => $user->email,
+            'role' => $user->role,
+        ]);
+    }
 
     // Logout user
     public function logout(Request $request)
     {
         $request->user()->tokens()->delete();
-
-        return response()->json([
-            'message' => 'Logged out successfully'
-        ]);
+        return response()->json(['message' => 'Logged out successfully']);
     }
 }

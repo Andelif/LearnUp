@@ -6,6 +6,7 @@ import NavBar from './NavBar/NavBar';
 import Footer from './Footer/Footer';
 import { ContextProvider } from './context/contextProvider';
 import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 const App = () => {
   return (
@@ -18,13 +19,15 @@ const App = () => {
           </div>
           <Footer />
         </div>
-        <ToastContainer className="toast-container"
-          position="top-center"
-          autoClose={2000} // Toast disappears in 2 seconds
-          hideProgressBar={true}
+        <ToastContainer
+          position="top-right" // More conventional position
+          autoClose={3000} // Toast disappears in 3 seconds
+          hideProgressBar={false}
           closeOnClick
-          pauseOnHover={false}
-          draggable={false}  />
+          pauseOnHover
+          draggable
+          theme="colored" // Try "light" or "dark" if needed
+        />
       </Router>
     </ContextProvider>
   );

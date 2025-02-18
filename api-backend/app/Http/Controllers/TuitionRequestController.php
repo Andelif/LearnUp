@@ -3,14 +3,15 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\TuitionRequest;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 
 class TuitionRequestController extends Controller
 {
     public function index()
     {
-        return response()->json(TuitionRequest::all());
+        $tuitionRequests = DB::select("SELECT * FROM tuition_requests");
+        return response()->json($tuitionRequests);
     }
 
     public function store(Request $request)
@@ -29,50 +30,16 @@ class TuitionRequestController extends Controller
             'location'=>'required|string',
         ]);
 
-        $tuitionRequest = TuitionRequest::create([
-            'learner_id' => $user->id,  // Associate request with authenticated learner
-            'class' => $request->class,
-            'subjects' => $request->subjects,
-            'asked_salary' => $request->asked_salary,
-            'curriculum' => $request->curriculum,
-            'days' => $request->days,
-            'location'=>$request->location,
+        DB::insert("INSERT INTO tuition_requests (learner_id, class, subjects, asked_salary, curriculum, days, location) VALUES (?, ?, ?, ?, ?, ?, ?)", [
+            $user->id,
+            $request->class,
+            $request->subjects,
+            $request->asked_salary,
+            $request->curriculum,
+            $request->days,
+            $request->location
         ]);
 
-        return response()->json([
-            'message' => 'Tuition request created successfully',
-            'tuition_request' => $tuitionRequest
-        ], 201);
-    }
-
-    public function show($id)
-    {
-        return response()->json(TuitionRequest::findOrFail($id));
-    }
-
-    public function update(Request $request, $id)
-    {
-        $user = Auth::user();
-        $tuitionRequest = TuitionRequest::findOrFail($id);
-
-        if (!$user || $user->id !== $tuitionRequest->learner_id) {
-            return response()->json(['message' => 'Unauthorized: Only the learner who created this request can update it'], 403);
-        }
-
-        $tuitionRequest->update($request->all());
-        return response()->json($tuitionRequest);
-    }
-
-    public function destroy($id)
-    {
-        $user = Auth::user();
-        $tuitionRequest = TuitionRequest::findOrFail($id);
-
-        if (!$user || $user->id !== $tuitionRequest->learner_id) {
-            return response()->json(['message' => 'Unauthorized: Only the learner who created this request can delete it'], 403);
-        }
-
-        $tuitionRequest->delete();
-        return response()->json(['message' => 'Tuition request deleted successfully']);
+        return response()->json(['message' => 'Tuition request created successfully'], 201);
     }
 }
