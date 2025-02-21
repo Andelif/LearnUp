@@ -84,7 +84,7 @@ const FindTutors = () => {
         <label>Location: <input type="text" name="location" value={formData.location} onChange={handleChange} required /></label>
         <label>Budget: <input type="text" name="asked_salary" value={formData.asked_salary} onChange={handleChange} required /></label>
         <label>Days: <input type="text" name="days" value={formData.days} onChange={handleChange} required /></label>
-        <label>Curriculum: <textarea name="curriculum" value={formData.curriculum} onChange={handleChange} required></textarea></label>
+        <label>Curriculum: <input type="text" name="curriculum" value={formData.curriculum} onChange={handleChange} required></input></label>
         <button type="submit">Submit</button>
       </form>
     </div>

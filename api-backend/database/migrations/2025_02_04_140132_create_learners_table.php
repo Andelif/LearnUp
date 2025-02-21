@@ -19,9 +19,9 @@ return new class extends Migration
             full_name VARCHAR(255),
             guardian_full_name VARCHAR(255) NULL,
             contact_number VARCHAR(255) NULL,
-            guardian_contact_number VARCHAR(255) not NULL,
-            gender ENUM('Male', 'Female', 'Other') not NULL,
-            address TEXT not NULL,
+            guardian_contact_number VARCHAR(255) NULL,
+            gender ENUM('Male', 'Female', 'Other') NULL,
+            address TEXT NULL,
             created_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
             updated_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
             FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE

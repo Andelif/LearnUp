@@ -14,6 +14,17 @@ class TuitionRequestController extends Controller
         return response()->json($tuitionRequests);
     }
 
+    public function show($id)
+    {
+        $tuitionRequest = DB::select("SELECT * FROM tuition_requests WHERE TutionID = ?", [$id]);
+
+        if (empty($tuitionRequest)) {
+            return response()->json(['message' => 'Tuition request not found'], 404);
+        }
+
+        return response()->json($tuitionRequest[0]);
+    }
+
     public function store(Request $request)
     {
         $user = Auth::user();
