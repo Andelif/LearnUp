@@ -21,7 +21,9 @@ class UserController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
             'password' => 'required|min:6',
-            'role' => 'required|string|in:learner,tutor,admin'
+            'role' => 'required|string|in:learner,tutor,admin',
+            'contact_number' => 'nullable|string|max:20',
+            'gender' => 'nullable|string|in:male,female,other'
         ]);
 
         if ($validator->fails()) {
@@ -42,16 +44,19 @@ class UserController extends Controller
 
             // Insert into role-specific tables
             if ($request->role === 'learner') {
-                DB::insert("INSERT INTO learners (user_id, full_name, contact_number, address) VALUES (?, ?, ?, ?)", [
+                DB::insert("INSERT INTO learners (user_id, full_name, contact_number, gender, address) VALUES (?, ?, ?, ?, ?)", [
                     $userId,
                     $request->name,
-                    null,  // Placeholder for contact number
+                    $request->contact_number ?? null, 
+                    $request->gender ?? null,  
                     null   // Placeholder for address
                 ]);
             } elseif ($request->role === 'tutor') {
-                DB::insert("INSERT INTO tutors (user_id, full_name, qualification, experience, preferred_salary, availability, address) VALUES (?, ?, ?, ?, ?, ?, ?)", [
+                DB::insert("INSERT INTO tutors (user_id, full_name, contact_number, gender, qualification, experience, preferred_salary, availability, address) VALUES (?, ?, ?, ?, ?, ?, ?)", [
                     $userId,
                     $request->name,
+                    $request->contact_number ?? null, 
+                    $request->gender ?? null,
                     null,  // Placeholder for qualifications
                     null,  // Placeholder for experience
                     null,  // Placeholder for preferred salary

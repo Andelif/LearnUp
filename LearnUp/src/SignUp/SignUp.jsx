@@ -8,7 +8,7 @@ import "./SignUp.css";
 const SignUp = () => {
   const [formData, setFormData] = useState({
     name: "",
-    phone: "",
+    contact_number: "",
     email: "",
     gender: "male",
     password: "",
@@ -103,10 +103,10 @@ const SignUp = () => {
               <label className="input-label">Phone</label>
               <input
                 type="text"
-                name="phone"
+                name="contact_number"
                 className="input-field"
                 placeholder="Enter your phone number"
-                value={formData.phone}
+                value={formData.contact_number}
                 onChange={handleChange}
                 required
               />
