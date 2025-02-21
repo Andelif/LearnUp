@@ -36,7 +36,7 @@ const LandingPage = () => {
       */}
       <div className="img-banner">
       <img  className="img-container" src="src/assets/banner.png" alt="" />
-      <p className="banner-p">Welcome to LearnUp,{user?.name || "Guest"}!</p> 
+      <p className="banner-p">Welcome to LearnUp, {user?.name || "Guest"}!</p> 
       </div>
       
       <section className="hero-section">

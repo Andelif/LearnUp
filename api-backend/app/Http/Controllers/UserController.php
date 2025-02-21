@@ -49,7 +49,7 @@ class UserController extends Controller
                     null   // Placeholder for address
                 ]);
             } elseif ($request->role === 'tutor') {
-                DB::insert("INSERT INTO tutors (user_id, full_name, qualifications, experience, preferred_salary, availability, address) VALUES (?, ?, ?, ?, ?, ?, ?)", [
+                DB::insert("INSERT INTO tutors (user_id, full_name, qualification, experience, preferred_salary, availability, address) VALUES (?, ?, ?, ?, ?, ?, ?)", [
                     $userId,
                     $request->name,
                     null,  // Placeholder for qualifications

@@ -36,6 +36,7 @@ const NavBar = () => {
         <div className="profile-container">
           <div className="profile-section" onClick={() => setShowDropdown(!showDropdown)}>
             <span className="profile-icon">👤</span>
+            <br></br>
             <span className="user-name">{user.name}</span> {/* ✅ Show username */}
           </div>
 

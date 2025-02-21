@@ -32,3 +32,10 @@
     cursor: pointer;
     font-weight: bold;
   }
+
+  .profile-container:hover{
+    cursor: pointer;
+  }
+  .dropdown-item:hover{
+    cursor: pointer;
+  }
