@@ -2,12 +2,14 @@ import React, { useContext, useState } from "react";
 import { Link } from "react-router-dom";
 import { storeContext } from "../context/contextProvider";
 import { useNavigate } from "react-router-dom";
+import { FaBell } from "react-icons/fa";
 import "./NavBar.css";
 
 const NavBar = () => {
   const { user, setUser, setToken } = useContext(storeContext);
   const [showDropdown, setShowDropdown] = useState(false);
   const navigate = useNavigate();
+
   const handleClick=()=>{
     navigate("/");
   }
@@ -32,8 +34,20 @@ const NavBar = () => {
         {(user?.role === "learner" || user?.role==="tutor") && <Link to="/dashboard">Dashboard</Link>}
       </nav>
 
+      
+
       {user ? (
+        
         <div className="profile-container">
+          <div className="notification-container">
+            {user && (
+              <Link to="/notification-center" className="notification-bell-icon">
+                <FaBell  />
+                {/* Optionally add a badge for unread notifications */}
+                {/* <span className="notification-badge">3</span> */}
+              </Link>
+            )}
+          </div>
           <div className="profile-section" onClick={() => setShowDropdown(!showDropdown)}>
             <span className="profile-icon">👤</span>
             <br></br>
