@@ -131,6 +131,25 @@ class UserController extends Controller
             'role' => $user->role,
         ]);
     }
+    
+    public function updateProfile(Request $request)
+    {
+        $user = Auth::user();
+
+        $validator = Validator::make($request->all(), [
+            'name' => 'required|string|max:255'
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 400);
+        }
+
+        // Update the user's name
+        DB::update("UPDATE users SET name = ? WHERE id = ?", [$request->name, $user->id]);
+
+        return response()->json(['message' => 'User profile updated successfully']);
+    }
+
 
     // Logout user
     public function logout(Request $request)

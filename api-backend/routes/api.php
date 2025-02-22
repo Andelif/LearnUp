@@ -21,10 +21,14 @@ Route::get('/tuition-requests/{id}', [TuitionRequestController::class, 'show']);
 Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/user', [UserController::class, 'getUser']);
     Route::post('/logout', [UserController::class, 'logout']);
+    Route::put('/user/update-profile', [UserController::class, 'updateProfile']);
 
     Route::resource('learners', LearnerController::class);
     Route::resource('tutors', TutorController::class);
     Route::resource('admins', AdminController::class);
+
+    Route::put('/tutors/{id}', [TutorController::class, 'update']);
+    Route::put('/learners/{id}', [LearnerController::class, 'update']);
 
     Route::post('/tuition-requests', [TuitionRequestController::class, 'store']); 
     Route::put('/tuition-requests/{id}', [TuitionRequestController::class, 'update']);

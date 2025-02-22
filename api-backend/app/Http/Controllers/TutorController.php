@@ -41,7 +41,7 @@ class TutorController extends Controller
 
     public function show($id)
     {
-        $tutor = DB::select("SELECT * FROM tutors WHERE id = ?", [$id]);
+        $tutor = DB::select("SELECT * FROM tutors WHERE user_id = ?", [$id]);
 
         if (!$tutor || (Auth::id() !== $tutor[0]->user_id && Auth::user()->role !== 'admin')) {
             return response()->json(['message' => 'Unauthorized'], 403);
@@ -52,13 +52,13 @@ class TutorController extends Controller
 
     public function update(Request $request, $id)
     {
-        $tutor = DB::select("SELECT * FROM tutors WHERE id = ?", [$id]);
+        $tutor = DB::select("SELECT * FROM tutors WHERE user_id = ?", [$id]);
 
         if (!$tutor || Auth::id() !== $tutor[0]->user_id) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 
-        DB::update("UPDATE tutors SET full_name = ?, address = ?, contact_number = ?, gender = ?, preferred_salary = ?, qualification = ?, experience = ?, currently_studying_in = ? WHERE id = ?", [
+        DB::update("UPDATE tutors SET full_name = ?, address = ?, contact_number = ?, gender = ?, preferred_salary = ?, qualification = ?, experience = ?, currently_studying_in = ?, preferred_location = ?, preferred_time = ? WHERE user_id = ?", [
             $request->full_name,
             $request->address,
             $request->contact_number,
@@ -67,6 +67,8 @@ class TutorController extends Controller
             $request->qualification,
             $request->experience,
             $request->currently_studying_in,
+            $request->preferred_location,
+            $request->preferred_time,
             $id
         ]);
 
@@ -75,7 +77,7 @@ class TutorController extends Controller
 
     public function destroy($id)
     {
-        $tutor = DB::select("SELECT * FROM tutors WHERE id = ?", [$id]);
+        $tutor = DB::select("SELECT * FROM tutors WHERE user_id = ?", [$id]);
 
         if (!$tutor || (Auth::id() !== $tutor[0]->user_id && Auth::user()->role !== 'admin')) {
             return response()->json(['message' => 'Unauthorized'], 403);

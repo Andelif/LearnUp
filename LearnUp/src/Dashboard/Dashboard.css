@@ -87,3 +87,7 @@
     position: absolute;
   }
   
+  .edit-icon:hover{
+    cursor: pointer;
+    
+  }

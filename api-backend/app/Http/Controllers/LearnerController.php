@@ -41,7 +41,7 @@ class LearnerController extends Controller
     public function show($id)
     {
         $user = Auth::user();
-        $learner = DB::select("SELECT * FROM learners WHERE id = ?", [$id]);
+        $learner = DB::select("SELECT * FROM learners WHERE user_id = ?", [$id]);
         
         if (!$learner || $user->id !== $learner[0]->user_id) {
             return response()->json(['message' => 'Unauthorized'], 403);
@@ -53,13 +53,13 @@ class LearnerController extends Controller
     public function update(Request $request, $id)
     {
         $user = Auth::user();
-        $learner = DB::select("SELECT * FROM learners WHERE id = ?", [$id]);
+        $learner = DB::select("SELECT * FROM learners WHERE user_id = ?", [$id]);
         
         if (!$learner || $user->id !== $learner[0]->user_id) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
         
-        DB::update("UPDATE learners SET full_name = ?, guardian_full_name = ?, contact_number = ?, gender = ?, address = ? WHERE id = ?", [
+        DB::update("UPDATE learners SET full_name = ?, guardian_full_name = ?, contact_number = ?, gender = ?, address = ? WHERE user_id = ?", [
             $request->full_name,
             $request->guardian_full_name,
             $request->contact_number,
@@ -74,7 +74,7 @@ class LearnerController extends Controller
     public function destroy($id)
     {
         $user = Auth::user();
-        $learner = DB::select("SELECT * FROM learners WHERE id = ?", [$id]);
+        $learner = DB::select("SELECT * FROM learners WHERE user_id = ?", [$id]);
         
         if (!$learner || $user->id !== $learner[0]->user_id) {
             return response()->json(['message' => 'Unauthorized'], 403);
