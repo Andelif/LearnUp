@@ -40,9 +40,10 @@ class TuitionRequestController extends Controller
             'days' => 'required|string',
             'location'=>'required|string',
         ]);
-
+        $learner = DB::select("SELECT LearnerID FROM learners WHERE user_id = ?", [$user->id]);
+        $learner_id = $learner[0]->LearnerID;
         DB::insert("INSERT INTO tuition_requests (LearnerID, class, subjects, asked_salary, curriculum, days, location) VALUES (?, ?, ?, ?, ?, ?, ?)", [
-            $user->id,
+            $learner_id,
             $request->class,
             $request->subjects,
             $request->asked_salary,

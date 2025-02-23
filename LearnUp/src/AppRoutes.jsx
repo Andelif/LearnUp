@@ -14,6 +14,7 @@ import JobDetails from './JobDetails/JobDetails';
 
 import AboutUs from './AboutUs/AboutUs';
 import Notification from './Notification/Notification';
+import AdminRoutes from './AdminRoutes';
 
 
 
@@ -32,7 +33,8 @@ const AppRoutes = () => {
     <Route path="/jobBoard" element={<JobBoard/>} /> 
     <Route path="/jobs/:id" element={<JobDetails/>} /> 
     <Route path="/notification-center" element={<Notification/>} /> 
-
+    
+    <Route path="/admin/*" element={<AdminRoutes />} />
     
    </Routes>
   )

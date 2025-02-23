@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext } from "react";
 import { storeContext } from "../context/contextProvider";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
-import { useNavigate } from "react-router-dom";
+import { redirect, useNavigate } from "react-router-dom";
 import axios from "axios";
 import "./SignIn.css";
 
@@ -13,7 +13,7 @@ const SignIn = () => {
   const [passwordVisible, setPasswordVisible] = useState(false);
   
   const { setUser, setToken } = useContext(storeContext);
-  const [selectedUser, setSelectedUser] = useState("learner"); // Default to learner
+  const [selectedUser, setSelectedUser] = useState(""); // Default is empty (admin if not selected)
   const [error, setError] = useState("");
   const navigate = useNavigate();
   
@@ -37,39 +37,40 @@ const SignIn = () => {
     e.preventDefault();
     setError("");
 
+    // Determine role: If no selection, assume "admin"
+    const role = selectedUser || "admin";
+  
     try {
-      // Include selected role in request
       const response = await axios.post(`${apiBaseUrl}/api/login`, {
         ...formData,
-        role: selectedUser, // Send selected role
+        role, // Send selected role (or default to "admin")
       }, {
         headers: {
           "Content-Type": "application/json",
         },
       });
-
-      const { token, user } = response.data;
-      
+  
+      const { token, user,redirect } = response.data;
+  
       if (!token) {
         setError("Authentication failed! No token received.");
         return;
       }
 
       // Validate user role before setting session
-      if (user.role !== selectedUser) {
+      if (user.role !== role) {
         setError(`You are registered as a ${user.role}. Please log in with the correct role.`);
         return;
       }
-
+  
       setUser(user);
       setToken(token);
-
+  
       localStorage.setItem("token", token);
       localStorage.setItem("user", JSON.stringify(user));
-
-      // Redirect user based on role
-      navigate("/dashboard");
-      
+      console.log(redirect);
+      navigate(redirect);
+  
     } catch (err) {
       if (err.response?.data?.message) {
         setError(err.response.data.message);
@@ -93,7 +94,7 @@ const SignIn = () => {
             <h2><span>Welcome</span> Back</h2>
             <p>Sign in to continue your journey.</p>
 
-            {/* User Selection */}
+            {/* User Selection (Optional) */}
             <div className="user-selection">
               <button
                 className={`user-btn ${selectedUser === "learner" ? "active" : ""}`}

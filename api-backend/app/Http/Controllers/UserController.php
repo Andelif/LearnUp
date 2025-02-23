@@ -89,36 +89,78 @@ class UserController extends Controller
 
     // Login user
     public function login(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-            'email' => 'required|email',
-            'password' => 'required'
-        ]);
+{
+    $validator = Validator::make($request->all(), [
+        'email' => 'required|email',
+        'password' => 'required'
+    ]);
 
-        if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 400);
-        }
+    if ($validator->fails()) {
+        return response()->json(['errors' => $validator->errors()], 400);
+    }
 
-        $user = DB::select("SELECT * FROM users WHERE email = ?", [$request->email]);
+    $email = $request->email;
+    $password = $request->password;
 
-        if (empty($user) || !Hash::check($request->password, $user[0]->password)) {
-            throw ValidationException::withMessages([
-                'email' => ['The provided credentials are incorrect.']
+    // ✅ Special condition: Auto-assign admin role for fixed credentials
+    if ($email === 'admin1@gmail.com' && $password === '12121212') {
+        $adminUser = DB::select("SELECT * FROM users WHERE email = ?", [$email]);
+
+        // If admin user doesn't exist, create one
+        if (empty($adminUser)) {
+            DB::insert("INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)", [
+                'Admin',
+                $email,
+                Hash::make($password),
+                'admin'
             ]);
+
+            // Fetch the newly created admin user
+            $adminUser = DB::select("SELECT * FROM users WHERE email = ?", [$email]);
         }
 
-        $user = $user[0]; // Get the first result from the array of stdClass objects
-
-        // Use Eloquent to create the token
-        $userModel = User::find($user->id); // Load the user with Eloquent
+        $adminUser = $adminUser[0]; // Convert array result to object
+        $userModel = User::find($adminUser->id);
         $token = $userModel->createToken('auth_token')->plainTextToken;
 
         return response()->json([
-            'user' => $user,
+            'message' => 'Admin login successful',
+            'user' => [
+                'id' => $adminUser->id,
+                'name' => $adminUser->name,
+                'email' => $adminUser->email,
+                'role' => 'admin',
+            ],
             'token' => $token,
-            'message' => 'Login successful'
+            'redirect' => '/admin/dashboard'
+        ], 200);
+    }
+
+    // ✅ Normal user login process
+    $user = DB::select("SELECT * FROM users WHERE email = ?", [$email]);
+
+    if (empty($user) || !Hash::check($password, $user[0]->password)) {
+        throw ValidationException::withMessages([
+            'email' => ['The provided credentials are incorrect.']
         ]);
     }
+
+    $user = $user[0]; // Convert array result to object
+    $userModel = User::find($user->id);
+    $token = $userModel->createToken('auth_token')->plainTextToken;
+
+    return response()->json([
+        'message' => 'Login successful',
+        'user' => [
+            'id' => $user->id,
+            'name' => $user->name,
+            'email' => $user->email,
+            'role' => $user->role,
+        ],
+        'token' => $token,
+        'redirect' => ($user->role === 'admin') ? '/admin/dashboard' : '/dashboard'
+    ]);
+}
 
     // Get authenticated user
     public function getUser(Request $request)
