@@ -23,6 +23,10 @@ class AdminController extends Controller
         if (Auth::user()->role !== 'admin') {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
+        $exists = DB::select("SELECT * FROM admins WHERE user_id = ?", [Auth::id()]);
+         if ($exists) {
+           return response()->json(['message' => 'User is already an admin'], 400);
+        }
 
         $request->validate([
             'full_name' => 'required|string|max:255',
@@ -44,7 +48,7 @@ class AdminController extends Controller
 
     public function show($id)
     {
-        $admin = DB::select("SELECT * FROM admins WHERE id = ?", [$id]);
+        $admin = DB::select("SELECT * FROM admins WHERE AdminID = ?", [$id]);
         
         if (!$admin || (Auth::id() !== $admin[0]->user_id && Auth::user()->role !== 'admin')) {
             return response()->json(['message' => 'Unauthorized'], 403);
@@ -55,13 +59,13 @@ class AdminController extends Controller
 
     public function update(Request $request, $id)
     {
-        $admin = DB::select("SELECT * FROM admins WHERE id = ?", [$id]);
+        $admin = DB::select("SELECT * FROM admins WHERE AdminID = ?", [$id]);
         
         if (!$admin || Auth::id() !== $admin[0]->user_id) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 
-        DB::update("UPDATE admins SET full_name = ?, address = ?, contact_number = ?, permission_req = ? WHERE id = ?", [
+        DB::update("UPDATE admins SET full_name = ?, address = ?, contact_number = ?, permission_req = ? WHERE AdminID = ?", [
             $request->full_name,
             $request->address,
             $request->contact_number,
@@ -78,7 +82,7 @@ class AdminController extends Controller
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 
-        DB::delete("DELETE FROM admins WHERE id = ?", [$id]);
+        DB::delete("DELETE FROM admins WHERE AdminID = ?", [$id]);
         return response()->json(['message' => 'Admin deleted successfully']);
     }
 }

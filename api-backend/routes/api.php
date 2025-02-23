@@ -31,7 +31,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::delete('/tuition-requests/{id}', [TuitionRequestController::class, 'destroy']);
 
 
-    Route::resource('applications', ApplicationController::class);
+    Route::post('applications',  [ApplicationController::class, 'store']);
     //Route::resource('messages', MessageController::class);
     Route::resource('notifications', NotificationController::class);
 
