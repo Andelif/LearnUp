@@ -22,13 +22,13 @@ class NotificationController extends Controller
     public function markAsRead($id)
     {
         $user = Auth::user();
-        $notification = DB::select("SELECT * FROM notifications WHERE id = ? AND user_id = ?", [$id, $user->id]);
+        $notification = DB::select("SELECT * FROM notifications WHERE NotificationID = ? AND user_id = ?", [$id, $user->id]);
 
         if (!$notification) {
             return response()->json(['message' => 'Notification not found or unauthorized'], 404);
         }
 
-        DB::update("UPDATE notifications SET Status = 'Read' WHERE id = ?", [$id]);
+        DB::update("UPDATE notifications SET Status = 'Read' WHERE NotificationID = ?", [$id]);
         return response()->json(['message' => 'Notification marked as read']);
     }
 
