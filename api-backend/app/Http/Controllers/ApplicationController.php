@@ -22,12 +22,24 @@ class ApplicationController extends Controller
         }
 
         $request->validate([
-            'tuition_id' => 'required|exists:tuition_requests,id',
+            'tution_id' => 'required|exists:tuition_requests,TutionID',
         ]);
+        $learner = DB::select("SELECT learner_id FROM tuition_requests WHERE TutionID = ?", [$request->tution_id]);
+        if (empty($learner)) {
+            return response()->json(['message' => 'Learner not found for this tuition request'], 404);
+        }
+    
+        $learner_id = $learner[0]->learner_id;
+        $tutor=DB::select("Select TutorID from tutors where user_id= ?",[$user->id]);
 
-        DB::insert("INSERT INTO applications (tuition_id, tutor_id) VALUES (?, ?)", [
-            $request->tuition_id,
-            $user->id
+        $tutor_id=$tutor[0]->TutorID;
+    
+
+        DB::insert("INSERT INTO applications (tution_id,learner_id ,tutor_id) VALUES (?, ?,?)", [
+            
+            $request->tution_id,
+            $learner_id,
+            $tutor_id
         ]);
 
         return response()->json(['message' => 'Application submitted successfully'], 201);

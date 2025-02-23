@@ -11,7 +11,7 @@ const JobDetails = () => {
   const [job, setJob] = useState(null);
   const [loading, setLoading] = useState(true);
   const { url ,user} = useContext(storeContext);
-  const handleApply=()=>{
+  const handleApply=async ()=>{
     if (!user) {
         toast.error("Login to continue", { autoClose: 2000 }); // Show toast message
         return;
@@ -22,7 +22,25 @@ const JobDetails = () => {
         return;
       }
   
-      toast.success("Applying...", { autoClose: 2000 });
+      try {
+        const response = await axios.post(`${url}/api/applications`, {
+          tution_id: id, // Send the job ID as tuition_id
+          
+        }, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`, // Include token
+            "Content-Type": "application/json",
+          },
+        });
+    
+        toast.success(response.data.message, { autoClose: 2000 });
+      } catch (error) {
+        if (error.response) {
+          toast.error(error.response.data.message || "Failed to apply", { autoClose: 2000 });
+        } else {
+          toast.error("Network error. Please try again later.", { autoClose: 2000 });
+        }
+      }
   }
 
   useEffect(() => {

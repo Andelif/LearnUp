@@ -13,8 +13,8 @@ class Application extends Model
     // Create a new application
     public static function createApplication($data)
     {
-        DB::insert("INSERT INTO applications (tuition_id, learner_id, tutor_id) VALUES (?, ?, ?)", [
-            $data['tuition_id'],
+        DB::insert("INSERT INTO applications (tution_id, learner_id, tutor_id) VALUES (?, ?, ?)", [
+            $data['tution_id'],
             $data['learner_id'],
             $data['tutor_id']
         ]);
