@@ -13,6 +13,7 @@ import JobBoard from './JobBoard/JobBoard';
 import JobDetails from './JobDetails/JobDetails';
 
 import AboutUs from './AboutUs/AboutUs';
+import Notification from './Notification/Notification';
 
 
 
@@ -30,7 +31,7 @@ const AppRoutes = () => {
     <Route path="/TermsAndConditions" element={<TermsAndConditions />} />
     <Route path="/jobBoard" element={<JobBoard/>} /> 
     <Route path="/jobs/:id" element={<JobDetails/>} /> 
-
+    <Route path="/notification-center" element={<Notification/>} /> 
 
     
    </Routes>

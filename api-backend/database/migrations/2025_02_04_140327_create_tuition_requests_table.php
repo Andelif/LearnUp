@@ -15,7 +15,7 @@ return new class extends Migration
     {
         DB::statement("CREATE TABLE tuition_requests (
             TutionID BIGINT AUTO_INCREMENT PRIMARY KEY,
-            learner_id BIGINT NOT NULL,
+            LearnerID BIGINT NOT NULL,
             class VARCHAR(255) not null,
             subjects TEXT not null,
             asked_salary INT not null,
@@ -24,7 +24,7 @@ return new class extends Migration
             location VARCHAR(255),
             created_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
             updated_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-            FOREIGN KEY (learner_id) REFERENCES learners(LearnerID) ON DELETE CASCADE
+            FOREIGN KEY (LearnerID) REFERENCES learners(LearnerID) ON DELETE CASCADE
         )");
     }
 

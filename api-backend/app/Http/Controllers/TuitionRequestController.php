@@ -31,7 +31,7 @@ class TuitionRequestController extends Controller
         if (!$user || $user->role !== 'learner') {
             return response()->json(['message' => 'Unauthorized! Please login to continue'], 403);
         }
-
+        
         $request->validate([
             'class' => 'required|string|max:255',
             'subjects' => 'required|string',
@@ -41,7 +41,7 @@ class TuitionRequestController extends Controller
             'location'=>'required|string',
         ]);
 
-        DB::insert("INSERT INTO tuition_requests (learner_id, class, subjects, asked_salary, curriculum, days, location) VALUES (?, ?, ?, ?, ?, ?, ?)", [
+        DB::insert("INSERT INTO tuition_requests (LearnerID, class, subjects, asked_salary, curriculum, days, location) VALUES (?, ?, ?, ?, ?, ?, ?)", [
             $user->id,
             $request->class,
             $request->subjects,

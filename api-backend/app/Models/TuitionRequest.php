@@ -7,14 +7,16 @@ use Illuminate\Database\Eloquent\Model;
 
 class TuitionRequest extends Model
 {
+    protected $table = 'tuition_requests';
     protected $primaryKey = 'TuitionID';
     public $incrementing = true;
+    protected $fillable = ['LearnerID', 'class', 'subjects', 'asked_salary', 'curriculum', 'days', 'location'];
 
     // Create a new tuition request
     public static function createTuitionRequest($data)
     {
-        DB::insert("INSERT INTO tuition_requests (learner_id, class, subjects, asked_salary, curriculum, days, location) VALUES (?, ?, ?, ?, ?, ?, ?)", [
-            $data['learner_id'],
+        DB::insert("INSERT INTO tuition_requests (LearnerID, class, subjects, asked_salary, curriculum, days, location) VALUES (?, ?, ?, ?, ?, ?, ?)", [
+            $data['LearnerID'],
             $data['class'],
             $data['subjects'],
             $data['asked_salary'],
