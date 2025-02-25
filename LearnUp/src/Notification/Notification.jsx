@@ -4,7 +4,7 @@ import { storeContext } from "../context/contextProvider";
 import "./Notification.css";
 
 const Notification = () => {
-  const { user, token } = useContext(storeContext);
+  const { user, token, url } = useContext(storeContext);
   const [notifications, setNotifications] = useState([]); // Default to an empty array
   const [error, setError] = useState("");
 
@@ -14,7 +14,7 @@ const Notification = () => {
 
   const fetchNotifications = async () => {
     try {
-      const response = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/api/notifications`, {
+      const response = await axios.get(`${url}/api/notifications`, {
         headers: { Authorization: `Bearer ${token}` },
         withCredentials: true,
       });
@@ -34,7 +34,7 @@ const Notification = () => {
 
   const markAsRead = async (id) => {
     try {
-      await axios.put(`${import.meta.env.VITE_API_BASE_URL}/api/notifications/${id}/markAsRead`, {}, {
+      await axios.put(`${url}/api/notifications/${id}/read`, {}, {
         headers: { Authorization: `Bearer ${token}` },
         withCredentials: true,
       });

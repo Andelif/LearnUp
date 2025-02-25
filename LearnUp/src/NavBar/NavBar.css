@@ -63,3 +63,6 @@
     color: #731b96; /* Change color on hover (gold in this case) */
   }
   
+  .logo:hover{
+    cursor: pointer;
+  }
