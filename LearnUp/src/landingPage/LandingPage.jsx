@@ -41,7 +41,7 @@ const LandingPage = () => {
       
       <section className="hero-section">
         <h1>Find the Best Tutors for Your Learning Needs!</h1>
-        <p>Search by Subject, Location, or Tutor Name</p>
+        <p>Search by Location or Tutor Name</p>
         <input type="text" placeholder="Search tutors..." className="search-bar" />
         <div className="hero-buttons">
           <button className="btn-light">Find a Tutor</button>

@@ -1,18 +1,46 @@
-/* Footer */
+/* Ensure the page takes full height */
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+/* Make app-container a flex column layout */
+.app-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh; /* Full viewport height */
+}
+
+/* Main content should expand and push the footer down */
+.layout {
+  display: flex;
+  flex-grow: 1; /* Takes up all remaining space */
+}
+
+/* Make sure the main content expands */
+.main-content {
+  flex-grow: 1; /* Ensures content area stretches */
+  padding: 20px; /* Optional spacing */
+}
+
+/* Footer should stay at the bottom */
 .footer {
-    background: linear-gradient(135deg, #9e7dc2, #a731c5);
-    padding: 20px;
-    text-align: center;
-    color: white;
-    border-radius: 0;
-  }
-  
-  .footer-links a {
-    margin: 0 12px;
-    color: #ddd;
-    text-decoration: none;
-  }
-  
-  .footer-links a:hover {
-    text-decoration: underline;
-  }
+  background: linear-gradient(135deg, #9e7dc2, #a731c5);
+  padding: 20px;
+  text-align: center;
+  color: white;
+  border-radius: 0;
+  width: 100%;
+  margin-top: auto; /* Push footer to the bottom */
+}
+
+.footer-links a {
+  margin: 0 12px;
+  color: #ddd;
+  text-decoration: none;
+}
+
+.footer-links a:hover {
+  text-decoration: underline;
+}

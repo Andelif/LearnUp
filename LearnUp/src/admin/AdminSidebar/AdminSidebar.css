@@ -1,0 +1,16 @@
+.admin-sidebar {
+    width: 220px;
+    background: #273a59;
+    color: white;
+    padding: 20px;
+    height: 100vh;
+    position: fixed;
+    left: 0;
+    top: 0;
+  }
+  
+  .admin-main-content {
+    margin-left: 220px; /* Push content to the right */
+    flex-grow: 1;
+    padding: 20px;
+  }

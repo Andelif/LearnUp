@@ -29,9 +29,10 @@ const NavBar = () => {
       <nav className="nav-links">
         <Link to="/">Home</Link>
         {user?.role === "learner" && <Link to="/find-tutors">Find Tutors</Link>}
-        <Link to="/jobBoard">JobBoard</Link>
+        {user?.role !='admin' && <Link to="/jobBoard">JobBoard</Link>}
         
         {(user?.role === "learner" || user?.role==="tutor") && <Link to="/dashboard">Dashboard</Link>}
+        {user?.role==='admin' && <Link to='/admin/dashboard'>DashBoard</Link>}
       </nav>
 
       
