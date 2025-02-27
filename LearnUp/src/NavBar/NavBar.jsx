@@ -50,17 +50,18 @@ const NavBar = () => {
             )}
           </div>
           <div className="profile-section" onClick={() => setShowDropdown(!showDropdown)}>
-            <span className="profile-icon">👤</span>
-            <br></br>
-            <span className="user-name">{user.name}</span> {/* ✅ Show username */}
+            
+              <span className="profile-icon">👤</span>
+              <br />
+              <span className="user-name">{user.name}</span> {/* ✅ Show username */}
+            
           </div>
 
           {showDropdown && (
             <div className="dropdown-menu">
-              <button className="dropdown-item" onClick={handleLogout}>
-                Logout
-              </button>
-            </div>
+            <Link to="/ProfilePage" className="dropdown-item">Profile</Link> {/* Link to profile page */}
+            <button className="dropdown-item" onClick={handleLogout}>Logout</button> {/* Logout button */}
+          </div>
           )}
         </div>
       ) : (
