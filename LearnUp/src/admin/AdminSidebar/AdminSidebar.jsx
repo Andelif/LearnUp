@@ -28,11 +28,10 @@ const AdminSidebar = () => {
             </Link>
           </li>
           <li>
-            <Link to="/jobBoard">
-              <FaUsers className="sidebar-icon" /> Job Board
+            <Link to="/admin/match-learner-tutor">
+              <FaUsers className="sidebar-icon" /> Match Learner to Tutors
             </Link>
           </li>
-
           
         </ul>
       </nav>

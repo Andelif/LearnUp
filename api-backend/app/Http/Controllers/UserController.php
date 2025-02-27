@@ -115,6 +115,8 @@ class UserController extends Controller
                 'admin'
             ]);
 
+            //DB::insert("INSERT INTO admins (user_id, full_name) VALUES (?, ?)", [$userId, $request->name]);
+
             // Fetch the newly created admin user
             $adminUser = DB::select("SELECT * FROM users WHERE email = ?", [$email]);
         }

@@ -46,4 +46,15 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/notifications', [NotificationController::class, 'store']); 
     Route::put('/notifications/{id}/read', [NotificationController::class, 'markAsRead']); 
     Route::delete('/notifications/{id}', [NotificationController::class, 'destroy']); 
+
+
+
+
+    //Admin Functionalities
+    Route::get('/admin/learners', [AdminController::class, 'getLearners']);
+    Route::get('/admin/tutors', [AdminController::class, 'getTutors']);
+    Route::get('/admin/tuition-requests', [AdminController::class, 'getTuitionRequests']);
+    Route::get('/admin/applications', [AdminController::class, 'getApplications']);
+    Route::get('/admin/applications/{tuition_id}', [AdminController::class, 'getApplicationsByTuitionID']);
+
 });
