@@ -27,6 +27,12 @@ const AdminSidebar = () => {
               <FaUsers className="sidebar-icon" /> Manage Learners
             </Link>
           </li>
+          <li>
+            <Link to="/jobBoard">
+              <FaUsers className="sidebar-icon" /> Job Board
+            </Link>
+          </li>
+
           
         </ul>
       </nav>

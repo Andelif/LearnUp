@@ -1,5 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 import { storeContext } from "../context/contextProvider";
 import { useContext } from "react";
 import "./LandingPage.css";
@@ -16,6 +17,35 @@ const LandingPage = () => {
   ];
   const { user } = useContext(storeContext);
   const navigate=useNavigate();
+  const [searchQuery, setSearchQuery] = useState("");
+  const [tuitionRequests, setTuitionRequests] = useState([]);
+  const [filteredResults, setFilteredResults] = useState([]);
+
+  useEffect(() => {
+    // Fetch tuition requests from the backend
+    const fetchTuitionRequests = async () => {
+      try {
+        const response = await fetch("http://localhost:4000/api/tuition-requests");
+        const data = await response.json();
+        setTuitionRequests(data);
+      } catch (error) {
+        console.error("Error fetching tuition requests:", error);
+      }
+    };
+    fetchTuitionRequests();
+  }, []);
+
+  const handleSearch = () => {
+    if (!searchQuery) {
+      setFilteredResults([]);
+      return;
+    }
+    const results = tuitionRequests.filter(request =>
+      request.subject.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      request.location.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+    setFilteredResults(results);
+  };
 
   const handleSignUp = () => {
     navigate('/signup');
@@ -40,14 +70,27 @@ const LandingPage = () => {
       </div>
       
       <section className="hero-section">
-        <h1>Find the Best Tutors for Your Learning Needs!</h1>
-        <p>Search by Location or Tutor Name</p>
-        <input type="text" placeholder="Search tutors..." className="search-bar" />
+        <h1>Find the Best Tuition Opportunities According to Your Skills!</h1>
+        <p>Search by Location or Grade</p>
+        <input type="text" placeholder="Search tutors..." className="search-bar" value={searchQuery}
+         onChange={(e) => setSearchQuery(e.target.value)}/>
         <div className="hero-buttons">
-          <button className="btn-light">Find a Tutor</button>
+          <button className="btn-light" onClick={handleSearch}>Find Tuition</button>
           
         </div>
       </section>
+      {filteredResults.length > 0 && (
+        <section className="search-results">
+          <h2>Search Results</h2>
+          <ul>
+            {filteredResults.map((request) => (
+              <li key={request.id} className="result-item">
+                <strong>{request.subject}</strong> - {request.location} ({request.grade})
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
 
       {/* Features Section */}
       <section className="features-section">
