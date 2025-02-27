@@ -26,6 +26,7 @@ const LandingPage = () => {
       try {
         const response = await axios.get("http://localhost:8000/api/tuition-requests");
         setTuitionRequests(response.data);
+        // console.log(response.data);
       } catch (error) {
         console.error("Error fetching tuition requests:", error);
       }
