@@ -17,6 +17,8 @@ Route::post('/register', [UserController::class, 'register']);
 Route::post('/login', [UserController::class, 'login']);
 Route::get('/tuition-requests', [TuitionRequestController::class, 'index']);
 Route::get('/tuition-requests/{id}', [TuitionRequestController::class, 'show']);
+Route::get('/tuition-requests/filter', [TuitionRequestController::class, 'filterTuitionRequests']);
+
 
 Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/user', [UserController::class, 'getUser']);

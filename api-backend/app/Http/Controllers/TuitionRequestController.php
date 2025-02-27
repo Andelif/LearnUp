@@ -54,4 +54,14 @@ class TuitionRequestController extends Controller
 
         return response()->json(['message' => 'Tuition request created successfully'], 201);
     }
+    public function filterTuitionRequests(Request $request)
+{
+    
+    $filters = $request->only(['class', 'subjects', 'asked_salary_min', 'asked_salary_max', 'location']);
+    
+    
+    $filteredRequests = TuitionRequest::filterTuitionRequests($filters);
+
+    return response()->json($filteredRequests);
+}
 }
