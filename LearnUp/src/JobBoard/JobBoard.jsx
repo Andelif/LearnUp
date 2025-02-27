@@ -17,6 +17,7 @@ const JobBoard = () => {
       .get("http://localhost:8000/api/tuition-requests")
       .then((response) => {
         setJobs(response.data);
+        
         setLoading(false);
       })
       .catch((error) => {
@@ -59,7 +60,7 @@ const JobBoard = () => {
               <p><strong>Location:</strong> {job.location}</p>
               <p><strong>Days:</strong> {job.days}</p>
               <p><strong>Date:</strong> {job.updated_at}</p>
-              <Link to={`/jobs/${job.id}`} className="details-button">View Details</Link>
+              <Link to={`/jobs/${job.TutionID}`} className="details-button">View Details</Link>
             </div>
           ))
         )}

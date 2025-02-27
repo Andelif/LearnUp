@@ -66,7 +66,7 @@ const LandingPage = () => {
         <p>Search by Location or Grade</p>
         <input
           type="text"
-          placeholder="Search tutors..."
+          placeholder="Search tuitions..."
           className="search-bar"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
