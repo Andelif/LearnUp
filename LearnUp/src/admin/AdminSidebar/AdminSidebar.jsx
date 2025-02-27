@@ -27,6 +27,11 @@ const AdminSidebar = () => {
               <FaUsers className="sidebar-icon" /> Manage Learners
             </Link>
           </li>
+          <li>
+            <Link to="/admin/match-learner-tutor">
+              <FaUsers className="sidebar-icon" /> Match Learner to Tutors
+            </Link>
+          </li>
           
         </ul>
       </nav>

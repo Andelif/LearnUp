@@ -85,4 +85,74 @@ class AdminController extends Controller
         DB::delete("DELETE FROM admins WHERE AdminID = ?", [$id]);
         return response()->json(['message' => 'Admin deleted successfully']);
     }
+
+
+
+
+
+
+
+    public function getLearners()
+    {
+        if (Auth::user()->role !== 'admin') {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+        $learners = DB::select("SELECT * FROM learners");
+        return response()->json($learners);
+    }
+
+    public function getTutors()
+    {
+        if (Auth::user()->role !== 'admin') {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+        $tutors = DB::select("SELECT * FROM tutors");
+        return response()->json($tutors);
+    }
+
+    public function getTuitionRequests()
+    {
+        if (Auth::user()->role !== 'admin') {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+        $tuitionRequests = DB::select("SELECT * FROM tuition_requests");
+        return response()->json($tuitionRequests);
+    }
+
+    public function getApplications()
+    {
+        if (Auth::user()->role !== 'admin') {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+        $applications = DB::select("SELECT * FROM applications");
+        return response()->json($applications);
+    }
+
+
+    public function getApplicationsByTuitionID($tutionID)
+    {
+        if (Auth::user()->role !== 'admin') {
+            return response()->json(['message' => 'Unauthorized'], 403);
+        }
+
+        $applications = DB::select("
+            SELECT a.ApplicationID, 
+                   t.full_name AS tutor_name, 
+                   t.experience, 
+                   t.qualification,
+                   t.currently_studying_in,
+                   t.preferred_salary,
+                   t.preferred_location,
+                   t.preferred_time
+            FROM applications a
+            JOIN tutors t ON a.tutor_id = t.TutorID
+            WHERE a.tution_id = ?", [$tutionID]);
+
+        return response()->json($applications);
+    }
+
 }

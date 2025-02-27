@@ -5,6 +5,7 @@ import ManageTutors from "./admin/ManageTutors/ManageTutors";
 import { storeContext } from "./context/contextProvider";
 import AdminLayout from "./admin/AdminLayout";
 import ManageLearners from "./admin/ManageLearners/ManageLearners";
+import MatchLearnerTutor from "./admin/MatchLearnerTutor/MatchLearnerTutor";
 
 const AdminRoutes = () => {
   const { user } = useContext(storeContext);
@@ -20,6 +21,7 @@ const AdminRoutes = () => {
         <Route path="dashboard" element={<AdminDashBoard />} />
         <Route path="manage-tutors" element={<ManageTutors />} />
         <Route path="manage-learners" element={<ManageLearners />} />
+        <Route path="match-learner-tutor" element={<MatchLearnerTutor />} />
      </Route>
     </Routes>
   );
