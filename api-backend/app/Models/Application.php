@@ -13,10 +13,11 @@ class Application extends Model
     // Create a new application
     public static function createApplication($data)
     {
-        DB::insert("INSERT INTO applications (tution_id, learner_id, tutor_id) VALUES (?, ?, ?)", [
+        DB::insert("INSERT INTO applications (tution_id, learner_id, tutor_id, matched) VALUES (?, ?, ?, ?)", [
             $data['tution_id'],
             $data['learner_id'],
-            $data['tutor_id']
+            $data['tutor_id'],
+            false
         ]);
         return DB::getPdo()->lastInsertId();
     }

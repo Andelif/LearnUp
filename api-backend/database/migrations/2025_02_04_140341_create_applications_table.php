@@ -19,6 +19,7 @@ return new class extends Migration
             tution_id BIGINT NOT NULL, -- Foreign key to tuition_requests table
             learner_id BIGINT NOT NULL, -- Foreign key to learners table
             tutor_id BIGINT NOT NULL, -- Foreign key to tutors table
+            matched BOOLEAN NOT NULL DEFAULT FALSE,
             created_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
             updated_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
             FOREIGN KEY (tution_id) REFERENCES tuition_requests(TutionID) ON DELETE CASCADE,

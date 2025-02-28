@@ -33,6 +33,21 @@ const MatchLearnerAndTutor = () => {
       });
   };
 
+  const matchTutor = (applicationID) => {
+    axios.post(
+        "http://localhost:8000/api/admin/match-tutor",
+        { application_id: applicationID },
+        { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }
+      ).then((response) => {
+        alert(response.data.message);
+        // Refresh applications list after matching
+        fetchApplications(selectedTuitionID);
+      })
+      .catch((error) => {
+        console.error("Error matching tutor:", error);
+      });
+  };
+
   return (
     <div>
       <h2>Match Learner and Tutor</h2>
@@ -100,6 +115,12 @@ const MatchLearnerAndTutor = () => {
                   <td>{app.preferred_salary}</td>
                   <td>{app.preferred_location}</td>
                   <td>{app.preferred_time}</td>
+                  <td>
+                    {!app.matched && (
+                      <button onClick={() => matchTutor(app.ApplicationID)}>Match</button>
+                    )}
+                  </td>
+
                 </tr>
               ))}
             </tbody>

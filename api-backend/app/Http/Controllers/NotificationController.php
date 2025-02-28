@@ -15,14 +15,22 @@ class NotificationController extends Controller
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 
-        $notifications = DB::select("SELECT * FROM notifications WHERE user_id = ? ORDER BY TimeSent DESC", [$user->id]);
+        $notifications = DB::select(
+            "SELECT * FROM notifications 
+            WHERE view = 'everyone' 
+            OR (view = 'all_learner' AND EXISTS (SELECT 1 FROM learners WHERE user_id = ?))
+            OR (view = 'all_tutor' AND EXISTS (SELECT 1 FROM tutors WHERE user_id = ?))
+            OR view = ?
+            ORDER BY TimeSent DESC",
+            [$user->id, $user->id, $user->id]);
+
         return response()->json($notifications);
     }
 
     public function markAsRead($id)
     {
         $user = Auth::user();
-        $notification = DB::select("SELECT * FROM notifications WHERE NotificationID = ? AND user_id = ?", [$id, $user->id]);
+        $notification = DB::select("SELECT * FROM notifications WHERE NotificationID = ?", [$id]);
 
         if (!$notification) {
             return response()->json(['message' => 'Notification not found or unauthorized'], 404);
@@ -38,12 +46,14 @@ class NotificationController extends Controller
             'user_id' => 'required|exists:users,id',
             'Message' => 'required|string',
             'Type' => 'required|in:Tuition Request,Application Update,New Message,Admin Message,General',
+            'view' => 'required|string'
         ]);
 
-        DB::insert("INSERT INTO notifications (user_id, Message, Type, Status, TimeSent) VALUES (?, ?, ?, 'Unread', NOW())", [
+        DB::insert("INSERT INTO notifications (user_id, Message, Type, Status, TimeSent, view) VALUES (?, ?, ?, 'Unread', NOW(), ?)", [
             $request->user_id,
             $request->Message,
-            $request->Type
+            $request->Type,
+            $request->view
         ]);
 
         return response()->json(['message' => 'Notification created'], 201);

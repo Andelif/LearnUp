@@ -35,7 +35,7 @@ return new class extends Migration
      */
     public function down()
     {
-        DB::statement("ALTER TABLE admins DROP FOREIGN KEY fk_admins_user");
+        
         DB::statement("DROP TABLE IF EXISTS admins");
         
     }
