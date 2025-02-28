@@ -110,4 +110,17 @@ public function update(Request $request, $id)
 
     return response()->json(['message' => 'Tuition request updated successfully']);
 }
+public function destroy($id)
+{
+    $tutionReq = DB::select("SELECT * FROM tuition_requests WHERE TutionID = ?", [$id]);
+    if (empty($tutionReq)) {
+        // If the tuition request doesn't exist, return a 404 error
+        return response()->json(['message' => 'Tuition Request not found'], 404);
+    }
+
+    
+
+    DB::delete("DELETE FROM tuition_requests WHERE TutionID = ?", [$id]);
+    return response()->json(['message' => 'Tuition Request deleted successfully']);
+}
 }
