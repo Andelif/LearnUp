@@ -13,6 +13,19 @@ class TuitionRequestController extends Controller
         $tuitionRequests = DB::select("SELECT * FROM tuition_requests");
         return response()->json($tuitionRequests);
     }
+    public function getAllRequests()
+   {
+    $user = Auth::user(); // Get authenticated user
+
+    if (!$user) {
+        return response()->json(['message' => 'Unauthorized'], 401);
+    }
+    $tuitionRequests = DB::select("
+        select * from tuition_requests where LearnerID=(select LearnerID from learners where user_id= ?)
+    ",[$user->id]);
+
+    return response()->json($tuitionRequests);
+    }
 
     public function show($id)
     {

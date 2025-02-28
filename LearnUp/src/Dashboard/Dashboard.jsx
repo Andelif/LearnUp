@@ -55,6 +55,9 @@ const Dashboard = () => {
         <div>
           <Link to="/jobBoard" className="sidebar-link">Job Board</Link>
         </div>
+        <div>
+          <Link to='/myTuitions' className="sidebar-link">My tuitions</Link>
+        </div>
       </aside>
 
       <main className="dashboard-main">

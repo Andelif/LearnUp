@@ -16,6 +16,7 @@ import AboutUs from './AboutUs/AboutUs';
 import Notification from './Notification/Notification';
 import AdminRoutes from './AdminRoutes';
 import ProfilePage from './ProfilePage/ProfilePage';
+import MyTuitions from './MyTuitions/MyTuitions';
 
 
 
@@ -35,6 +36,7 @@ const AppRoutes = () => {
     <Route path="/jobs/:id" element={<JobDetails/>} /> 
     <Route path="/notification-center" element={<Notification/>} /> 
     <Route path="/ProfilePage" element={<ProfilePage />} />
+    <Route path="/myTuitions" element={<MyTuitions />} />
     
     <Route path="/admin/*" element={<AdminRoutes />} />
     
