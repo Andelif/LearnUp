@@ -20,6 +20,7 @@ return new class extends Migration
             $table->text('Message'); 
             $table->enum('Type', ['Tuition Request', 'Application Update', 'New Message', 'Admin Message', 'General']); 
             $table->enum('Status', ['Unread', 'Read'])->default('Unread'); 
+            $table->string('view');
             $table->timestamps();
 
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');

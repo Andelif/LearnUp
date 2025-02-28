@@ -5,7 +5,7 @@ import "./Notification.css";
 
 const Notification = () => {
   const { user, token, url } = useContext(storeContext);
-  const [notifications, setNotifications] = useState([]); // Default to an empty array
+  const [notifications, setNotifications] = useState([]);
   const [error, setError] = useState("");
 
   useEffect(() => {
@@ -19,16 +19,15 @@ const Notification = () => {
         withCredentials: true,
       });
 
-      // Ensure data is an array
       if (Array.isArray(response.data)) {
         setNotifications(response.data);
       } else {
-        setNotifications([]); // Default to an empty array
+        setNotifications([]);
       }
     } catch (err) {
       console.error("Error fetching notifications:", err);
       setError("Failed to fetch notifications.");
-      setNotifications([]); // Prevent `map()` error
+      setNotifications([]);
     }
   };
 
@@ -58,20 +57,30 @@ const Notification = () => {
         <p className="no-notifications">No notifications available.</p>
       ) : (
         <ul className="notification-list">
-          {notifications.map((notif) => (
-            <li key={notif.NotificationID} className={`notification-item ${notif.Status === "Unread" ? "unread" : ""}`}>
-              <div className="notification-content">
-                <p className="notification-type">{notif.Type}</p>
-                <p className="notification-message">{notif.Message}</p>
-                <p className="notification-time">{new Date(notif.TimeSent).toLocaleString()}</p>
-              </div>
-              {notif.Status === "Unread" && (
-                <button className="mark-read-btn" onClick={() => markAsRead(notif.NotificationID)}>
-                  Mark as Read
-                </button>
-              )}
-            </li>
-          ))}
+          {notifications
+            .filter((notif) => {
+              // Ensure the notification is visible to the user
+              return (
+                notif.view === "everyone" ||
+                (notif.view === "all_learner" && user.role === "Learner") ||
+                (notif.view === "all_tutor" && user.role === "Tutor") ||
+                notif.view == user.id // Specific notifications for the user
+              );
+            })
+            .map((notif) => (
+              <li key={notif.NotificationID} className={`notification-item ${notif.Status === "Unread" ? "unread" : ""}`}>
+                <div className="notification-content">
+                  <p className="notification-type">{notif.Type}</p>
+                  <p className="notification-message">{notif.Message}</p>
+                  <p className="notification-time">{new Date(notif.TimeSent).toLocaleString()}</p>
+                </div>
+                {notif.Status === "Unread" && (
+                  <button className="mark-read-btn" onClick={() => markAsRead(notif.NotificationID)}>
+                    Mark as Read
+                  </button>
+                )}
+              </li>
+            ))}
         </ul>
       )}
     </div>

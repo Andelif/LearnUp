@@ -35,11 +35,12 @@ class ApplicationController extends Controller
         $tutor_id=$tutor[0]->TutorID;
     
 
-        DB::insert("INSERT INTO applications (tution_id,learner_id ,tutor_id) VALUES (?, ?,?)", [
+        DB::insert("INSERT INTO applications (tution_id,learner_id ,tutor_id, matched) VALUES (?, ?, ?, ?)", [
             
             $request->tution_id,
             $learner_id,
-            $tutor_id
+            $tutor_id, 
+            false
         ]);
 
         return response()->json(['message' => 'Application submitted successfully'], 201);

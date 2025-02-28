@@ -155,4 +155,71 @@ class AdminController extends Controller
         return response()->json($applications);
     }
 
+
+
+
+
+    public function matchTutor(Request $request)
+{
+    $request->validate([
+        'application_id' => 'required|exists:applications,ApplicationID',
+    ]);
+
+    // Fetch application details
+    $application = DB::select("SELECT * FROM applications WHERE ApplicationID = ?", [$request->application_id]);
+
+    if (empty($application)) {
+        return response()->json(['message' => 'Application not found'], 404);
+    }
+
+    $application = $application[0];
+
+    // Update the matched column
+    DB::update("UPDATE applications SET matched = 1 WHERE ApplicationID = ?", [$request->application_id]);
+
+    $adminId = Auth::id();
+
+    // Fetch user_id of the learner
+    $learnerUser = DB::select(
+        "SELECT user_id FROM learners WHERE LearnerID = 
+            (SELECT learner_id FROM applications WHERE ApplicationID = ?)", [$request->application_id]
+    );
+
+    // Fetch user_id of the tutor
+    $tutorUser = DB::select(
+        "SELECT user_id FROM tutors WHERE TutorID = 
+            (SELECT tutor_id FROM applications WHERE ApplicationID = ?)", [$request->application_id]
+    );
+
+    // Check if learner user exists
+    if (!empty($learnerUser)) {
+        $learnerUserID = $learnerUser[0]->user_id;
+        
+        // Create notification for learner
+        DB::insert("INSERT INTO notifications (user_id, Message, Type, Status, TimeSent, view) VALUES (?, ?, ?, 'Unread', NOW(), ?)", [
+            $adminId,
+            "A Tutor has been selected for your Tuition ID: {$application->tution_id}.",
+            'Application Update',
+            $learnerUserID // View set to the specific learner user_id
+        ]);
+    }
+
+    // Check if tutor user exists
+    if (!empty($tutorUser)) {
+        $tutorUserID = $tutorUser[0]->user_id;
+        
+        // Create notification for tutor
+        DB::insert("INSERT INTO notifications (user_id, Message, Type, Status, TimeSent, view) VALUES (?, ?, ?, 'Unread', NOW(), ?)", [
+            $adminId,
+            "You have been selected for Tuition ID: {$application->tution_id}.",
+            'Application Update',
+            $tutorUserID // View set to the specific tutor user_id
+        ]);
+    }
+
+    return response()->json(['message' => 'Tutor successfully matched with learner'], 200);
+}
+
+
+
 }

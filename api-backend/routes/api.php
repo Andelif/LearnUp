@@ -56,5 +56,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/admin/tuition-requests', [AdminController::class, 'getTuitionRequests']);
     Route::get('/admin/applications', [AdminController::class, 'getApplications']);
     Route::get('/admin/applications/{tuition_id}', [AdminController::class, 'getApplicationsByTuitionID']);
+    Route::post('/admin/match-tutor', [AdminController::class, 'matchTutor']);
+
 
 });
