@@ -8,7 +8,7 @@ const JobBoard = () => {
   const [loading, setLoading] = useState(true);
 
   // Filters
-  const [searchDate, setSearchDate] = useState("");
+  const [searchSub, setSearchSub] = useState("");
   const [searchLocation, setSearchLocation] = useState("");
   const [searchClass, setSearchClass] = useState("");
 
@@ -29,7 +29,7 @@ const JobBoard = () => {
   // Filtering logic
   const filteredJobs = jobs.filter((job) => {
     return (
-      // (searchDate ? (job.date?.includes(searchDate) || false) : true) &&
+      (searchSub ? (job.subjects?.toLowerCase().includes(searchSub.toLowerCase()) || false) : true) &&
       (searchLocation ? (job.location?.toLowerCase().includes(searchLocation.toLowerCase()) || false) : true) &&
       (searchClass ? (job.class?.toLowerCase().includes(searchClass.toLowerCase()) || false) : true)
     );
@@ -43,7 +43,7 @@ const JobBoard = () => {
 
       {/* Filters */}
       <div className="filter-container">
-        {/* <input type="date" value={searchDate} onChange={(e) => setSearchDate(e.target.value)} placeholder="Date" /> */}
+        <input type="text" value={searchSub} onChange={(e) => setSearchSub(e.target.value)} placeholder="Subject" />
         <input type="text" value={searchLocation} onChange={(e) => setSearchLocation(e.target.value)} placeholder="Location" />
         <input type="text" value={searchClass} onChange={(e) => setSearchClass(e.target.value)} placeholder="Class" />
       </div>

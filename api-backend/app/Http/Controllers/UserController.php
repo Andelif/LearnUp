@@ -38,6 +38,7 @@ class UserController extends Controller
                 Hash::make($request->password),
                 $request->role
             ]);
+            
 
             // Get the newly created user ID
             $userId = DB::getPdo()->lastInsertId();
@@ -188,7 +189,7 @@ class UserController extends Controller
             return response()->json(['errors' => $validator->errors()], 400);
         }
 
-        // Update the user's name
+        
         DB::update("UPDATE users SET name = ? WHERE id = ?", [$request->name, $user->id]);
 
         return response()->json(['message' => 'User profile updated successfully']);

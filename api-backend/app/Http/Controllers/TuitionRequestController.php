@@ -51,6 +51,7 @@ class TuitionRequestController extends Controller
             $request->days,
             $request->location
         ]);
+        
 
         return response()->json(['message' => 'Tuition request created successfully'], 201);
     }
