@@ -36,4 +36,5 @@ class Learner extends Model
     {
         return DB::select("SELECT * FROM tuition_requests WHERE learner_id = ?", [$learner_id]);
     }
+   
 }

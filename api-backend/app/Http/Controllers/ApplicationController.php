@@ -13,6 +13,48 @@ class ApplicationController extends Controller
         $applications = DB::select("SELECT * FROM applications");
         return response()->json($applications);
     }
+    public function getTutorStats(Request $request, $userId)
+    {
+        $tutor=DB::select("SELECT TutorID FROM tutors WHERE user_id = ?", [$userId]);
+        if (empty($tutor)) {
+            return response()->json(['message' => 'Tutor not found'], 404);
+        }
+    
+        $tutorId = $tutor[0]->TutorID;
+        $query = "
+            SELECT 
+                (SELECT COUNT(*) FROM applications WHERE tutor_id = ? ) AS applied,
+                (SELECT COUNT(*) FROM applications WHERE tutor_id = ? AND status = 'shortlisted') AS shortlisted,
+                
+                (SELECT COUNT(*) FROM applications WHERE tutor_id = ? AND status = 'confirmed') AS confirmed,
+                (SELECT COUNT(*) FROM applications WHERE tutor_id = ? AND status = 'cancelled') AS cancelled;
+        ";
+
+        $results = DB::select($query, [$tutorId, $tutorId, $tutorId, $tutorId]);
+
+        return response()->json($results[0]);
+    }
+    public function getLearnerStats(Request $request, $userId)
+    {
+        $learner=DB::select("SELECT LearnerID FROM learners WHERE user_id = ?", [$userId]);
+        if (empty($learner)) {
+            return response()->json(['message' => 'Learner not found'], 404);
+        }
+    
+        $learnerId = $learner[0]->LearnerID;
+        $query = "
+            SELECT 
+                (SELECT COUNT(*) FROM applications WHERE learner_id = ? ) AS applied,
+                (SELECT COUNT(*) FROM applications WHERE learner_id = ? AND status = 'shortlisted') AS shortlisted,
+                
+                (SELECT COUNT(*) FROM applications WHERE learner_id = ? AND status = 'confirmed') AS confirmed,
+                (SELECT COUNT(*) FROM applications WHERE learner_id = ? AND status = 'cancelled') AS cancelled;
+        ";
+
+        $results = DB::select($query, [$learnerId ,$learnerId ,$learnerId ,$learnerId ]);
+
+        return response()->json($results[0]);
+    }
 
     public function store(Request $request)
     {

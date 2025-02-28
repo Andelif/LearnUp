@@ -49,6 +49,7 @@ class TutorController extends Controller
 
         return response()->json($tutor[0]);
     }
+   
 
     public function update(Request $request, $id)
     {
