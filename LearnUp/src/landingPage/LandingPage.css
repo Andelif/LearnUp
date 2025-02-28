@@ -176,151 +176,249 @@
      margin-top: 10px;
      font-weight: 500;
    }
-   
-   .how-it-works {
-    text-align: center;
-    margin: 50px 0;
+
+.how-it-works {
+  text-align: center;
+  margin: 60px 0;
+  background-color: #f4f4f9;
+  padding: 40px 0;
+  border-radius: 10px;
+}
+
+.how-it-works h2 {
+  font-size: 30px;
+  font-weight: bold;
+  color: #270d41;
+  margin-bottom: 30px;
+}
+
+.how-it-works .highlight {
+  color: #a17dc5;
+  font-weight: 600;
+}
+
+
+.steps-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: 50px;
+  gap: 30px;
+  animation: fadeInUp 1s ease-in-out;
+}
+
+
+.step {
+  text-align: center;
+  width: 22%;
+  position: relative;
+  opacity: 0;
+  animation: stepFadeIn 0.5s ease-out forwards;
+}
+
+.step:nth-child(1) {
+  animation-delay: 0.2s;
+}
+
+.step:nth-child(2) {
+  animation-delay: 0.4s;
+}
+
+.step:nth-child(3) {
+  animation-delay: 0.6s;
+}
+
+.step:nth-child(4) {
+  animation-delay: 0.8s;
+}
+
+
+.step-icon {
+  width: 70px;
+  height: 70px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #a17dc5;
+  color: white;
+  font-size: 32px;
+  border-radius: 50%;
+  margin: 0 auto 15px;
+  transition: transform 0.3s ease-in-out;
+}
+
+.step-icon:hover {
+  transform: scale(1.2);
+}
+
+
+.step h3 {
+  font-size: 20px;
+  margin: 10px 0;
+  font-weight: 500;
+  color: #270d41;
+}
+
+
+.arrow {
+  font-size: 30px;
+  color: #a17dc5;
+  line-height: 0;
+  transition: transform 0.3s ease;
+}
+
+.arrow:hover {
+  transform: scale(1.2);
+}
+
+
+@keyframes fadeInUp {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
   }
-  
-  .how-it-works h2 {
-    font-size: 28px;
+  100% {
+    opacity: 1;
+    transform: translateY(0);
   }
-  
-  .how-it-works .highlight {
-    color: #270d41;
-    font-weight: bold;
+}
+
+@keyframes stepFadeIn {
+  0% {
+    opacity: 0;
   }
-  
+  100% {
+    opacity: 1;
+  }
+}
+
+
+.step:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+
+@media (max-width: 768px) {
   .steps-container {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    position: relative;
-    margin-top: 40px;
-    padding: 20px 0;
+    flex-direction: column;
+    gap: 40px;
   }
-  
+
   .step {
-    width: 22%;
-    text-align: center;
-    position: relative;
-  }
-  
-  .step-icon {
-    width: 60px;
-    height: 60px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background-color: #a17dc5;
-    color: white;
-    font-size: 28px;
-    border-radius: 50%;
-    margin: 0 auto 10px;
-  }
-  
-  .step h3 {
-    font-size: 18px;
-    margin: 10px 0;
-  }
-  
-  .step p {
-    font-size: 14px;
-    color: #555;
-  }
-  
-  .curve-line {
-    position: absolute;
-    top: 40px;
-    left: 10%;
     width: 80%;
-    height: 50px;
-    border-top: 2px dashed #a17dc5;
-    border-radius: 50px;
   }
+
+ 
+  .arrow {
+    font-size: 24px;
+  }
+}
+
   .tutor-steps {
-    text-align: center;
-    margin: 50px 0;
+    padding: 40px 20px;
+    background-color: #f9f9f9;
   }
-  
-  .tutor-steps h2 {
-    font-size: 28px;
-    font-weight: bold;
-    margin-bottom: 20px;
-  }
-  
   .tutor-steps .highlight {
-    color: #270d41;
+    color: #a17dc5;
+    font-weight: 600;
+  }
+  
+  .section-title {
+    text-align: center;
+    font-size: 2rem;
+    margin-bottom: 30px;
+  }
+  
+  .highlight {
+    color: rgb(11, 48, 81);
     font-weight: bold;
   }
   
-  .steps-container {
+  .steps-wrapper {
     display: flex;
     justify-content: space-between;
-    align-items: center;
-    position: relative;
-    margin-top: 40px;
-    padding: 20px 0;
+    flex-wrap: wrap;
+    gap: 20px;
+    animation: fadeIn 1s ease-in-out;
   }
   
-  .step {
-    width: 22%;
+  .step-card {
+    background-color: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    flex-basis: 45%;
     text-align: center;
-    position: relative;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+    opacity: 0;
   }
   
-  .step-icon {
-    width: 60px;
-    height: 60px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background-color: #a17dc5;
-    color: white;
-    font-size: 28px;
-    border-radius: 50%;
-    margin: 0 auto 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  .step-card:nth-child(1), .step-card:nth-child(3) {
+    animation: slideInLeft 1s forwards;
   }
   
-  .step h3 {
-    font-size: 18px;
-    margin: 10px 0;
-    font-weight: bold;
+  .step-card:nth-child(2), .step-card:nth-child(4) {
+    animation: slideInRight 1s forwards;
   }
   
-  .step p {
-    font-size: 14px;
-    color: #555;
+  .step-card:hover {
+    transform: translateY(-5px);
+    opacity: 1;
   }
   
-  .curve-line {
-    position: absolute;
-    top: 40px;
-    left: 10%;
-    width: 80%;
-    height: 50px;
-    border-top: 2px dashed #a17dc5;
-    border-radius: 50px;
-    z-index: 0;
+  .step-content img {
+    width: 100px;
+    height: 100px;
+    margin-bottom: 20px;
+    transition: transform 0.3s ease;
   }
   
-  @media (max-width: 768px) {
-    .steps-container {
-      flex-direction: column;
-      align-items: flex-start;
+  .step-content img:hover {
+    transform: scale(1.1);
+  }
+  
+  h3 {
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+  }
+  
+  p {
+    font-size: 1rem;
+    color: rgb(84, 76, 76);
+  }
+  
+  @keyframes fadeIn {
+    0% {
+      opacity: 0;
     }
-    .step {
-      width: 100%;
-      margin-bottom: 30px;
-    }
-    .curve-line {
-      top: 30px;
-      left: 5%;
-      width: 90%;
+    100% {
+      opacity: 1;
     }
   }
   
+  @keyframes slideInLeft {
+    0% {
+      transform: translateX(-50px);
+      opacity: 0;
+    }
+    100% {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
+  
+  @keyframes slideInRight {
+    0% {
+      transform: translateX(50px);
+      opacity: 0;
+    }
+    100% {
+      transform: translateX(0);
+      opacity: 1;
+    }
+  }
   
    
    /* Join LearnUp Section */
