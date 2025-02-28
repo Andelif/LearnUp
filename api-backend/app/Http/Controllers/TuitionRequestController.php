@@ -78,4 +78,36 @@ class TuitionRequestController extends Controller
 
     return response()->json($filteredRequests);
 }
+public function update(Request $request, $id)
+{
+    // Validate the request data
+    $request->validate([
+        'class' => 'required|string|max:255',
+        'subjects' => 'required|string',
+        'asked_salary' => 'required|numeric',
+        'curriculum' => 'required|string',
+        'days' => 'required|string',
+        'location' => 'required|string',
+    ]);
+
+    // Check if the tuition request exists
+    $tuitionRequest = DB::select("SELECT * FROM tuition_requests WHERE TutionID = ?", [$id]);
+
+    if (empty($tuitionRequest)) {
+        return response()->json(['message' => 'Tuition request not found'], 404);
+    }
+
+    // Update the tuition request
+    DB::update("UPDATE tuition_requests SET class = ?, subjects = ?, asked_salary = ?, curriculum = ?, days = ?, location = ? WHERE TutionID = ?", [
+        $request->class,
+        $request->subjects,
+        $request->asked_salary,
+        $request->curriculum,
+        $request->days,
+        $request->location,
+        $id
+    ]);
+
+    return response()->json(['message' => 'Tuition request updated successfully']);
+}
 }
