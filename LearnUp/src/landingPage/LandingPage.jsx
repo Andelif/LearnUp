@@ -110,24 +110,71 @@ const LandingPage = () => {
       </section>
 
       <section className="how-it-works">
-        <h2>The ways <span className="highlight">Learners</span> can connect with us.</h2>
-        <div className="steps-container">
-          <div className="step"><div className="step-icon">👤</div><h3>Create Profile</h3></div>
-          <div className="step"><div className="step-icon">📝</div><h3>Submit Requirements</h3></div>
-          <div className="step"><div className="step-icon">📄</div><h3>Get Tutors' CV</h3></div>
-          <div className="step"><div className="step-icon">⭐</div><h3>Select Your Tutor</h3></div>
-        </div>
+      <h2>The ways <span className="highlight">Learners</span> can connect with us.</h2>
+  <div className="steps-container">
+    <div className="step">
+      <div class="step-icon">👤</div>
+      <h3>Create Profile</h3>
+    </div>
+    <div class="arrow">&#8594;</div> 
+    <div className="step">
+      <div class="step-icon">📝</div>
+      <h3>Submit Requirements</h3>
+    </div>
+    <div className="arrow">&#8594;</div> 
+    <div className="step">
+      <div class="step-icon">📄</div>
+      <h3>Get Tutors' CV</h3>
+    </div>
+    <div className="arrow">&#8594;</div> 
+    <div className="step">
+      <div class="step-icon">⭐</div>
+      <h3>Select Your Tutor</h3>
+    </div>
+  </div>
+
       </section>
 
       <section className="tutor-steps">
-        <h2>The ways <span className="highlight">Tutors</span> can connect with us.</h2>
-        <div className="steps-container">
-          <div className="step"><div className="step-icon">👤</div><h3>Create Profile</h3></div>
-          <div className="step"><div className="step-icon">✔️</div><h3>Complete Profile</h3></div>
-          <div className="step"><div className="step-icon">🔍</div><h3>Apply for Tuition Job</h3></div>
-          <div className="step"><div className="step-icon">🎓</div><h3>Start Tutoring</h3></div>
-        </div>
-      </section>
+  <h2 className="section-title">
+    The ways <span className="highlight">Tutors</span> can connect with us.
+  </h2>
+  
+  <div className="steps-wrapper">
+    <div className="step-card">
+      <div className="step-content">
+        <img src="src/assets/tutor01.png" alt="Create Profile" />
+        <h3>Create Your Profile</h3>
+        <p>Sign up and provide your details to create your tutor profile.</p>
+      </div>
+    </div>
+
+    <div className="step-card">
+      <div className="step-content">
+        <img src="src/assets/tutor02.png" alt="Complete Profile" />
+        <h3>Complete Your Profile</h3>
+        <p>Fill in necessary details and verify credentials to stand out.</p>
+      </div>
+    </div>
+
+    <div className="step-card">
+      <div className="step-content">
+        <img src="src/assets/tutor03.png" alt="Apply for Tuition" />
+        <h3>Apply for Tuition Jobs</h3>
+        <p>Search for tuition jobs that match your skills and apply.</p>
+      </div>
+    </div>
+
+    <div className="step-card">
+      <div className="step-content">
+        <img src="src/assets/tutor04.png" alt="Start Tutoring" />
+        <h3>Start Tutoring</h3>
+        <p>Get selected by students and start your tutoring journey.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
 
       <section className="join-learnup">
         <h2>Join LearnUp Today!</h2>
