@@ -14,7 +14,15 @@ class AppServiceProvider extends ServiceProvider
     public function register()
     {
         //
+        $this->app->singleton(TuitionRequestService::class, function ($app) {
+            return new TuitionRequestService();
+        });
+
+        $this->app->bind(UserService::class, function ($app) {
+            return new UserService();
+        });
     }
+
 
     /**
      * Bootstrap any application services.

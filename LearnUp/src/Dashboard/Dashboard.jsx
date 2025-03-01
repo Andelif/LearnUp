@@ -63,11 +63,11 @@ const Dashboard = () => {
 
       <main className="dashboard-main">
         <div className="stats-container">
-          <div className="stat-box"> <h2>25</h2> <p>{user.role === "tutor" ? "Applied Jobs" : "Applied Requests"}</p> </div>
-          <div className="stat-box"> <h2>10</h2> <p>{user.role === "tutor" ? "Shortlisted Jobs" : "Shortlisted Tutors"}</p> </div>
-          <div className="stat-box"> <h2>2</h2> <p>{user.role === "tutor" ? "Appointed Jobs" : "Appointed Tutors"}</p> </div>
-          <div className="stat-box"> <h2>3</h2> <p>{user.role === "tutor" ? "Confirmed Jobs" : "Confirmed Tutors"}</p> </div>
-          <div className="stat-box"> <h2>9</h2> <p>{user.role === "tutor" ? "Cancelled Jobs" : "Cancelled Tutors"}</p> </div>
+          <div className="stat-box"> <h2>25</h2> <p>{user?.role === "tutor" ? "Applied Jobs" : "Applied Requests"}</p> </div>
+          <div className="stat-box"> <h2>10</h2> <p>{user?.role === "tutor" ? "Shortlisted Jobs" : "Shortlisted Tutors"}</p> </div>
+          <div className="stat-box"> <h2>2</h2> <p>{user?.role === "tutor" ? "Appointed Jobs" : "Appointed Tutors"}</p> </div>
+          <div className="stat-box"> <h2>3</h2> <p>{user?.role === "tutor" ? "Confirmed Jobs" : "Confirmed Tutors"}</p> </div>
+          <div className="stat-box"> <h2>9</h2> <p>{user?.role === "tutor" ? "Cancelled Jobs" : "Cancelled Tutors"}</p> </div>
         </div>
 
         <div className="notice-board">

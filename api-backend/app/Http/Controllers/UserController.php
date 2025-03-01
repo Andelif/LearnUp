@@ -3,20 +3,24 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
+use App\Services\UserService;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Support\Facades\DB;
 use App\Models\User;
 
 class UserController extends Controller
 {
-    use HasApiTokens;
+    protected $userService;
+    public function __construct(UserService $userService)
+    {
+        $this->userService = $userService;
+    }
 
     public function register(Request $request)
     {
-        // Validate input
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
@@ -31,46 +35,10 @@ class UserController extends Controller
         }
 
         try {
-            // Insert user into users table
-            DB::insert("INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)", [
-                $request->name,
-                $request->email,
-                Hash::make($request->password),
-                $request->role
-            ]);
-            
+            $userId = $this->userService->register($request->all());
 
-            // Get the newly created user ID
-            $userId = DB::getPdo()->lastInsertId();
-
-            // Insert into role-specific tables
-            if ($request->role === 'learner') {
-                DB::insert("INSERT INTO learners (user_id, full_name, contact_number, gender, address) VALUES (?, ?, ?, ?, ?)", [
-                    $userId,
-                    $request->name,
-                    $request->contact_number ?? null, 
-                    $request->gender ?? null,  
-                    null   // Placeholder for address
-                ]);
-            } elseif ($request->role === 'tutor') {
-                DB::insert("INSERT INTO tutors (user_id, full_name, contact_number, gender, qualification, experience, preferred_salary, availability, address) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", [
-                    $userId,
-                    $request->name,
-                    $request->contact_number ?? null, 
-                    $request->gender ?? null,
-                    null,  // Placeholder for qualifications
-                    null,  // Placeholder for experience
-                    null,  // Placeholder for preferred salary
-                    null,  // Placeholder for availability
-                    null   // Placeholder for address
-                ]);
-            } elseif ($request->role === 'admin') {
-                DB::insert("INSERT INTO admins (user_id, full_name) VALUES (?, ?)", [$userId, $request->name]);
-            }
-
-            // Now use Eloquent for token creation
-            $userModel = User::find($userId); // Load the user with Eloquent
-            $token = $userModel->createToken('auth_token')->plainTextToken;
+            // Generate token using Eloquent
+            $userModel = User::find($userId);
             $token = $userModel->createToken('auth_token')->plainTextToken;
 
             return response()->json([
@@ -179,7 +147,7 @@ class UserController extends Controller
     
     public function updateProfile(Request $request)
     {
-        $user = Auth::user();
+        $user = $request->user();
 
         $validator = Validator::make($request->all(), [
             'name' => 'required|string|max:255'
@@ -189,10 +157,12 @@ class UserController extends Controller
             return response()->json(['errors' => $validator->errors()], 400);
         }
 
-        
-        DB::update("UPDATE users SET name = ? WHERE id = ?", [$request->name, $user->id]);
-
-        return response()->json(['message' => 'User profile updated successfully']);
+        try {
+            $this->userService->updateProfile($user->id, $request->name);
+            return response()->json(['message' => 'User profile updated successfully']);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Profile update failed', 'details' => $e->getMessage()], 500);
+        }
     }
 
 

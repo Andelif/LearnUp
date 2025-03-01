@@ -3,70 +3,47 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use App\Services\TuitionRequestService;
+
 
 class TuitionRequestController extends Controller
 {
+    protected $tuitionRequestService;
+
+    public function __construct(TuitionRequestService $tuitionRequestService)
+    {
+        $this->tuitionRequestService = $tuitionRequestService;
+    }
     public function index()
     {
-        $tuitionRequests = DB::select("SELECT * FROM tuition_requests");
+        $tuitionRequests = $this->tuitionRequestService->getAllTuitionRequests();
         return response()->json($tuitionRequests);
     }
     public function getAllRequests()
    {
-    $user = Auth::user(); // Get authenticated user
-
-    if (!$user) {
-        return response()->json(['message' => 'Unauthorized'], 401);
-    }
-    $tuitionRequests = DB::select("
-        select * from tuition_requests where LearnerID=(select LearnerID from learners where user_id= ?)
-    ",[$user->id]);
-
-    return response()->json($tuitionRequests);
+    return response()->json($this->tuitionRequestService->getUserTuitionRequests());
+   
     }
 
     public function show($id)
     {
-        $tuitionRequest = DB::select("SELECT * FROM tuition_requests WHERE TutionID = ?", [$id]);
+        $tuitionRequest = $this->tuitionRequestService->getTuitionRequestById($id);
 
-        if (empty($tuitionRequest)) {
+        if (!$tuitionRequest) {
             return response()->json(['message' => 'Tuition request not found'], 404);
         }
 
-        return response()->json($tuitionRequest[0]);
+        return response()->json($tuitionRequest);
     }
 
     public function store(Request $request)
-    {
-        $user = Auth::user();
-        if (!$user || $user->role !== 'learner') {
-            return response()->json(['message' => 'Unauthorized! Please login to continue'], 403);
-        }
-        
-        $request->validate([
-            'class' => 'required|string|max:255',
-            'subjects' => 'required|string',
-            'asked_salary' => 'required|numeric',
-            'curriculum' => 'required|string',
-            'days' => 'required|string',
-            'location'=>'required|string',
-        ]);
-        $learner = DB::select("SELECT LearnerID FROM learners WHERE user_id = ?", [$user->id]);
-        $learner_id = $learner[0]->LearnerID;
-        DB::insert("INSERT INTO tuition_requests (LearnerID, class, subjects, asked_salary, curriculum, days, location) VALUES (?, ?, ?, ?, ?, ?, ?)", [
-            $learner_id,
-            $request->class,
-            $request->subjects,
-            $request->asked_salary,
-            $request->curriculum,
-            $request->days,
-            $request->location
-        ]);
-        
+    { 
+        $result = $this->tuitionRequestService->createTuitionRequest($request);
 
-        return response()->json(['message' => 'Tuition request created successfully'], 201);
+        return response()->json($result, 201);
+       
+
     }
     public function filterTuitionRequests(Request $request)
 {
@@ -80,47 +57,22 @@ class TuitionRequestController extends Controller
 }
 public function update(Request $request, $id)
 {
-    // Validate the request data
-    $request->validate([
-        'class' => 'required|string|max:255',
-        'subjects' => 'required|string',
-        'asked_salary' => 'required|numeric',
-        'curriculum' => 'required|string',
-        'days' => 'required|string',
-        'location' => 'required|string',
-    ]);
+    $result = $this->tuitionRequestService->updateTuitionRequest($request, $id);
 
-    // Check if the tuition request exists
-    $tuitionRequest = DB::select("SELECT * FROM tuition_requests WHERE TutionID = ?", [$id]);
-
-    if (empty($tuitionRequest)) {
+    if (!$result) {
         return response()->json(['message' => 'Tuition request not found'], 404);
     }
 
-    // Update the tuition request
-    DB::update("UPDATE tuition_requests SET class = ?, subjects = ?, asked_salary = ?, curriculum = ?, days = ?, location = ? WHERE TutionID = ?", [
-        $request->class,
-        $request->subjects,
-        $request->asked_salary,
-        $request->curriculum,
-        $request->days,
-        $request->location,
-        $id
-    ]);
-
-    return response()->json(['message' => 'Tuition request updated successfully']);
+    return response()->json($result);
 }
 public function destroy($id)
 {
-    $tutionReq = DB::select("SELECT * FROM tuition_requests WHERE TutionID = ?", [$id]);
-    if (empty($tutionReq)) {
-        // If the tuition request doesn't exist, return a 404 error
-        return response()->json(['message' => 'Tuition Request not found'], 404);
+    $result = $this->tuitionRequestService->deleteTuitionRequest($id);
+
+    if (!$result) {
+        return response()->json(['message' => 'Tuition request not found'], 404);
     }
 
-    
-
-    DB::delete("DELETE FROM tuition_requests WHERE TutionID = ?", [$id]);
-    return response()->json(['message' => 'Tuition Request deleted successfully']);
+    return response()->json($result);
 }
 }
