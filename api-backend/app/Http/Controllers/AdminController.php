@@ -1,31 +1,35 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use App\Services\AdminService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 
 class AdminController extends Controller
 {
+    protected $adminService;
+
+    public function __construct(AdminService $adminService)
+    {
+        $this->adminService = $adminService;
+    }
+
+
+    
     public function index()
     {
         if (Auth::user()->role !== 'admin') {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 
-        $admins = DB::select("SELECT * FROM admins");
-        return response()->json($admins);
+        return response()->json($this->adminService->getAllAdmins());
     }
 
     public function store(Request $request)
     {
         if (Auth::user()->role !== 'admin') {
             return response()->json(['message' => 'Unauthorized'], 403);
-        }
-        $exists = DB::select("SELECT * FROM admins WHERE user_id = ?", [Auth::id()]);
-         if ($exists) {
-           return response()->json(['message' => 'User is already an admin'], 400);
         }
 
         $request->validate([
@@ -35,21 +39,15 @@ class AdminController extends Controller
             'permission_req' => 'nullable|boolean',
         ]);
 
-        DB::insert("INSERT INTO admins (user_id, full_name, address, contact_number, permission_req) VALUES (?, ?, ?, ?, ?)", [
-            Auth::id(),
-            $request->full_name,
-            $request->address,
-            $request->contact_number,
-            $request->permission_req
-        ]);
+        $response = $this->adminService->createAdmin($request->all(), Auth::id());
 
-        return response()->json(['message' => 'Admin profile updated successfully'], 201);
+        return response()->json($response, isset($response['error']) ? 400 : 201);
     }
 
     public function show($id)
     {
-        $admin = DB::select("SELECT * FROM admins WHERE AdminID = ?", [$id]);
-        
+        $admin = $this->adminService->getAdminById($id);
+
         if (!$admin || (Auth::id() !== $admin[0]->user_id && Auth::user()->role !== 'admin')) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
@@ -59,19 +57,11 @@ class AdminController extends Controller
 
     public function update(Request $request, $id)
     {
-        $admin = DB::select("SELECT * FROM admins WHERE AdminID = ?", [$id]);
-        
-        if (!$admin || Auth::id() !== $admin[0]->user_id) {
+        if (Auth::id() !== $id && Auth::user()->role !== 'admin') {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 
-        DB::update("UPDATE admins SET full_name = ?, address = ?, contact_number = ?, permission_req = ? WHERE AdminID = ?", [
-            $request->full_name,
-            $request->address,
-            $request->contact_number,
-            $request->permission_req,
-            $id
-        ]);
+        $this->adminService->updateAdmin($id, $request->all());
 
         return response()->json(['message' => 'Admin updated successfully']);
     }
@@ -82,143 +72,47 @@ class AdminController extends Controller
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 
-        DB::delete("DELETE FROM admins WHERE AdminID = ?", [$id]);
-        return response()->json(['message' => 'Admin deleted successfully']);
+        return response()->json($this->adminService->deleteAdmin($id));
     }
-
-
-
-
-
 
 
     public function getLearners()
     {
-        if (Auth::user()->role !== 'admin') {
-            return response()->json(['message' => 'Unauthorized'], 403);
-        }
-
-        $learners = DB::select("SELECT * FROM learners");
-        return response()->json($learners);
+        return response()->json($this->adminService->getLearners());
     }
 
     public function getTutors()
     {
-        if (Auth::user()->role !== 'admin') {
-            return response()->json(['message' => 'Unauthorized'], 403);
-        }
-
-        $tutors = DB::select("SELECT * FROM tutors");
-        return response()->json($tutors);
+        return response()->json($this->adminService->getTutors());
     }
 
     public function getTuitionRequests()
     {
-        if (Auth::user()->role !== 'admin') {
-            return response()->json(['message' => 'Unauthorized'], 403);
-        }
-
-        $tuitionRequests = DB::select("SELECT * FROM tuition_requests");
-        return response()->json($tuitionRequests);
+        return response()->json($this->adminService->getTuitionRequests());
     }
 
     public function getApplications()
     {
-        if (Auth::user()->role !== 'admin') {
-            return response()->json(['message' => 'Unauthorized'], 403);
-        }
-
-        $applications = DB::select("SELECT * FROM applications");
-        return response()->json($applications);
+        return response()->json($this->adminService->getApplications());
     }
 
 
     public function getApplicationsByTuitionID($tutionID)
     {
-        if (Auth::user()->role !== 'admin') {
-            return response()->json(['message' => 'Unauthorized'], 403);
-        }
-
-        $applications = DB::select("
-            SELECT a.ApplicationID, 
-                   t.full_name AS tutor_name, 
-                   t.experience, 
-                   t.qualification,
-                   t.currently_studying_in,
-                   t.preferred_salary,
-                   t.preferred_location,
-                   t.preferred_time
-            FROM applications a
-            JOIN tutors t ON a.tutor_id = t.TutorID
-            WHERE a.tution_id = ?", [$tutionID]);
-
-        return response()->json($applications);
+        return response()->json($this->adminService->getApplicationsByTuitionID($tutionID));
     }
-
-
-
-
 
     public function matchTutor(Request $request)
-{
-    $request->validate([
-        'application_id' => 'required|exists:applications,ApplicationID',
-    ]);
-
-    // Fetch application details
-    $application = DB::select("SELECT * FROM applications WHERE ApplicationID = ?", [$request->application_id]);
-
-    if (empty($application)) {
-        return response()->json(['message' => 'Application not found'], 404);
-    }
-
-    $application = $application[0];
-
-    // Update the matched column
-    DB::update("UPDATE applications SET matched = 1 WHERE ApplicationID = ?", [$request->application_id]);
-
-    $adminId = Auth::id();
-
-    // Fetch user_id of the learner
-    $learnerUser = DB::select(
-        "SELECT user_id FROM learners WHERE LearnerID = 
-            (SELECT learner_id FROM applications WHERE ApplicationID = ?)", [$request->application_id]
-    );
-
-    // Fetch user_id of the tutor
-    $tutorUser = DB::select(
-        "SELECT user_id FROM tutors WHERE TutorID = 
-            (SELECT tutor_id FROM applications WHERE ApplicationID = ?)", [$request->application_id]
-    );
-
-    // Check if learner user exists
-    if (!empty($learnerUser)) {
-        $learnerUserID = $learnerUser[0]->user_id;
-        
-        // Create notification for learner
-        DB::insert("INSERT INTO notifications (user_id, Message, Type, Status, TimeSent, view) VALUES (?, ?, ?, 'Unread', NOW(), ?)", [
-            $adminId,
-            "A Tutor has been selected for your Tuition ID: {$application->tution_id}.",
-            'Application Update',
-            $learnerUserID // View set to the specific learner user_id
+    {
+        $request->validate([
+            'application_id' => 'required|exists:applications,ApplicationID',
         ]);
+
+        $response = $this->adminService->matchTutor($request->application_id);
+
+        return response()->json($response, isset($response['error']) ? 404 : 200);
     }
 
-    // Check if tutor user exists
-    if (!empty($tutorUser)) {
-        $tutorUserID = $tutorUser[0]->user_id;
-        
-        // Create notification for tutor
-        DB::insert("INSERT INTO notifications (user_id, Message, Type, Status, TimeSent, view) VALUES (?, ?, ?, 'Unread', NOW(), ?)", [
-            $adminId,
-            "You have been selected for Tuition ID: {$application->tution_id}.",
-            'Application Update',
-            $tutorUserID // View set to the specific tutor user_id
-        ]);
-    }
-
-    return response()->json(['message' => 'Tutor successfully matched with learner'], 200);
-}
 
 
 
