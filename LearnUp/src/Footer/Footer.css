@@ -35,6 +35,10 @@ html, body {
   margin-top: auto; /* Push footer to the bottom */
 }
 
+.footer p {
+  color: #ddd;
+}
+
 .footer-links a {
   margin: 0 12px;
   color: #ddd;

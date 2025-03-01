@@ -9,6 +9,7 @@ use App\Http\Controllers\ApplicationController;
 use App\Http\Controllers\MessageController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\DashboardController;
 
 // Authentication Routes
 
@@ -49,7 +50,14 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/notifications', [NotificationController::class, 'index']);  
     Route::post('/notifications', [NotificationController::class, 'store']); 
     Route::put('/notifications/{id}/read', [NotificationController::class, 'markAsRead']); 
-    Route::delete('/notifications/{id}', [NotificationController::class, 'destroy']); 
+    Route::delete('/notifications/{id}', [NotificationController::class, 'destroy']);
+    
+    
+
+    //Message Routes
+    Route::post('/messages', [MessageController::class, 'sendMessage']); 
+    Route::get('/messages/{userId}', [MessageController::class, 'getMessages']); 
+    Route::put('/messages/seen/{senderId}', [MessageController::class, 'markAsSeen']); 
 
 
 
@@ -61,6 +69,10 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/admin/applications', [AdminController::class, 'getApplications']);
     Route::get('/admin/applications/{tuition_id}', [AdminController::class, 'getApplicationsByTuitionID']);
     Route::post('/admin/match-tutor', [AdminController::class, 'matchTutor']);
+
+
+    //Dashboard Route
+    Route::get('/dashboard/{userId}/{role}', [DashboardController::class, 'getDashboardStats']);
 
 
 });
