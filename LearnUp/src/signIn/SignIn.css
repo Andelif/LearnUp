@@ -92,6 +92,7 @@
     background-color: #f9fafb;
     transition: all 0.3s ease;
     font-weight: 500;
+    color: #100f0f;
   }
   
   .user-btn:hover {
