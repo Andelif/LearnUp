@@ -72,7 +72,7 @@ const MyTuitions = () => {
 
   return (
     <div className="tuition-container">
-      <h2>All Tuition Requests</h2>
+      <h1>All Tuition Requests</h1>
       {requests.length === 0 ? (
         <p>No tuition requests found.</p>
       ) : (
