@@ -1,100 +1,162 @@
-/* Tuition Card Styling */
+
 .tuition-card {
-    background: white;
-    padding: 15px;
-    border-radius: 8px;
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-    border-left: 5px solid #007bff;
-    transition: transform 0.2s ease-in-out;
-    margin-bottom: 15px;
-  }
-  
-  /* Header Layout (Title + Buttons Side by Side) */
+  background: #ffffff;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+ 
+  transition: transform 0.3s ease-in-out;
+  margin-bottom: 20px;
+  position: relative;
+  overflow: hidden;
+
+}
+
+.tuition-card:hover {
+  transform: translateY(-5px);
+}
+
+
+.tuition-header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.tuition-title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  color: #333;
+  margin: 0;
+  text-align: center;
+}
+
+
+.button-group {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.button-group button {
+  padding: 8px 12px;
+  font-size: 12px;
+  width: 80px;
+  height: 35px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.edit-btn {
+  background-color: #60d89c;
+  color: #222;
+}
+
+.edit-btn:hover {
+  background-color: #148b3c;
+}
+
+.delete-btn {
+  background-color: #dc3545;
+  color: #ffffff;
+}
+
+.delete-btn:hover {
+  background-color: #c82333;
+}
+
+.save-btn {
+  background-color: #28a745;
+  color: #ffffff;
+}
+
+.save-btn:hover {
+  background-color: #218838;
+}
+
+.cancel-btn {
+  background-color: #6c757d;
+  color: #ffffff;
+}
+
+.cancel-btn:hover {
+  background-color: #5a6268;
+}
+
+
+.tuition-info {
+  margin-top: 15px;
+  text-align: left;
+}
+
+.tuition-info p {
+  margin: 8px 0;
+  font-size: 1rem;
+  color: #555;
+}
+
+.tuition-info span {
+  font-weight: 600;
+  color: #333;
+}
+
+
+.edit-form input {
+  width: 100%;
+  margin-bottom: 12px;
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  font-size: 1rem;
+  color: #333;
+}
+
+
+@media (max-width: 768px) {
   .tuition-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+    flex-direction: column;
+    align-items: flex-start;
   }
-  
-  /* Tuition Title */
+
   .tuition-title {
-    font-size: 1.2rem;
-    font-weight: bold;
-  }
-  
-  /* Buttons Layout */
-  .button-group {
-    display: flex;
-    gap: 8px;
-  }
-  
-  /* Edit Button */
-  .edit-btn {
-    background-color: #ffc107;
-    color: #222;
-    border: none;
-    padding: 6px 12px;
-    cursor: pointer;
-    border-radius: 5px;
-    transition: 0.3s;
-    font-size: 14px;
-  }
-  
-  .edit-btn:hover {
-    background-color: #e0a800;
-  }
-  
-  /* Delete Button */
-  .delete-btn {
-    background-color: #dc3545;
-    color: white;
-    border: none;
-    padding: 6px 6px;
-    cursor: pointer;
-    border-radius: 5px;
-    transition: 0.3s;
-    font-size: 12px;
-  }
-  
-  .delete-btn:hover {
-    background-color: #c82333;
-  }
-  
-  /* Form Styling */
-  .edit-form input {
+    text-align: left;
     width: 100%;
-    margin-bottom: 8px;
-    padding: 8px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
   }
-  
-  /* Save and Cancel Buttons */
-  .save-btn {
-    background-color: #28a745;
-    color: white;
-    border: none;
-    padding: 6px 12px;
-    cursor: pointer;
-    border-radius: 5px;
+
+  .button-group {
+    width: 100%;
+    justify-content: flex-start;
+    bottom: 15px;
+    right: 15px;
+  }
+
+  .button-group button {
+    width: 100%;
+    margin-bottom: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .tuition-card {
+    padding: 15px;
+  }
+
+  .tuition-title {
+    font-size: 1.5rem;
+  }
+
+  .button-group button {
     font-size: 14px;
+    padding: 10px 15px;
   }
-  
-  .save-btn:hover {
-    background-color: #218838;
+
+  .tuition-info p {
+    font-size: 0.9rem;
   }
-  
-  .cancel-btn {
-    background-color: #6c757d;
-    color: white;
-    border: none;
-    padding: 6px 12px;
-    cursor: pointer;
-    border-radius: 5px;
-    font-size: 14px;
-  }
-  
-  .cancel-btn:hover {
-    background-color: #5a6268;
-  }
-  
+}
