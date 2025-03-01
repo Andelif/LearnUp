@@ -86,6 +86,14 @@ const Dashboard = () => {
           {user?.role === "learner" && <Link to='/myTuitions' className="sidebar-link">My tuitions</Link>}
           
         </div>
+
+
+        {/* <div>
+          <Link to="/inbox" className="sidebar-link">
+            Chat
+          </Link>
+        </div> */}
+
       </aside>
 
       <main className="dashboard-main">

@@ -17,6 +17,7 @@ import Notification from './Notification/Notification';
 import AdminRoutes from './AdminRoutes';
 import ProfilePage from './ProfilePage/ProfilePage';
 import MyTuitions from './MyTuitions/MyTuitions';
+import Inbox from './Inbox/Inbox';
 
 
 
@@ -39,6 +40,7 @@ const AppRoutes = () => {
     <Route path="/myTuitions" element={<MyTuitions />} />
     
     <Route path="/admin/*" element={<AdminRoutes />} />
+    <Route path="/inbox" element={<Inbox />} />
     
    </Routes>
   )
