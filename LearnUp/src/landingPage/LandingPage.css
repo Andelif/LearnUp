@@ -75,6 +75,13 @@
      font-weight: 600;
      color: #e6e6e6;
    }
+
+   .hero-section p {
+    font-size: 14px;
+    font-weight: 400;
+    color: #e6e6e6;
+
+   }
    
    .search-bar {
      width: 80%;
