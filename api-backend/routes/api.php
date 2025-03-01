@@ -15,7 +15,7 @@ use App\Http\Controllers\AdminController;
 
 Route::post('/register', [UserController::class, 'register']);
 Route::post('/login', [UserController::class, 'login']);
-Route::get('/tuition-requests', [TuitionRequestController::class, 'index']);
+Route::get('/tuition-requests/all', [TuitionRequestController::class, 'index']);
 Route::get('/tuition-requests/{id}', [TuitionRequestController::class, 'show']);
 Route::get('/tuition-requests/filter', [TuitionRequestController::class, 'filterTuitionRequests']);
 
@@ -33,11 +33,11 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::put('/learners/{id}', [LearnerController::class, 'update']);
 
     Route::post('/tuition-requests', [TuitionRequestController::class, 'store']); 
-    Route::get('/tuition-requests', [TuitionRequestController::class, 'getAllRequests']);
+    
 
     Route::put('/tuition-requests/{id}', [TuitionRequestController::class, 'update']);
     Route::delete('/tuition-requests/{id}', [TuitionRequestController::class, 'destroy']);
-
+    Route::get('/tuition-requests', [TuitionRequestController::class, 'getAllRequests']);
 
     Route::post('applications',  [ApplicationController::class, 'store']);
     Route::get('/tutor/{userId}/stats', [ApplicationController::class, 'getTutorStats']);

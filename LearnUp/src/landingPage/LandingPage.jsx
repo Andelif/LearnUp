@@ -24,9 +24,9 @@ const LandingPage = () => {
   useEffect(() => {
     const fetchTuitionRequests = async () => {
       try {
-        const response = await axios.get("http://localhost:8000/api/tuition-requests");
+        const response = await axios.get("http://localhost:8000/api/tuition-requests/all");
         setTuitionRequests(response.data);
-        // console.log(response.data);
+         console.log(response.data);
       } catch (error) {
         console.error("Error fetching tuition requests:", error);
       }
@@ -113,22 +113,22 @@ const LandingPage = () => {
       <h2>The ways <span className="highlight">Learners</span> can connect with us.</h2>
   <div className="steps-container">
     <div className="step">
-      <div class="step-icon">👤</div>
+      <div className="step-icon">👤</div>
       <h3>Create Profile</h3>
     </div>
-    <div class="arrow">&#8594;</div> 
+    <div className="arrow">&#8594;</div> 
     <div className="step">
-      <div class="step-icon">📝</div>
+      <div className="step-icon">📝</div>
       <h3>Submit Requirements</h3>
     </div>
     <div className="arrow">&#8594;</div> 
     <div className="step">
-      <div class="step-icon">📄</div>
+      <div className="step-icon">📄</div>
       <h3>Get Tutors' CV</h3>
     </div>
     <div className="arrow">&#8594;</div> 
     <div className="step">
-      <div class="step-icon">⭐</div>
+      <div className="step-icon">⭐</div>
       <h3>Select Your Tutor</h3>
     </div>
   </div>

@@ -14,7 +14,7 @@ const JobBoard = () => {
 
   useEffect(() => {
     axios
-      .get("http://localhost:8000/api/tuition-requests")
+      .get("http://localhost:8000/api/tuition-requests/all")
       .then((response) => {
         setJobs(response.data);
         

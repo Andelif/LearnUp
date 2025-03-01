@@ -56,7 +56,8 @@ const Dashboard = () => {
           <Link to="/jobBoard" className="sidebar-link">Job Board</Link>
         </div>
         <div>
-          <Link to='/myTuitions' className="sidebar-link">My tuitions</Link>
+          {user?.role === "learner" && <Link to='/myTuitions' className="sidebar-link">My tuitions</Link>}
+          
         </div>
       </aside>
 

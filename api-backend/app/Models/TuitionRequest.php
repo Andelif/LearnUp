@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\Model;
 class TuitionRequest extends Model
 {
     protected $table = 'tuition_requests';
-    protected $primaryKey = 'TuitionID';
+    protected $primaryKey = 'TutionID';
     public $incrementing = true;
     protected $fillable = ['LearnerID', 'class', 'subjects', 'asked_salary', 'curriculum', 'days', 'location'];
 
@@ -30,7 +30,7 @@ class TuitionRequest extends Model
     // Fetch tuition request by ID
     public static function findById($tuition_id)
     {
-        return DB::select("SELECT * FROM tuition_requests WHERE TuitionID = ?", [$tuition_id])[0] ?? null;
+        return DB::select("SELECT * FROM tuition_requests WHERE TutionID = ?", [$tuition_id])[0] ?? null;
     }
 
     // Get all applications for a tuition request
