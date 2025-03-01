@@ -13,8 +13,7 @@ return new class extends Migration
      */
     public function up()
     {
-        DB::statement("
-        CREATE TABLE users (
+        DB::statement("CREATE TABLE users (
             id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
             name VARCHAR(255) NOT NULL,
             email VARCHAR(255) UNIQUE NOT NULL,

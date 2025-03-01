@@ -13,8 +13,7 @@ return new class extends Migration
      */
     public function up()
     {
-        DB::statement("
-        CREATE TABLE applications (
+        DB::statement("CREATE TABLE applications (
             ApplicationID BIGINT AUTO_INCREMENT PRIMARY KEY,
             tution_id BIGINT NOT NULL, -- Foreign key to tuition_requests table
             learner_id BIGINT NOT NULL, -- Foreign key to learners table
