@@ -5,27 +5,21 @@
   }
   
   .sidebar {
-    width: 200px;
-    background: #273a59;
+    width: 250px;
+    background: #2a3f5f;
     color: white;
     padding: 20px;
-    height: 100%;
   }
-  .sidebar-link{
-    color: #8fb1bc;
-  }
+  
   .profile-section {
     text-align: center;
   }
-
-
-
+  
   .profile-pic {
     width: 80px;
     border-radius: 50%;
     margin-bottom: 10px;
   }
- 
   
   .dashboard-main {
     flex-grow: 1;
@@ -89,10 +83,4 @@
     right: 1rem;
     position: absolute;
   }
-  
-  .edit-icon:hover{
-    cursor: pointer;
-    
-  }
-
   
