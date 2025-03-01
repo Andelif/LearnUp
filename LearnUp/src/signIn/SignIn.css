@@ -92,10 +92,14 @@
     background-color: #f9fafb;
     transition: all 0.3s ease;
     font-weight: 500;
+    color: #100f0f;
   }
   
   .user-btn:hover {
     background-color: #e5e7eb;
+  }
+  .or-divider{
+    text-align: center;
   }
   
   .user-btn.active {
@@ -182,7 +186,7 @@
   .signup-option {
     text-align: center;
     font-size: 16px;
-    color: #555;
+    color: #100f0f;
     margin-top: 20px;
     display: flex;
     justify-content: center;
@@ -192,4 +196,9 @@
 .signup-link{
     color: #460956;
     font-weight: bold;
+    margin-left: .3rem;
+}
+
+.signup-link:hover{
+  cursor:pointer;
 }
