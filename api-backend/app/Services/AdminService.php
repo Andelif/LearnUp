@@ -57,11 +57,94 @@ class AdminService{
     {
         return DB::select("SELECT * FROM learners");
     }
+    public function deleteLearner($learnerId)
+    {
+        DB::beginTransaction();
+
+        try {
+            
+            $learner = DB::select('SELECT * FROM learners WHERE LearnerID = ?', [$learnerId]);
+
+            if (empty($learner)) {
+               
+                DB::rollBack();
+                return [
+                    'status' => 'error',
+                    'message' => 'Learner not found'
+                ];
+            }
+
+            
+            DB::statement('DELETE FROM learners WHERE LearnerID = ?', [$learnerId]);
+
+            
+            DB::statement('DELETE FROM users WHERE id = (SELECT user_id FROM learners WHERE LearnerID = ? LIMIT 1)', [$learnerId]);
+
+           
+            DB::commit();
+
+            return [
+                'status' => 'success',
+                'message' => 'Learner and associated user deleted successfully'
+            ];
+        } catch (Exception $e) {
+           
+            DB::rollBack();
+
+            
+            return [
+                'status' => 'error',
+                'message' => 'An error occurred while deleting the learner: ' . $e->getMessage()
+            ];
+        }
+    }
 
     public function getTutors()
     {
         return DB::select("SELECT * FROM tutors");
     }
+    public function deleteTutor($tutorId)
+    {
+        DB::beginTransaction();
+
+        try {
+            
+            $tutor = DB::select('SELECT * FROM tutors WHERE TutorID = ?', [$tutorId]);
+
+            if (empty($tutor)) {
+               
+                DB::rollBack();
+                return [
+                    'status' => 'error',
+                    'message' => 'Learner not found'
+                ];
+            }
+
+            
+            DB::statement('DELETE FROM tutors WHERE TutorID = ?', [$tutorId]);
+
+            
+            DB::statement('DELETE FROM users WHERE id = (SELECT user_id FROM tutors WHERE TutorID = ? LIMIT 1)', [$tutorId]);
+
+           
+            DB::commit();
+
+            return [
+                'status' => 'success',
+                'message' => 'Tutor and associated user deleted successfully'
+            ];
+        } catch (Exception $e) {
+           
+            DB::rollBack();
+
+            
+            return [
+                'status' => 'error',
+                'message' => 'An error occurred while deleting the tutor: ' . $e->getMessage()
+            ];
+        }
+    }
+
 
     public function getTuitionRequests()
     {

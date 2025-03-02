@@ -48,6 +48,9 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(NotificationService::class, function ($app) {
             return new NotificationService();
         });    
+        $this->app->bind(DashboardService::class, function ($app) {
+            return new DashboardService();
+        });
     }
 
 

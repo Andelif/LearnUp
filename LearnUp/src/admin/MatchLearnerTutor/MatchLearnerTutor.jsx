@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import { toast } from "react-toastify";
 import "./MatchLearnerTutor.css";
 
 const MatchLearnerAndTutor = () => {
@@ -30,6 +31,7 @@ const MatchLearnerAndTutor = () => {
         setApplications(response.data);
       })
       .catch((error) => {
+        toast.error("Failed to match");
         console.error("Error fetching applications:", error);
       });
   };
@@ -40,7 +42,7 @@ const MatchLearnerAndTutor = () => {
         { application_id: applicationID },
         { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }
       ).then((response) => {
-        alert(response.data.message);
+        toast.success("Tutor matched successfully!");
         // Refresh applications list after matching
         fetchApplications(selectedTuitionID);
       })

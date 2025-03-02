@@ -80,10 +80,34 @@ class AdminController extends Controller
     {
         return response()->json($this->adminService->getLearners());
     }
+    public function deleteLearner($learnerId)
+    {
+        $result = $this->adminService->deleteLearner($learnerId);
+
+        // Check for error or success response
+        if ($result['status'] === 'error') {
+            return response()->json(['error' => $result['message']], 404);
+        }
+
+        return response()->json(['message' => $result['message']]);
+    }
+  
 
     public function getTutors()
     {
         return response()->json($this->adminService->getTutors());
+    }
+    public function deleteTutor($tutorId)
+    {
+        $result = $this->adminService->deleteTutor($tutorId);
+
+        // Check for error or success response
+        if ($result['status'] === 'error') {
+            return response()->json(['error' => $result['message']], 404);
+        }
+
+        return response()->json(['message' => $result['message']]);
+        
     }
 
     public function getTuitionRequests()

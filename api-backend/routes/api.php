@@ -64,7 +64,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     //Admin Functionalities
     Route::get('/admin/learners', [AdminController::class, 'getLearners']);
+    Route::delete('/admin/learners/{id}', [AdminController::class, 'deleteLearner']);
     Route::get('/admin/tutors', [AdminController::class, 'getTutors']);
+    Route::delete('/admin/tutors/{id}', [AdminController::class, 'deleteTutor']);
     Route::get('/admin/tuition-requests', [AdminController::class, 'getTuitionRequests']);
     Route::get('/admin/applications', [AdminController::class, 'getApplications']);
     Route::get('/admin/applications/{tuition_id}', [AdminController::class, 'getApplicationsByTuitionID']);

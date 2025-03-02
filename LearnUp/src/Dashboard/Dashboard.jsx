@@ -46,6 +46,7 @@ const Dashboard = () => {
         withCredentials: true,
       });
       setStats(response.data);
+      console.log(response.data);
     } catch (err) {
       console.error("Failed to fetch dashboard stats", err);
     }
@@ -92,11 +93,11 @@ const Dashboard = () => {
         <div className="stats-container">
 
           <div className="stat-box"> 
-            <h2>{stats.appliedJobs}</h2> 
+            <h2>0</h2> 
             <p>{user?.role === "tutor" ? "Applied Jobs" : "Applied Requests"}</p> 
           </div>
           <div className="stat-box"> 
-            <h2>{stats.shortlistedJobs}</h2> 
+            <h2>0</h2> 
             <p>{user?.role === "tutor" ? "Shortlisted Jobs" : "Shortlisted Tutors"}</p> 
           </div>
 

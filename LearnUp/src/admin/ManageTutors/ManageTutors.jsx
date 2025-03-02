@@ -1,13 +1,14 @@
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import axios from "axios";
-
+import { storeContext } from "../../context/contextProvider";
 const ManageTutors = () => {
   const [tutors, setTutors] = useState([]);
+  const {token}=useContext(storeContext);
 
   useEffect(() => {
     axios
       .get("http://localhost:8000/api/admin/tutors", {
-        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+        headers: { Authorization: `Bearer ${token}` },
       })
       .then((response) => {
         setTutors(response.data);
@@ -16,6 +17,22 @@ const ManageTutors = () => {
         console.error("Error fetching tutors:", error);
       });
   }, []);
+  const handleDelete = (tutorId) => {
+    // Confirm deletion
+    if (window.confirm("Are you sure you want to delete this tutor?")) {
+      axios
+        .delete(`http://localhost:8000/api/admin/tutors/${tutorId}`, {
+          headers: { Authorization: `Bearer ${token}` },
+        })
+        .then((response) => {
+          // If successful, remove the tutor from the state
+          setTutors(tutors.filter((tutor) => tutor.TutorID !== tutorId));
+        })
+        .catch((error) => {
+          console.error("Error deleting tutor:", error);
+        });
+    }
+  };
 
   return (
     <div>
@@ -42,6 +59,9 @@ const ManageTutors = () => {
               <td>{tutor.availability}</td>
               <td>{tutor.qualifications}</td>
               <td>{tutor.experience}</td>
+              <td>
+                <button onClick={() => handleDelete(tutor.TutorID)}>Delete</button>
+              </td>
             </tr>
           ))}
         </tbody>
