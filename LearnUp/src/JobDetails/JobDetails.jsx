@@ -9,6 +9,7 @@ const JobDetails = () => {
   const { id } = useParams(); 
   console.log(id);
   const [job, setJob] = useState(null);
+  const [hasApplied, setHasApplied] = useState(false);
   const [loading, setLoading] = useState(true);
   const { url ,user} = useContext(storeContext);
   const handleApply=async ()=>{
@@ -19,6 +20,10 @@ const JobDetails = () => {
       
       if (user.role !== "tutor") {
         toast.error("You are not eligible to apply", { autoClose: 2000 }); // Show toast message
+        return;
+      }
+      if(hasApplied){
+        toast.error("You have already applied for this job");
         return;
       }
   
@@ -34,6 +39,7 @@ const JobDetails = () => {
         });
     
         toast.success(response.data.message, { autoClose: 2000 });
+        setHasApplied(true);
       } catch (error) {
         if (error.response) {
           toast.error(error.response.data.message || "Failed to apply", { autoClose: 2000 });
@@ -66,9 +72,27 @@ const JobDetails = () => {
         setLoading(false);
       }
     };
+    const checkApplicationStatus = async () => {
+      if (!user) return;
+
+      try {
+        const res = await axios.get(`${url}/api/applications/check/${id}`, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        });
+
+        if (res.data.applied) {
+          setHasApplied(true);
+        }
+      } catch (error) {
+        console.error("Error checking application status:", error);
+      }
+    };
 
     fetchJobDetails();
-  }, [id]);
+    if (user) checkApplicationStatus();
+  }, [id, user]);
 
   if (loading) return <p>Loading job details...</p>;
   if (!job) return <p>Job not found</p>;
@@ -82,7 +106,7 @@ const JobDetails = () => {
       <p><strong>Salary:</strong> {job.asked_salary} BDT</p>
       <p><strong>Curriculum:</strong> {job.curriculum}</p>
       <p><strong>Days per Week:</strong> {job.days}</p>
-      <button className="apply-btn" onClick={handleApply}>Apply Now</button>
+      <button className="apply-btn" onClick={handleApply} disabled={hasApplied}>{hasApplied ? "Already Applied" : "Apply Now"}</button>
     </div>
   );
 };

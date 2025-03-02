@@ -51,5 +51,16 @@ class ApplicationController extends Controller
 
         return response()->json(['message' => $result['message']], $result['status']);
     }
+    public function checkApplication(Request $request, $tuition_id) {
+        $user = auth()->user();
+    
+        // Check if the tutor has already applied
+        $exists = DB::table('applications')
+            ->where('tuition_id', $tuition_id)
+            ->where('tutor_id', $user->id)
+            ->exists();
+    
+        return response()->json(['applied' => $exists]);
+    }
 }
 

@@ -42,6 +42,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     Route::post('applications',  [ApplicationController::class, 'store']);
     Route::get('/tutor/{userId}/stats', [ApplicationController::class, 'getTutorStats']);
+    Route::get('/applications/check/{tuition_id}', [ApplicationController::class, 'checkApplication']); 
     Route::get('/learner/{userId}/stats', [ApplicationController::class, 'getLearnerStats']);
     //Route::resource('messages', MessageController::class);
     Route::resource('notifications', NotificationController::class);

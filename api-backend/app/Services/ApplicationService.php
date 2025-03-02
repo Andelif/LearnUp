@@ -56,35 +56,64 @@ class ApplicationService{
     public function createApplication($request)
     {
         $user = Auth::user();
-        if (!$user || $user->role !== 'tutor') {
-            return ['error' => 'Unauthorized: Only tutors can apply for tuition requests', 'status' => 403];
-        }
+    if (!$user || $user->role !== 'tutor') {
+        return ['error' => 'Unauthorized: Only tutors can apply for tuition requests', 'status' => 403];
+    }
 
-        $request->validate([
-            'tution_id' => 'required|exists:tuition_requests,TutionID',
-        ]);
+    $request->validate([
+        'tution_id' => 'required|exists:tuition_requests,TutionID',
+    ]);
 
-        $learner = DB::select("SELECT LearnerID FROM tuition_requests WHERE TutionID = ?", [$request->tution_id]);
-        if (empty($learner)) {
-            return ['error' => 'Learner not found for this tuition request', 'status' => 404];
-        }
+    $tution_id = $request->tution_id; // Define $tution_id
+    $tutor = DB::select("SELECT TutorID FROM tutors WHERE user_id = ?", [$user->id]);
 
-        $learner_id = $learner[0]->LearnerID;
-        $tutor = DB::select("SELECT TutorID FROM tutors WHERE user_id = ?", [$user->id]);
+    if (empty($tutor)) {
+        return ['error' => 'Tutor not found', 'status' => 404];
+    }
 
-        if (empty($tutor)) {
-            return ['error' => 'Tutor not found', 'status' => 404];
-        }
+    $tutor_id = $tutor[0]->TutorID;
+    // Check if tutor has already applied
+    $exists = DB::table('applications')
+        ->where('tution_id', $tution_id)
+        ->where('tutor_id', $tutor_id)
+        ->exists();
 
-        $tutor_id = $tutor[0]->TutorID;
+    if ($exists) {
+        return ['error' => 'You have already applied for this job', 'status' => 400];
+    }
 
-        DB::insert("INSERT INTO applications (tution_id, learner_id, tutor_id, matched) VALUES (?, ?, ?, ?)", [
-            $request->tution_id,
-            $learner_id,
-            $tutor_id,
-            false
-        ]);
+    // Get LearnerID from tuition_requests table
+    $learner = DB::select("SELECT LearnerID FROM tuition_requests WHERE TutionID = ?", [$tution_id]);
 
-        return ['message' => 'Application submitted successfully', 'status' => 201];
+    if (empty($learner)) {
+        return ['error' => 'Learner not found for this tuition request', 'status' => 404];
+    }
+
+    $learner_id = $learner[0]->LearnerID;
+
+    // Get TutorID from tutors table
+    $tutor = DB::select("SELECT TutorID FROM tutors WHERE user_id = ?", [$user->id]);
+
+    if (empty($tutor)) {
+        return ['error' => 'Tutor not found', 'status' => 404];
+    }
+
+    $tutor_id = $tutor[0]->TutorID;
+
+    try {
+        // Start a transaction
+        DB::beginTransaction();
+
+        DB::insert(
+            "INSERT INTO applications (tution_id, learner_id, tutor_id, matched) VALUES (?, ?, ?, ?)", 
+            [$tution_id, $learner_id, $tutor_id, 0] // Use 0 instead of false
+        );
+
+        DB::commit();
+        return ['message' => 'Application submitted successfully', 'status' => 200];
+    } catch (\Exception $e) {
+        DB::rollBack();
+        return ['error' => 'Failed to apply: ' . $e->getMessage(), 'status' => 500];
+    }
     }
 }
