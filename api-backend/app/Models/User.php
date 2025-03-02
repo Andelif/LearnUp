@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Support\Facades\DB;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Notifications\Notifiable;
@@ -19,40 +20,67 @@ class User extends Authenticatable
         'password', 'remember_token',
     ];
 
-    // Define relationships
-    public function learner()
+    // Fetch user by ID
+    public static function findById($id)
     {
-        return $this->hasOne(\App\Models\Learner::class);
+        return DB::select("SELECT * FROM users WHERE id = ?", [$id])[0] ?? null;
     }
 
-    public function tutor()
+    // Fetch user by email
+    public static function findByEmail($email)
     {
-        return $this->hasOne(\App\Models\Tutor::class);
+        return DB::select("SELECT * FROM users WHERE email = ?", [$email])[0] ?? null;
     }
 
-    public function tuitionRequests()
+    // Create a new user
+    public static function createUser($data)
     {
-        return $this->hasMany(\App\Models\TuitionRequest::class, 'learner_id');
+        DB::insert("INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)", [
+            $data['name'],
+            $data['email'],
+            bcrypt($data['password']),
+            $data['role']
+        ]);
+        return DB::getPdo()->lastInsertId();
     }
 
-    public function applications()
+    // Define relationships using raw queries
+    public static function getLearner($id)
     {
-        return $this->hasMany(\App\Models\Application::class, 'tutor_id');
+        return DB::select("SELECT * FROM learners WHERE user_id = ?", [$id])[0] ?? null;
+    }
+
+    public static function getTutor($id)
+    {
+        return DB::select("SELECT * FROM tutors WHERE user_id = ?", [$id])[0] ?? null;
+    }
+
+    public static function getTuitionRequests($id)
+    {
+        return DB::select("SELECT * FROM tuition_requests WHERE learner_id = ?", [$id]);
+    }
+
+    public static function getApplications($id)
+    {
+        return DB::select("SELECT * FROM applications WHERE tutor_id = ?", [$id]);
     }
 
     // Role-based helper methods
-    public function isLearner()
+    public static function isLearner($id)
     {
-        return $this->role === 'learner';
+        $user = self::findById($id);
+        return $user && $user->role === 'learner';
     }
 
-    public function isTutor()
+    public static function isTutor($id)
     {
-        return $this->role === 'tutor';
+        $user = self::findById($id);
+        return $user && $user->role === 'tutor';
     }
 
-    public function isAdmin()
+    public static function isAdmin($id)
     {
-        return $this->role === 'admin';
+        $user = self::findById($id);
+        return $user && $user->role === 'admin';
     }
 }

@@ -2,7 +2,7 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\Schema;
+use Illuminate\Support\Facades\DB;
 
 return new class extends Migration
 {
@@ -13,24 +13,24 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('tutors', function (Blueprint $table) {
-            $table->id('TutorID'); // This will be the UserID (FK)
-            $table->unsignedBigInteger('user_id')->unique(); // Foreign key to users table
-            $table->string('full_name');
-            $table->string('address');
-            $table->string('contact_number');
-            $table->enum('gender', ['Male', 'Female', 'Other']);
-            $table->integer('preferred_salary');
-            $table->string('qualification');
-            $table->integer('experience');
-            $table->string('currently_studying_in');
-            $table->string('preferred_location');
-            $table->string('preferred_time');
-            $table->boolean('availability')->default(true);
-            $table->timestamps();
-    
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
-        });
+        DB::statement("CREATE TABLE tutors (
+            TutorID BIGINT AUTO_INCREMENT PRIMARY KEY,
+            user_id BIGINT unsigned NOT NULL,
+            full_name VARCHAR(255),
+            address VARCHAR(255)  NULL,
+            contact_number VARCHAR(255) NULL,
+            gender ENUM('Male', 'Female', 'Other')  NULL,
+            preferred_salary INT NULL,
+            qualification VARCHAR(255) NULL,
+            experience VARCHAR(255) NULL,
+            currently_studying_in VARCHAR(255) NULL,
+            preferred_location VARCHAR(255) NULL,
+            preferred_time VARCHAR(255) NULL,
+            availability BOOLEAN DEFAULT TRUE,
+            created_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+        )");
     }
 
     /**
@@ -40,6 +40,6 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('tutors');
+        DB::statement("DROP TABLE IF EXISTS tutors");
     }
 };

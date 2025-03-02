@@ -13,19 +13,19 @@ return new class extends Migration
      */
     public function up()
     {
-        Schema::create('admins', function (Blueprint $table) {
-            $table->id('AdminID'); // This will be the UserID (FK)
-            $table->unsignedBigInteger('user_id')->unique(); // Foreign key to users table
-            $table->string('full_name');
-            $table->string('address');
-            $table->string('contact_number');
-            $table->boolean('permission_req')->default(false);
-            $table->integer('match_made')->default(0);
-            $table->string('task_assigned')->nullable();
-            $table->timestamps();
-    
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
-        });
+    DB::statement("CREATE TABLE admins (
+    AdminID BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    user_id BIGINT UNSIGNED UNIQUE NOT NULL,
+    full_name VARCHAR(255) NOT NULL,
+    address VARCHAR(255) NULL,
+    contact_number VARCHAR(20) NULL,
+    permission_req BOOLEAN DEFAULT FALSE,
+    match_made INT DEFAULT 0,
+    task_assigned VARCHAR(255) NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    CONSTRAINT fk_admins_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+    );");
     }
 
     /**
@@ -35,6 +35,8 @@ return new class extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('admins');
+        
+        DB::statement("DROP TABLE IF EXISTS admins");
+        
     }
 };
