@@ -55,12 +55,14 @@ class ApplicationController extends Controller
         $user = auth()->user();
     
         // Check if the tutor has already applied
-        $exists = DB::table('applications')
-            ->where('tuition_id', $tuition_id)
-            ->where('tutor_id', $user->id)
-            ->exists();
+        $query = "SELECT EXISTS (SELECT 1 FROM applications WHERE tuition_id = ? AND tutor_id = ?) AS applied";
+        
+        // Execute the query
+        $result = DB::select($query, [$tuition_id, $user->id]);
     
-        return response()->json(['applied' => $exists]);
+        // Return the result
+        return response()->json(['applied' => $result[0]->applied]);
     }
+        
 }
 

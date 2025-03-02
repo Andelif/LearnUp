@@ -60,11 +60,15 @@ class ApplicationService{
         return ['error' => 'Unauthorized: Only tutors can apply for tuition requests', 'status' => 403];
     }
 
-    $request->validate([
-        'tution_id' => 'required|exists:tuition_requests,TutionID',
-    ]);
+    // Validate tuition_id
+    $tution_id = $request->tution_id;
+    $validateTution = DB::select("SELECT COUNT(*) as count FROM tuition_requests WHERE TutionID = ?", [$tution_id]);
 
-    $tution_id = $request->tution_id; // Define $tution_id
+    if ($validateTution[0]->count == 0) {
+        return ['error' => 'Invalid tuition request', 'status' => 400];
+    }
+
+    // Get TutorID from tutors table
     $tutor = DB::select("SELECT TutorID FROM tutors WHERE user_id = ?", [$user->id]);
 
     if (empty($tutor)) {
@@ -72,13 +76,15 @@ class ApplicationService{
     }
 
     $tutor_id = $tutor[0]->TutorID;
-    // Check if tutor has already applied
-    $exists = DB::table('applications')
-        ->where('tution_id', $tution_id)
-        ->where('tutor_id', $tutor_id)
-        ->exists();
 
-    if ($exists) {
+    // Check if tutor has already applied
+    $applicationExists = DB::select("
+        SELECT COUNT(*) as count FROM applications 
+        WHERE tution_id = ? AND tutor_id = ?", 
+        [$tution_id, $tutor_id]
+    );
+
+    if ($applicationExists[0]->count > 0) {
         return ['error' => 'You have already applied for this job', 'status' => 400];
     }
 
@@ -91,22 +97,15 @@ class ApplicationService{
 
     $learner_id = $learner[0]->LearnerID;
 
-    // Get TutorID from tutors table
-    $tutor = DB::select("SELECT TutorID FROM tutors WHERE user_id = ?", [$user->id]);
-
-    if (empty($tutor)) {
-        return ['error' => 'Tutor not found', 'status' => 404];
-    }
-
-    $tutor_id = $tutor[0]->TutorID;
-
     try {
         // Start a transaction
         DB::beginTransaction();
 
-        DB::insert(
-            "INSERT INTO applications (tution_id, learner_id, tutor_id, matched) VALUES (?, ?, ?, ?)", 
-            [$tution_id, $learner_id, $tutor_id, 0] // Use 0 instead of false
+        // Insert application record using raw SQL
+        DB::statement("
+            INSERT INTO applications (tution_id, learner_id, tutor_id, matched) 
+            VALUES (?, ?, ?, ?)", 
+            [$tution_id, $learner_id, $tutor_id, 0] // Use 0 for matched instead of false
         );
 
         DB::commit();
