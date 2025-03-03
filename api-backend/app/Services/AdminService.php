@@ -180,7 +180,7 @@ class AdminService{
             return ['error' => 'Application not found'];
         }
 
-        DB::update("UPDATE applications SET matched = 1 WHERE ApplicationID = ?", [$applicationId]);
+        DB::update("UPDATE applications SET matched = 1, status = 'Shortlisted' WHERE ApplicationID = ?", [$applicationId]);
 
         $adminId = Auth::id();
         $application = $application[0];

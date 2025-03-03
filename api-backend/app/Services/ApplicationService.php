@@ -21,10 +21,10 @@ class ApplicationService{
         $tutorId = $tutor[0]->TutorID;
         $query = "
             SELECT 
-                (SELECT COUNT(*) FROM applications WHERE tutor_id = ? ) AS applied,
-                (SELECT COUNT(*) FROM applications WHERE tutor_id = ? AND status = 'shortlisted') AS shortlisted,
-                (SELECT COUNT(*) FROM applications WHERE tutor_id = ? AND status = 'confirmed') AS confirmed,
-                (SELECT COUNT(*) FROM applications WHERE tutor_id = ? AND status = 'cancelled') AS cancelled;
+                (SELECT COUNT(*) FROM applications WHERE tutor_id = ? AND status = 'Applied')) AS applied,
+                (SELECT COUNT(*) FROM applications WHERE tutor_id = ? AND status = 'Shortlisted') AS shortlisted,
+                (SELECT COUNT(*) FROM applications WHERE tutor_id = ? AND status = 'Confirmed') AS confirmed,
+                (SELECT COUNT(*) FROM applications WHERE tutor_id = ? AND status = 'Cancelled') AS cancelled;
         ";
 
         $results = DB::select($query, [$tutorId, $tutorId, $tutorId, $tutorId]);
@@ -42,10 +42,10 @@ class ApplicationService{
         $learnerId = $learner[0]->LearnerID;
         $query = "
             SELECT 
-                (SELECT COUNT(*) FROM applications WHERE learner_id = ? ) AS applied,
-                (SELECT COUNT(*) FROM applications WHERE learner_id = ? AND status = 'shortlisted') AS shortlisted,
-                (SELECT COUNT(*) FROM applications WHERE learner_id = ? AND status = 'confirmed') AS confirmed,
-                (SELECT COUNT(*) FROM applications WHERE learner_id = ? AND status = 'cancelled') AS cancelled;
+                (SELECT COUNT(*) FROM applications WHERE learner_id = ? AND status = 'Applied') AS applied,
+                (SELECT COUNT(*) FROM applications WHERE learner_id = ? AND status = 'Shortlisted') AS shortlisted,
+                (SELECT COUNT(*) FROM applications WHERE learner_id = ? AND status = 'Confirmed') AS confirmed,
+                (SELECT COUNT(*) FROM applications WHERE learner_id = ? AND status = 'Cancelled') AS cancelled;
         ";
 
         $results = DB::select($query, [$learnerId, $learnerId, $learnerId, $learnerId]);
@@ -103,9 +103,9 @@ class ApplicationService{
 
         // Insert application record using raw SQL
         DB::statement("
-            INSERT INTO applications (tution_id, learner_id, tutor_id, matched) 
-            VALUES (?, ?, ?, ?)", 
-            [$tution_id, $learner_id, $tutor_id, 0] // Use 0 for matched instead of false
+            INSERT INTO applications (tution_id, learner_id, tutor_id, matched, status) 
+            VALUES (?, ?, ?, ?, ?)", 
+            [$tution_id, $learner_id, $tutor_id, 0, 'Applied'] // Use 0 for matched instead of false
         );
 
         DB::commit();
