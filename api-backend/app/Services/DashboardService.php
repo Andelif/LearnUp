@@ -21,11 +21,15 @@ class DashboardService{
                                     (SELECT TutorID FROM tutors WHERE user_id = ?)", [$userId])[0]->count;
 
         $shortlistedJobs = DB::select("SELECT COUNT(*) as count FROM applications WHERE tutor_id = 
-                                        (SELECT TutorID FROM tutors WHERE user_id = ?) AND matched = 1", [$userId])[0]->count;
+                                        SELECT TutorID FROM tutors WHERE user_id = ? AND status = 'Shortlisted'", [$userId])[0]->count;
+
+        $cancelledJobs = DB::select("SELECT COUNT(*) as count FROM applications WHERE tutor_id = 
+                                        SELECT TutorID FROM tutors WHERE user_id = ? AND status = 'Cancelled'", [$userId])[0]->count;
 
         return [
             'appliedJobs' => $appliedJobs,
             'shortlistedJobs' => $shortlistedJobs,
+            'cancelledJobs' => $cancelledJobs
         ];
     }
 
@@ -33,12 +37,16 @@ class DashboardService{
     {
         $appliedRequests = DB::select("SELECT COUNT(*) as count FROM tuition_requests WHERE LearnerID = ?", [$userId])[0]->count;
 
-        $shortlistedTutors = DB::select("SELECT COUNT(*) as count FROM applications WHERE TutorID IN 
-                                         (SELECT TutorID FROM applications WHERE matched = 1)", [])[0]->count;
+        $shortlistedTutors = DB::select("SELECT COUNT(*) as count FROM applications WHERE learner_id = 
+                                         SELECT LearnerID FROM learners WHERE user_id = ? AND status = 'Shortlisted'", [$userId])[0]->count;
+
+        $cancelledTutors =  DB::select("SELECT COUNT(*) as count FROM applications WHERE learner_id = 
+                                         SELECT LearnerID FROM learners WHERE user_id = ? AND status = 'Cancelled'", [$userId])[0]->count;
 
         return [
             'appliedRequests' => $appliedRequests,
             'shortlistedTutors' => $shortlistedTutors,
+            'cancelledTutors' => $cancelledTutors
         ];
     }
 

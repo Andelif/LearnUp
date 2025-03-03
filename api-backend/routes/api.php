@@ -60,7 +60,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/messages/{userId}', [MessageController::class, 'getMessages']); 
     Route::put('/messages/seen/{senderId}', [MessageController::class, 'markAsSeen']); 
     Route::get('/matched-users', [MessageController::class, 'getMatchedUsers']); 
-
+    Route::post('/reject-tutor', [MessageController::class, 'rejectTutor']);
 
 
     //Admin Functionalities

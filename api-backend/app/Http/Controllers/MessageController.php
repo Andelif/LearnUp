@@ -95,4 +95,33 @@ class MessageController extends Controller
 
     }
 
+    // Reject Tutor API
+    public function rejectTutor(Request $request)
+    {
+        $user = Auth::user();
+
+        $request->validate([
+            'tutor_id' => 'required|exists:tutors,user_id',
+            'tution_id' => 'required|exists:applications,tution_id',
+        ]);
+
+        // Ensure the user is a learner
+        $learner = DB::select("SELECT LearnerID FROM learners WHERE user_id = ?", [$user->id]);
+
+        if (empty($learner)) {
+            return response()->json(['error' => 'Only learners can reject tutors'], 403);
+        }
+
+        $learnerId = $learner[0]->LearnerID;
+
+        // Update application status
+        DB::update("UPDATE applications SET status = 'Cancelled' WHERE tutor_id = ? AND learner_id = ? AND tution_id = ?", [
+            $request->tutor_id,
+            $learnerId,
+            $request->tution_id
+        ]);
+
+        return response()->json(['message' => 'Tutor rejected successfully.']);
+    }
+
 }
