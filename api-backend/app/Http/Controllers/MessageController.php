@@ -53,4 +53,46 @@ class MessageController extends Controller
 
         return response()->json(['message' => 'Messages marked as seen']);
     }
+
+    // Fetch matched users for messaging
+    public function getMatchedUsers()
+    {
+        $user = Auth::user();
+
+
+        $userRole = DB::select("SELECT role FROM users WHERE id = ?", 
+            [$user->id]);
+            
+        $role = $userRole[0]->role;    
+               
+
+
+        if($role === "tutor")
+        {
+            
+            $matchedUsers = DB::select("SELECT l.user_id, l.full_name, 'learner' AS role, a.tution_id
+                                        FROM learners l JOIN applications a ON l.LearnerID = a.learner_id 
+                                            WHERE a.matched = true AND a.tutor_id = 
+                                                (SELECT TutorID FROM tutors WHERE user_id = ?)"
+                                                , [ $user->id]);
+
+            
+        }elseif($role === "learner")
+        {
+            
+            $matchedUsers = DB::select("SELECT t.user_id, t.full_name, 'tutor' AS role, a.tution_id
+                                        FROM tutors t JOIN applications a ON t.TutorID = a.tutor_id 
+                                            WHERE a.matched = true AND a.learner_id = 
+                                                (SELECT LearnerID FROM learners WHERE user_id = ?)"
+                                                , [ $user->id]);
+
+            
+        } else {
+            $matchedUsers = []; 
+        }
+
+        return response()->json($matchedUsers);
+
+    }
+
 }

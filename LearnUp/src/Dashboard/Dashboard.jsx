@@ -15,10 +15,14 @@ const Dashboard = () => {
     appliedJobs: 0,
     shortlistedJobs: 0,
   });
+  const [matchedUsers, setMatchedUsers] = useState([]);
+  
+
 
   useEffect(() => {
     if (user?.id && user?.role && apiBaseUrl) {
       fetchStats();
+      fetchMatchedUsers();
     }
   }, [user, apiBaseUrl]);
 
@@ -44,6 +48,30 @@ const Dashboard = () => {
     }
   };
 
+  const fetchMatchedUsers = async () => {
+    try {
+      const response = await axios.get(`${apiBaseUrl}/api/matched-users`, {
+        headers: { Authorization: `Bearer ${token}` },
+        withCredentials: true,
+      });
+  
+      if (response.status === 200 && Array.isArray(response.data)) {
+        setMatchedUsers(response.data);
+      } else {
+        setMatchedUsers([]); // Fallback to an empty array if response is not an array
+      }
+    } catch (err) {
+      console.error("Error fetching matched users:", err);
+      setError("Failed to load matched users.");
+      setMatchedUsers([]); // Ensure it's always an array
+    }
+  };
+
+  
+
+
+
+
   return (
     <div className="dashboard-container">
       <aside className="sidebar">
@@ -56,6 +84,13 @@ const Dashboard = () => {
         </div>
         <Link to="/jobBoard" className="sidebar-link">Job Board</Link>
         {user?.role === "learner" && <Link to='/myTuitions' className="sidebar-link">My Tuitions</Link>}
+
+       <div>
+          <Link to="/inbox" className="sidebar-link">
+            Chat
+          </Link>
+        </div> 
+
       </aside>
 
       <main className="dashboard-main">
@@ -77,6 +112,8 @@ const Dashboard = () => {
           <h3>Notice Board</h3>
           <p>"Tutor of the Month, December 2024" is Md. Abidur Rahman...</p>
         </div>
+
+        
 
         <div className="info-boxes">
           <div className="info-box">

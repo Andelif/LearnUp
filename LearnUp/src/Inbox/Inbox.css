@@ -100,4 +100,11 @@
     cursor: pointer;
     font-size: 14px;
   }
+  .ChatList{
+
+  }
+  .ChatList:hover{
+    cursor: pointer;
+    border: 2px solid rgb(138, 24, 153);
+  }
   
