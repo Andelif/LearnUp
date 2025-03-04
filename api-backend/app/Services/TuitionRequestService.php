@@ -10,6 +10,8 @@ class TuitionRequestService{
     {
         return DB::select("SELECT * FROM tuition_requests");
     }
+
+
     public function getUserTuitionRequests()
     {
         $user = Auth::user();
@@ -20,12 +22,16 @@ class TuitionRequestService{
 
         return DB::select("SELECT * FROM tuition_requests WHERE LearnerID = (SELECT LearnerID FROM learners WHERE user_id = ?)", [$user->id]);
     }
+
+
     public function getTuitionRequestById($id)
     {
         $tuitionRequest = DB::select("SELECT * FROM tuition_requests WHERE TutionID = ?", [$id]);
 
         return empty($tuitionRequest) ? null : $tuitionRequest[0];
     }
+
+
     public function createTuitionRequest($request)
     {
         $user = Auth::user();
@@ -62,6 +68,8 @@ class TuitionRequestService{
 
         return ['message' => 'Tuition request created successfully'];
     }
+
+
     public function updateTuitionRequest($request, $id)
     {
         $tuitionRequest = DB::select("SELECT * FROM tuition_requests WHERE TutionID = ?", [$id]);
@@ -91,6 +99,8 @@ class TuitionRequestService{
 
         return ['message' => 'Tuition request updated successfully'];
     }
+
+    
     public function deleteTuitionRequest($id)
     {
         $tuitionRequest = DB::select("SELECT * FROM tuition_requests WHERE TutionID = ?", [$id]);

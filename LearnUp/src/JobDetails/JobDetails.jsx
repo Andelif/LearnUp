@@ -106,7 +106,7 @@ const JobDetails = () => {
       <p><strong>Salary:</strong> {job.asked_salary} BDT</p>
       <p><strong>Curriculum:</strong> {job.curriculum}</p>
       <p><strong>Days per Week:</strong> {job.days}</p>
-      <button className="apply-btn" onClick={handleApply} disabled={hasApplied}>{hasApplied ? "Already Applied" : "Apply Now"}</button>
+      <button className="apply-btn" onClick={handleApply} disabled={hasApplied}>{hasApplied ? "Applied" : "Apply Now"}</button>
     </div>
   );
 };

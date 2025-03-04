@@ -40,36 +40,36 @@ class TuitionRequest extends Model
     }
     public static function filterTuitionRequests($filters)
     {
-    $query = "SELECT * FROM tuition_requests WHERE 1=1";
-    $params = [];
+        $query = "SELECT * FROM tuition_requests WHERE 1=1";
+        $params = [];
 
-    if (!empty($filters['class'])) {
-        $query .= " AND class = :class";
-        $params[':class'] = $filters['class'];
+        if (!empty($filters['class'])) {
+            $query .= " AND class = :class";
+            $params[':class'] = $filters['class'];
+        }
+
+        if (!empty($filters['subjects'])) {
+            $query .= " AND subjects LIKE :subjects";
+            $params[':subjects'] = '%' . $filters['subjects'] . '%';
+        }
+
+        if (!empty($filters['asked_salary_min'])) {
+            $query .= " AND asked_salary >= :asked_salary_min";
+            $params[':asked_salary_min'] = $filters['asked_salary_min'];
+        }
+
+        if (!empty($filters['asked_salary_max'])) {
+            $query .= " AND asked_salary <= :asked_salary_max";
+            $params[':asked_salary_max'] = $filters['asked_salary_max'];
+        }
+
+        if (!empty($filters['location'])) {
+            $query .= " AND location LIKE :location";
+            $params[':location'] = '%' . $filters['location'] . '%';
+        }
+
+        // Directly execute raw SQL query
+        return DB::select($query, $params);
     }
-
-    if (!empty($filters['subjects'])) {
-        $query .= " AND subjects LIKE :subjects";
-        $params[':subjects'] = '%' . $filters['subjects'] . '%';
-    }
-
-    if (!empty($filters['asked_salary_min'])) {
-        $query .= " AND asked_salary >= :asked_salary_min";
-        $params[':asked_salary_min'] = $filters['asked_salary_min'];
-    }
-
-    if (!empty($filters['asked_salary_max'])) {
-        $query .= " AND asked_salary <= :asked_salary_max";
-        $params[':asked_salary_max'] = $filters['asked_salary_max'];
-    }
-
-    if (!empty($filters['location'])) {
-        $query .= " AND location LIKE :location";
-        $params[':location'] = '%' . $filters['location'] . '%';
-    }
-
-    // Directly execute raw SQL query
-    return DB::select($query, $params);
-   }
 
 }

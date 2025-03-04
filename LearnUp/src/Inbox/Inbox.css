@@ -22,7 +22,7 @@
   }
   
   .inbox-header {
-    background: #007bff;
+    background: #9a529b;
     color: white;
     padding: 10px;
     display: flex;
@@ -58,14 +58,14 @@
   }
   
   .sent {
-    background: #007bff;
+    background: #b085dd;
     color: white;
     align-self: flex-end;
   }
   
   .received {
-    background: #f1f1f1;
-    color: black;
+    background: #45799f;
+    color: #ffffff;
     align-self: flex-start;
   }
   
@@ -106,5 +106,10 @@
   .ChatList:hover{
     cursor: pointer;
     border: 2px solid rgb(138, 24, 153);
+  }
+
+  .MsgContent{
+    color: white;
+
   }
   

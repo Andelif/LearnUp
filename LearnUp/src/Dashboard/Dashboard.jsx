@@ -14,6 +14,7 @@ const Dashboard = () => {
   const [stats, setStats] = useState({
     appliedJobs: 0,
     shortlistedJobs: 0,
+    cancelledJobs: 0
   });
   const [matchedUsers, setMatchedUsers] = useState([]);
   
@@ -99,13 +100,20 @@ const Dashboard = () => {
             <h2>{user?.role === "tutor" ? stats.appliedJobs : stats.appliedRequests}</h2> 
             <p>{user?.role === "tutor" ? "Applied Jobs" : "Applied Requests"}</p> 
           </div>
+
           <div className="stat-box"> 
             <h2>{user?.role === "tutor" ? stats.shortlistedJobs : stats.shortlistedTutors}</h2> 
             <p>{user?.role === "tutor" ? "Shortlisted Jobs" : "Shortlisted Tutors"}</p> 
           </div>
-          <div className="stat-box"> <h2>0</h2> <p>{user?.role === "tutor" ? "Appointed Jobs" : "Appointed Tutors"}</p> </div>
+
+          
           <div className="stat-box"> <h2>0</h2> <p>{user?.role === "tutor" ? "Confirmed Jobs" : "Confirmed Tutors"}</p> </div>
-          <div className="stat-box"> <h2>0</h2> <p>{user?.role === "tutor" ? "Cancelled Jobs" : "Cancelled Tutors"}</p> </div>
+
+
+          <div className="stat-box"> 
+            <h2>{user?.role === "tutor" ? stats.cancelledJobs : stats.cancelledTutors}</h2> 
+            <p>{user?.role === "tutor" ? "Cancelled Jobs" : "Cancelled Tutors"}</p> 
+          </div>
         </div>
 
         <div className="notice-board">

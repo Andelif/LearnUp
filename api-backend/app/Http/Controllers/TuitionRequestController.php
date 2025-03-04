@@ -46,33 +46,33 @@ class TuitionRequestController extends Controller
 
     }
     public function filterTuitionRequests(Request $request)
-{
-    
-    $filters = $request->only(['class', 'subjects', 'asked_salary_min', 'asked_salary_max', 'location']);
-    
-    
-    $filteredRequests = TuitionRequest::filterTuitionRequests($filters);
+    {
+        
+        $filters = $request->only(['class', 'subjects', 'asked_salary_min', 'asked_salary_max', 'location']);
+        
+        
+        $filteredRequests = TuitionRequest::filterTuitionRequests($filters);
 
-    return response()->json($filteredRequests);
-}
-public function update(Request $request, $id)
-{
-    $result = $this->tuitionRequestService->updateTuitionRequest($request, $id);
-
-    if (!$result) {
-        return response()->json(['message' => 'Tuition request not found'], 404);
+        return response()->json($filteredRequests);
     }
+    public function update(Request $request, $id)
+    {
+        $result = $this->tuitionRequestService->updateTuitionRequest($request, $id);
 
-    return response()->json($result);
-}
-public function destroy($id)
-{
-    $result = $this->tuitionRequestService->deleteTuitionRequest($id);
+        if (!$result) {
+            return response()->json(['message' => 'Tuition request not found'], 404);
+        }
 
-    if (!$result) {
-        return response()->json(['message' => 'Tuition request not found'], 404);
+        return response()->json($result);
     }
+    public function destroy($id)
+    {
+        $result = $this->tuitionRequestService->deleteTuitionRequest($id);
 
-    return response()->json($result);
-}
+        if (!$result) {
+            return response()->json(['message' => 'Tuition request not found'], 404);
+        }
+
+        return response()->json($result);
+    }
 }
