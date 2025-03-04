@@ -13,18 +13,35 @@ const JobBoard = () => {
   const [searchClass, setSearchClass] = useState("");
 
   useEffect(() => {
+    const token = localStorage.getItem("token"); // Retrieve token
     axios
+<<<<<<< Updated upstream
       .get("http://localhost:8000/api/tuition-requests/all")
+=======
+      .get("http://localhost:8000/api/tuition-requests", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          Accept: "application/json",
+        },
+      })
+>>>>>>> Stashed changes
       .then((response) => {
-        setJobs(response.data);
-        
+        console.log("API Response:", response.data); // Debugging
+        if (Array.isArray(response.data)) {
+          setJobs(response.data);
+        } else {
+          setJobs([]); // Fallback to empty array if response is not an array
+        }
         setLoading(false);
       })
       .catch((error) => {
         console.error("Error fetching jobs:", error);
+        setJobs([]); // Prevents the filter error
         setLoading(false);
       });
   }, []);
+  
+
 
   // Filtering logic
   const filteredJobs = jobs.filter((job) => {

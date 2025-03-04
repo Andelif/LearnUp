@@ -20,6 +20,7 @@ class TuitionRequestController extends Controller
         $tuitionRequests = $this->tuitionRequestService->getAllTuitionRequests();
         return response()->json($tuitionRequests);
     }
+
     public function getAllRequests()
    {
     return response()->json($this->tuitionRequestService->getUserTuitionRequests());
