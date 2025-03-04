@@ -1,13 +1,12 @@
 <?php
 
 namespace Database\Seeders;
+
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 
-
-class userSeeder extends Seeder
+class UserSeeder extends Seeder
 {
     /**
      * Run the database seeds.
@@ -16,30 +15,94 @@ class userSeeder extends Seeder
      */
     public function run()
     {
-        
         $users = [
             [
                 'name' => 'John Doe',
                 'email' => 'john@example.com',
                 'password' => Hash::make('password'),
                 'role' => 'learner',
+                'gender' => 'male',
+                'contact_number' => '0123456789',
+                'address' => 'Dhanmondi'
             ],
+           
+            [
+                'name' => 'Emma Watson',
+                'email' => 'emma@example.com',
+                'password' => Hash::make('password'),
+                'role' => 'learner',
+                'gender' => 'female',
+                'contact_number' => '01722222222',
+                'address' => 'Uttara'
+            ],
+            [
+                'name' => 'Noah Khan',
+                'email' => 'noah@example.com',
+                'password' => Hash::make('password'),
+                'role' => 'learner',
+                'gender' => 'male',
+                'contact_number' => '01733333333',
+                'address' => 'Banani'
+            ],
+            [
+                'name' => 'Sophia Rahman',
+                'email' => 'sophia@example.com',
+                'password' => Hash::make('password'),
+                'role' => 'learner',
+                'gender' => 'female',
+                'contact_number' => '01744444444',
+                'address' => 'Gulshan'
+            ],
+
+            // Tutors
             [
                 'name' => 'Jane Smith',
                 'email' => 'jane@example.com',
                 'password' => Hash::make('password'),
                 'role' => 'tutor',
+                'gender' => 'female',
+                'contact_number' => '01811111111',
+                'qualification' => 'Bachelor of Science',
+                'experience' => '5 years',
+                'preferred_salary' => '50000'
             ],
             [
                 'name' => 'Alice Johnson',
                 'email' => 'alice@example.com',
                 'password' => Hash::make('password'),
                 'role' => 'tutor',
+                'gender' => 'female',
+                'contact_number' => '01822222222',
+                'qualification' => 'Master of Arts',
+                'experience' => '3 years',
+                'preferred_salary' => '45000'
             ],
+            [
+                'name' => 'Robert Brown',
+                'email' => 'robert@example.com',
+                'password' => Hash::make('password'),
+                'role' => 'tutor',
+                'gender' => 'male',
+                'contact_number' => '01833333333',
+                'qualification' => 'Ph.D. in Mathematics',
+                'experience' => '10 years',
+                'preferred_salary' => '70000'
+            ],
+            [
+                'name' => 'Mia Hasan',
+                'email' => 'mia@example.com',
+                'password' => Hash::make('password'),
+                'role' => 'tutor',
+                'gender' => 'female',
+                'contact_number' => '01844444444',
+                'qualification' => 'M.Sc. in Physics',
+                'experience' => '7 years',
+                'preferred_salary' => '60000'
+            ]
         ];
 
         foreach ($users as $userData) {
-            // Raw SQL to insert into the 'users' table
+            // Insert into users table using raw SQL
             DB::statement("INSERT INTO users (name, email, password, role, created_at, updated_at) 
                 VALUES (?, ?, ?, ?, NOW(), NOW())", [
                 $userData['name'],
@@ -48,33 +111,29 @@ class userSeeder extends Seeder
                 $userData['role'],
             ]);
 
-            // Get the last inserted user ID
+            // Retrieve the last inserted user ID
             $userId = DB::getPdo()->lastInsertId();
 
-            // Insert corresponding data into the learners or tutors table based on the role
+            // Insert into the respective table based on role
             if ($userData['role'] === 'learner') {
-                // Raw SQL for inserting into the 'learners' table
-                DB::statement("INSERT INTO learners (user_id, full_name, contact_number, gender, address) 
-                    VALUES (?, ?, ?, ?, ?)", [
+                DB::statement("INSERT INTO learners (user_id, full_name, contact_number, gender, address, created_at, updated_at) 
+                    VALUES (?, ?, ?, ?, ?, NOW(), NOW())", [
                     $userId,
                     $userData['name'],
-                    '1234567890',  // Example contact number
-                    'male',        // Example gender
-                    'Dhanmondi',  // Example address
+                    $userData['contact_number'],
+                    $userData['gender'],
+                    $userData['address']
                 ]);
             } elseif ($userData['role'] === 'tutor') {
-                // Raw SQL for inserting into the 'tutors' table
-                DB::statement("INSERT INTO tutors (user_id, full_name, contact_number, gender, qualification, experience, preferred_salary) 
-                    VALUES (?, ?, ?, ?, ?, ?, ?)", [
+                DB::statement("INSERT INTO tutors (user_id, full_name, contact_number, gender, qualification, experience, preferred_salary, created_at, updated_at) 
+                    VALUES (?, ?, ?, ?, ?, ?, ?, NOW(), NOW())", [
                     $userId,
                     $userData['name'],
-                    '1234567890',  // Example contact number
-                    'female',      // Example gender
-                    'Bachelor of Science', // Example qualification
-                    '5 years',     // Example experience
-                    '50000',       // Example preferred salary
-                    
-                    
+                    $userData['contact_number'],
+                    $userData['gender'],
+                    $userData['qualification'],
+                    $userData['experience'],
+                    $userData['preferred_salary']
                 ]);
             }
         }
