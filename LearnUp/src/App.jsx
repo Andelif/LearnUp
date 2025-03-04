@@ -22,7 +22,7 @@ const App = () => {
             {isAdmin && <AdminSidebar/>}
             <AppRoutes />
           </div>
-          {!isAdmin && <Footer />}
+          { <Footer />}
         </div>
         <ToastContainer
           position="top-right" // More conventional position

@@ -17,6 +17,7 @@
     height: 500px;
     border-radius: 10px;
     display: flex;
+    min-height: 100vh;
     flex-direction: column;
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
   }
@@ -100,9 +101,7 @@
     cursor: pointer;
     font-size: 14px;
   }
-  .ChatList{
-
-  }
+  
   .ChatList:hover{
     cursor: pointer;
     border: 2px solid rgb(138, 24, 153);
