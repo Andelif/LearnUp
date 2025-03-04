@@ -15,16 +15,7 @@ const JobBoard = () => {
   useEffect(() => {
     const token = localStorage.getItem("token"); // Retrieve token
     axios
-<<<<<<< Updated upstream
       .get("http://localhost:8000/api/tuition-requests/all")
-=======
-      .get("http://localhost:8000/api/tuition-requests", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          Accept: "application/json",
-        },
-      })
->>>>>>> Stashed changes
       .then((response) => {
         console.log("API Response:", response.data); // Debugging
         if (Array.isArray(response.data)) {

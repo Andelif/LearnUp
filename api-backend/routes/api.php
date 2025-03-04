@@ -54,15 +54,12 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::delete('/notifications/{id}', [NotificationController::class, 'destroy']);
     
     
-<<<<<<< Updated upstream
-=======
 
     //Message Routes
     Route::post('/messages', [MessageController::class, 'sendMessage']); 
     Route::get('/messages/{userId}', [MessageController::class, 'getMessages']); 
     Route::put('/messages/seen/{senderId}', [MessageController::class, 'markAsSeen']); 
 
->>>>>>> Stashed changes
 
     //Message Routes
     Route::post('/messages', [MessageController::class, 'sendMessage']); 
