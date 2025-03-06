@@ -1,44 +1,71 @@
 .find-tutors-container {
-    max-width: 500px;
-    margin: 30px auto;
-    padding: 20px;
-    background: #f9f9f9;
-    border-radius: 10px;
-    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+  max-width: 650px; 
+  width: 90%; 
+  margin: 40px auto;
+  padding: 25px;
+  background: #f9f9f9;
+  border-radius: 12px;
+  box-shadow: 0px 0px 12px rgba(0, 0, 0, 0.1);
+  min-height: 750px; 
+}
+
+.find-tutors-container h2 {
+  text-align: center;
+  margin-bottom: 25px;
+  font-size: 1.8rem;
+}
+
+.find-tutors-form label {
+  display: block;
+  margin-bottom: 12px;
+  font-size: 1rem;
+}
+
+.find-tutors-form input,
+.find-tutors-form textarea {
+  width: 100%;
+  padding: 10px;
+  margin-top: 6px;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+.find-tutors-form button {
+  width: 100%;
+  padding: 12px;
+  margin-top: 18px;
+  font-size: 1rem;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.find-tutors-form button:hover {
+  background-color: #0056b3;
+}
+
+/* Responsive adjustments */
+@media (max-width: 600px) {
+  .find-tutors-container {
+      width: 95%;
+      padding: 20px;
   }
-  
+
   .find-tutors-container h2 {
-    text-align: center;
-    margin-bottom: 20px;
+      font-size: 1.5rem;
   }
-  
-  .find-tutors-form label {
-    display: block;
-    margin-bottom: 10px;
-    font-weight: bold;
-  }
-  
+
   .find-tutors-form input,
   .find-tutors-form textarea {
-    width: 100%;
-    padding: 8px;
-    margin-top: 5px;
-    border: 1px solid #ccc;
-    border-radius: 5px;
+      font-size: 0.9rem;
+      padding: 8px;
   }
-  
+
   .find-tutors-form button {
-    width: 100%;
-    padding: 10px;
-    margin-top: 15px;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
+      font-size: 0.9rem;
+      padding: 10px;
   }
-  
-  .find-tutors-form button:hover {
-    background-color: #0056b3;
-  }
-  
+}
