@@ -43,8 +43,15 @@ const JobBoard = () => {
     );
   });
 
-  if (loading) return <p>Loading jobs...</p>;
-
+  if (loading) {
+    return (
+      <div className="loader-container">
+        <div className="loader"></div>
+        <p className="loading-text">Loading...</p>
+      </div>
+    );
+  }
+  
   return (
     <div className="job-board">
       <h1 className="title">Available Tuition Jobs</h1>

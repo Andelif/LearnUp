@@ -67,7 +67,12 @@ const MyTuitions = () => {
   };
 
   if (loading) {
-    return <p>Loading...</p>; // Loading message or spinner
+    return (
+      <div className="loader-container">
+        <div className="loader"></div>
+        <p className="loading-text">Loading...</p>
+      </div>
+    );
   }
 
   return (
