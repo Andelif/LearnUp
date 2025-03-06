@@ -7,6 +7,7 @@ const MatchLearnerAndTutor = () => {
   const [tuitionRequests, setTuitionRequests] = useState([]);
   const [applications, setApplications] = useState([]);
   const [selectedTuitionID, setSelectedTuitionID] = useState(null);
+  const [loading, setLoading] = useState(true); // Added loading state
 
   useEffect(() => {
     axios
@@ -15,9 +16,11 @@ const MatchLearnerAndTutor = () => {
       })
       .then((response) => {
         setTuitionRequests(response.data);
+        setLoading(false); // Set loading to false after data is loaded
       })
       .catch((error) => {
         console.error("Error fetching tuition requests:", error);
+        setLoading(false); // Ensure loading is stopped even on error
       });
   }, []);
 
@@ -43,13 +46,22 @@ const MatchLearnerAndTutor = () => {
         { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }
       ).then((response) => {
         toast.success("Tutor matched successfully!");
-        // Refresh applications list after matching
         fetchApplications(selectedTuitionID);
       })
       .catch((error) => {
         console.error("Error matching tutor:", error);
       });
   };
+
+  // Show loading page when data is being fetched
+  if (loading) {
+    return (
+      <div className="loader-container">
+        <div className="loader"></div>
+        <p className="loading-text">Loading...</p>
+      </div>
+    );
+  }
 
   return (
     <div>
@@ -89,8 +101,6 @@ const MatchLearnerAndTutor = () => {
       </table>
 
       {/* Applications Table (Shown only when a tuition request is selected) */}
-
-      {/* Here we can add more fields of tutor and learner*/}
       {selectedTuitionID && (
         <>
           <h3>Applications for Tuition ID: {selectedTuitionID}</h3>
@@ -123,7 +133,6 @@ const MatchLearnerAndTutor = () => {
                       <button onClick={() => matchTutor(app.ApplicationID)}>Match</button>
                     )}
                   </td>
-
                 </tr>
               ))}
             </tbody>

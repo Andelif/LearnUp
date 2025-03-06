@@ -1,6 +1,6 @@
 import React from 'react'
 import AdminSidebar from '../AdminSidebar/AdminSidebar'
-import Footer from '../../Footer/Footer'
+
 
 const AdminDashBoard = () => {
   return (

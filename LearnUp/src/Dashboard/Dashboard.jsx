@@ -67,12 +67,6 @@ const Dashboard = () => {
       setMatchedUsers([]); // Ensure it's always an array
     }
   };
-
-  
-
-
-
-
   return (
     <div className="dashboard-container">
       <aside className="sidebar">

@@ -1,9 +1,12 @@
 import React, { useContext, useEffect, useState } from "react";
 import axios from "axios";
 import { storeContext } from "../../context/contextProvider";
+import "./ManageTutors.css";
+
 const ManageTutors = () => {
   const [tutors, setTutors] = useState([]);
-  const {token}=useContext(storeContext);
+  const [loading, setLoading] = useState(true); // Track loading state
+  const { token } = useContext(storeContext);
 
   useEffect(() => {
     axios
@@ -12,11 +15,14 @@ const ManageTutors = () => {
       })
       .then((response) => {
         setTutors(response.data);
+        setLoading(false); // Set loading to false once data is fetched
       })
       .catch((error) => {
         console.error("Error fetching tutors:", error);
+        setLoading(false); // Set loading to false even if there is an error
       });
-  }, []);
+  }, [token]);
+
   const handleDelete = (tutorId) => {
     // Confirm deletion
     if (window.confirm("Are you sure you want to delete this tutor?")) {
@@ -26,13 +32,24 @@ const ManageTutors = () => {
         })
         .then((response) => {
           // If successful, remove the tutor from the state
-          setTutors(tutors.filter((tutor) => tutor.TutorID !== tutorId));
+          setTutors((prevTutors) =>
+            prevTutors.filter((tutor) => tutor.TutorID !== tutorId)
+          );
         })
         .catch((error) => {
           console.error("Error deleting tutor:", error);
         });
     }
   };
+
+  if (loading) {
+    return (
+      <div className="loader-container">
+        <div className="loader"></div>
+        <p className="loading-text">Loading...</p>
+      </div>
+    );
+  }
 
   return (
     <div>
