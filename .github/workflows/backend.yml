@@ -15,11 +15,11 @@ jobs:
         env:
           MYSQL_ROOT_PASSWORD: root
           MYSQL_DATABASE: learnup_db
-          MYSQL_USER: root   # ✅ Changed from 'user' to 'root' for consistency
-          MYSQL_PASSWORD: 
+          MYSQL_USER: root   # ✅ Changed to 'root' for consistency
+          MYSQL_PASSWORD: password  # ✅ Set password for MySQL
         ports:
           - 3306:3306
-        options: --health-cmd="mysqladmin ping --host=127.0.0.1 --user=root --password=password" --health-interval=10s --health-timeout=5s --health-retries=3  # ✅ Fixed credentials
+        options: --health-cmd="mysqladmin ping --host=mysql --user=root --password=password" --health-interval=10s --health-timeout=5s --health-retries=3  # ✅ Fixed service name to 'mysql'
 
     steps:
       - name: Checkout Code
@@ -45,11 +45,11 @@ jobs:
       - name: Run Migrations
         env:
           DB_CONNECTION: mysql
-          DB_HOST: 127.0.0.1
+          DB_HOST: mysql  # ✅ Use 'mysql' as the service name
           DB_PORT: 3306
           DB_DATABASE: learnup_db
-          DB_USERNAME: root  # ✅ Matches MySQL setup
-          DB_PASSWORD: 
+          DB_USERNAME: root  # ✅ Match the MySQL setup
+          DB_PASSWORD: password  # ✅ Set the correct password
         run: |
           cd api-backend
           cp .env.example .env   # ✅ Ensures .env exists before migrations
