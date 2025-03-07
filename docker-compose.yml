@@ -1,0 +1,55 @@
+
+
+services:
+  # MySQL Database
+  mysql:
+    image: mysql:8.0
+    container_name: learnup_mysql
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: learnup_db
+      MYSQL_USER: user
+      MYSQL_PASSWORD: password
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      retries: 3
+      timeout: 5s
+
+  # Laravel Backend (api-backend)
+  backend:
+    build: ./api-backend
+    container_name: learnup_backend
+    restart: always
+    depends_on:
+      mysql:
+        condition: service_healthy
+    ports:
+      - "9000:9000"
+    volumes:
+      - ./api-backend:/var/www
+    environment:
+      DB_HOST: mysql
+      DB_DATABASE: learnup_db
+      DB_USERNAME: root
+      DB_PASSWORD: password
+
+  # React Frontend (LearnUp)
+  frontend:
+    build: ./LearnUp
+    container_name: learnup_frontend
+    restart: always
+    depends_on:
+      - backend
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./LearnUp:/app
+
+volumes:
+  mysql_data:
