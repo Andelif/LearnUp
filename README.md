@@ -6,10 +6,6 @@ Connect Tutors and Guardians Seamlessly with LearnUp.
 
 **LearnUp** is a platform where guardians can search for suitable tutors for their children, and tutors can find tuition opportunities that match their preferences. With intuitive features and a clean interface, our platform streamlines the process of connecting tutors and guardians, ensuring a better learning experience for students.
 
-## Title
-
-### LearnUp
-
 ## Short Description
 
 LearnUp is a tutor-searching and tuition-finding platform that allows:
@@ -50,24 +46,19 @@ LearnUp is designed for:
 
 ---
 
-## [Figma Link](https://www.figma.com/design/Fzj0GcPvfdRMbjPLvjbcrd/LearnUp?m=auto&t=xquyMiVgqsoUJdpw-1)
-
----
-
 Tech Stack:
 
      Backend: Laravel
-     Frontend: pHp(using blade) & Bootstrap (css)
+     Frontend: React
      Database: My SQL
 
 Rendering Method:
 
-    Server-Side Rendering (SSR)
+    Client-Side Rendering (CSR)
 
 UI Design:
 
-     Here is the demo ui design for our app. Our is intended to look like this.
-     ## [Figma Link](https://www.figma.com/design/Fzj0GcPvfdRMbjPLvjbcrd/LearnUp?m=auto&t=xquyMiVgqsoUJdpw-1)
+    ### 🔗 [Figma Link](https://www.figma.com/design/Fzj0GcPvfdRMbjPLvjbcrd/LearnUp?node-id=0-1&t=KDtoafx0wYHCUIXZ-1)
 
 Project Features:
 
@@ -87,32 +78,31 @@ Project Features:
           •	CRUD Operations on Tuition Requests
           •	Search Functionality
           •	Search & Filter
-          • View Transactions
-
+          •    View Transactions
 
 ## API Endpoints
 
 ### Authentication Routes
 
-| **Endpoint**           | **HTTP Method** | **Description**                                                 |
-| ---------------------- | --------------- | --------------------------------------------------------------- |
-| `/register`            | `POST`          | Register a new user (Tutor/Guardian).                           |
-| `/login`               | `POST`          | Login for an existing user.                                     |
-| `/logout`              | `POST`          | Logout the current user.                                        |
-| `/user`                | `GET`           | Get the authenticated user's details (requires authentication). |
-| `/user/update-profile` | `PUT`           | Update the user's profile (requires authentication).            |
+| **Endpoint**           | **HTTP Method** | **Description**                       |
+| ---------------------- | --------------- | ------------------------------------- |
+| `/register`            | `POST`          | Register a new user.                  |
+| `/login`               | `POST`          | Login for an existing user.           |
+| `/logout`              | `POST`          | Logout the current user.              |
+| `/user`                | `GET`           | Get the authenticated user's details. |
+| `/user/update-profile` | `PUT`           | Update the user's profile.            |
 
 ### Tuition Request Routes
 
-| **Endpoint**               | **HTTP Method** | **Description**                                                   |
-| -------------------------- | --------------- | ----------------------------------------------------------------- |
-| `/tuition-requests/all`    | `GET`           | Get all tuition requests.                                         |
-| `/tuition-requests/{id}`   | `GET`           | Get a specific tuition request by ID.                             |
-| `/tuition-requests/filter` | `GET`           | Filter tuition requests based on criteria (e.g., subject, grade). |
-| `/tuition-requests`        | `GET`           | Get all tuition requests for the authenticated user.              |
-| `/tuition-requests`        | `POST`          | Create a new tuition request (requires authentication).           |
-| `/tuition-requests/{id}`   | `PUT`           | Update an existing tuition request (requires authentication).     |
-| `/tuition-requests/{id}`   | `DELETE`        | Delete a tuition request (requires authentication).               |
+| **Endpoint**               | **HTTP Method** | **Description**                                      |
+| -------------------------- | --------------- | ---------------------------------------------------- |
+| `/tuition-requests/all`    | `GET`           | Get all tuition requests.                            |
+| `/tuition-requests/{id}`   | `GET`           | Get a specific tuition request by ID.                |
+| `/tuition-requests/filter` | `GET`           | Filter tuition requests based on criteria.           |
+| `/tuition-requests`        | `GET`           | Get all tuition requests for the authenticated user. |
+| `/tuition-requests`        | `POST`          | Create a new tuition request..                       |
+| `/tuition-requests/{id}`   | `PUT`           | Update an existing tuition request.                  |
+| `/tuition-requests/{id}`   | `DELETE`        | Delete a tuition request.                            |
 
 ### Tutor, Learner, and Admin Routes
 
@@ -132,12 +122,12 @@ Project Features:
 
 ### Application Routes
 
-| **Endpoint**                       | **HTTP Method** | **Description**                                                        |
-| ---------------------------------- | --------------- | ---------------------------------------------------------------------- |
-| `/applications`                    | `POST`          | Submit an application for a tuition request (requires authentication). |
-| `/applications/check/{tuition_id}` | `GET`           | Check if a tutor has applied for a specific tuition request.           |
-| `/tutor/{userId}/stats`            | `GET`           | Get tutor statistics (e.g., number of applications).                   |
-| `/learner/{userId}/stats`          | `GET`           | Get learner statistics (e.g., number of tuition requests).             |
+| **Endpoint**                       | **HTTP Method** | **Description**                                              |
+| ---------------------------------- | --------------- | ------------------------------------------------------------ |
+| `/applications`                    | `POST`          | Submit an application for a tuition request .                |
+| `/applications/check/{tuition_id}` | `GET`           | Check if a tutor has applied for a specific tuition request. |
+| `/tutor/{userId}/stats`            | `GET`           | Get tutor statistics .                                       |
+| `/learner/{userId}/stats`          | `GET`           | Get learner statistics .                                     |
 
 ### Notification Routes
 
@@ -160,10 +150,10 @@ Project Features:
 
 ### Admin Functionalities
 
-| **Endpoint**              | **HTTP Method** | **Description**                                                   |
-| ------------------------- | --------------- | ----------------------------------------------------------------- |
-| `/admin/match-tutor`      | `POST`          | Match a tutor with a tuition request (requires admin).            |
-| `/admin/tuition-requests` | `GET`           | Get all tuition requests for the admin (requires authentication). |
+| **Endpoint**              | **HTTP Method** | **Description**                          |
+| ------------------------- | --------------- | ---------------------------------------- |
+| `/admin/match-tutor`      | `POST`          | Match a tutor with a tuition request .   |
+| `/admin/tuition-requests` | `GET`           | Get all tuition requests for the admin . |
 
 ### Confirmed Tuition Routes
 
@@ -176,21 +166,21 @@ Project Features:
 
 ---
 
-## Checkpoints
+## Milestones
 
-### Checkpoint 1
+### Milestone 1
 
 - Implement the mock UI for landing pages and dashboard from Figma.
 - Implement the frontend interface for the landing page.
 - Implement the frontend interface for tutor and guardian signup pages.
 
-### Checkpoint 2
+### Milestone 2
 
 - Implement user authentication (registration & login) for both frontend and backend.
 - Implement the tutor search and tuition listing pages with appropiate filters.
 - Implement the frontend interface for admin
 
-### Checkpoint 3
+### Milestone 3
 
 - Build the backend for search functionality and user profiles with appropiate filters.
 - Add admin functionalities for matching the best-match tutors with their students
@@ -246,5 +236,5 @@ Setup Instruction:
 |      Name       | Roll Number |              Email               |   Role   |
 | :-------------: | :---------: | :------------------------------: | :------: |
 |  Hridita Alam   | 20220104056 |      hriditaalam1@gmail.com      |   Lead   |
-|  SK Ali Ahnaf   | 20220104055 |  ahnaf.cse.20220104055@aust.edu  | Frontend |
+|  Sk. Ali Ahnaf  | 20220104055 |  ahnaf.cse.20220104055@aust.edu  | Frontend |
 | Andelif Hossain | 20220104052 | andelif.cse.20220104052@aust.edu | Backend  |
