@@ -11,6 +11,7 @@ use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ConfirmedTuitionController;
+use App\Http\Controllers\PaymentController;
 
 
 
@@ -93,6 +94,10 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/confirmed-tuitions', [ConfirmedTuitionController::class, 'store']);
     Route::put('/confirmed-tuitions/{id}', [ConfirmedTuitionController::class, 'update']);
     Route::delete('/confirmed-tuitions/{id}', [ConfirmedTuitionController::class, 'destroy']);
+   
     
+    //Payment Routes
+    Route::post('/payment/initiate', [PaymentController::class, 'initiatePayment']);
+
 
 });

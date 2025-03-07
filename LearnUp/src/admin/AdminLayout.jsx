@@ -7,7 +7,7 @@ const AdminLayout = () => {
     <div >
       <AdminSidebar />
       <div style={{ flexGrow: 1, padding: "20px", marginLeft: "220px" }}>
-        <Outlet /> {/* This renders the current admin page */}
+        <Outlet /> 
       </div>
     </div>
   );

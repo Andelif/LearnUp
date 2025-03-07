@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
-
+use App\Http\Controllers\PaymentController;
 class ConfirmedTuitionController extends Controller
 {
     // Get all confirmed tuitions
@@ -66,16 +66,14 @@ class ConfirmedTuitionController extends Controller
                 $request->FinalizedDays,
                 $request->Status
             ]);
+            (new PaymentController())->initiatePayment($request);
+
+              return response()->json(['message' => 'Confirmed Tuition created and payment processed successfully'], 201);
     
-            return response()->json(['message' => 'Confirmed Tuition created successfully'], 201);
+            
         }
-        else{
-
-            return response()->json(['message' => 'Tutor already confirmed to Learner'], 512);
-
-
-        }
-
+        
+       
 
 
 

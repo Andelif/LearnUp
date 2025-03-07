@@ -98,7 +98,37 @@ class UserSeeder extends Seeder
                 'qualification' => 'M.Sc. in Physics',
                 'experience' => '7 years',
                 'preferred_salary' => '60000'
+            ],
+            [
+                'name' => 'Hridita Alam',
+                'email' => 'hriditaalam1@gmail.com',
+                'password' => Hash::make('123123123'),
+                'role' => 'learner',
+                'gender' => 'female',
+                'contact_number' => '01744444444',
+                'address' => 'Rampura'
+            ],
+            [
+                'name' => 'user12',
+                'email' => 'user12@gmail.com',
+                'password' => Hash::make('123123123'),
+                'role' => 'learner',
+                'gender' => 'male',
+                'contact_number' => '01744444444',
+                'address' => 'Gulshan'
+            ],
+            [
+                'name' => 'User22',
+                'email' => 'user22@gmail.com',
+                'password' => Hash::make('123123123'),
+                'role' => 'tutor',
+                'gender' => 'male',
+                'contact_number' => '01833333333',
+                'qualification' => 'BSc in CSE',
+                'experience' => '4 years',
+                'preferred_salary' => '7000'
             ]
+
         ];
 
         foreach ($users as $userData) {

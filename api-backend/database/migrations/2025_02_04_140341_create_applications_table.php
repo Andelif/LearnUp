@@ -20,6 +20,7 @@ return new class extends Migration
             tutor_id BIGINT NOT NULL, -- Foreign key to tutors table
             matched BOOLEAN NOT NULL DEFAULT FALSE,
             status ENUM('Applied', 'Shortlisted', 'Confirmed', 'Cancelled') NULL,
+            payment_status ENUM('Pending', 'Completed') NOT NULL DEFAULT 'Pending',
             created_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
             updated_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
             FOREIGN KEY (tution_id) REFERENCES tuition_requests(TutionID) ON DELETE CASCADE,
