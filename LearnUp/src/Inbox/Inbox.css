@@ -160,8 +160,110 @@
 /* Responsive Design */
 @media (max-width: 768px) {
   .inbox-container {
+<<<<<<< Updated upstream
     flex-direction: column;
     height: 90vh;
+=======
+    
+      /* background: white; */
+      width: auto;
+      height: 500px;
+      border-radius: 10px;
+      display: flex
+  ;
+      flex-direction: row;
+      justify-content: space-between;
+      /* box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); */
+  }
+  
+  
+  
+  .inbox-header {
+    background: #9a529b;
+    color: white;
+    padding: 10px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+  }
+  
+  .inbox-header button {
+    background: none;
+    border: none;
+    color: white;
+    font-size: 18px;
+    cursor: pointer;
+  }
+  
+  .inbox-messages {
+    flex: 1;
+    padding: 10px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .message {
+    max-width: 75%;
+    padding: 8px 12px;
+    margin: 5px 0;
+    border-radius: 10px;
+    font-size: 14px;
+    word-wrap: break-word;
+  }
+  
+  .sent {
+    background: #b085dd;
+    color: white;
+    align-self: flex-end;
+  }
+  
+  .received {
+    background: #45799f;
+    color: #ffffff;
+    align-self: flex-start;
+  }
+  
+  .message span {
+    display: block;
+    font-size: 10px;
+    text-align: right;
+    opacity: 0.7;
+  }
+  
+  .inbox-input {
+    display: flex;
+    padding: 10px;
+    border-top: 1px solid #ccc;
+  }
+  
+  .inbox-input input {
+    flex: 1;
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 14px;
+  }
+  
+  .inbox-input button {
+    background: #007bff;
+    color: white;
+    border: none;
+    padding: 8px 12px;
+    margin-left: 8px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+  }
+  .ChatList{
+
+  }
+  .ChatList:hover{
+    cursor: pointer;
+    border: 2px solid rgb(138, 24, 153);
+>>>>>>> Stashed changes
   }
 
   .inbox-sidebar {
@@ -170,7 +272,19 @@
     border-bottom: 2px solid #ddd;
   }
 
+<<<<<<< Updated upstream
   .inbox-chat {
     width: 100%;
   }
 }
+=======
+  .inbox-sidebar{
+
+  }
+
+  .inbox-chat{
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+    background: white;
+  }
+  
+>>>>>>> Stashed changes
