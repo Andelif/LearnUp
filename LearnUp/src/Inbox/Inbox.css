@@ -92,6 +92,7 @@
 
 .message.received {
   background: #ddd;
+ 
   color: black;
   align-self: flex-start;
 }

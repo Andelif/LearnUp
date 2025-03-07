@@ -71,7 +71,7 @@ class UserController extends Controller
     $email = $request->email;
     $password = $request->password;
 
-    // ✅ Special condition: Auto-assign admin role for fixed credentials
+    // Special condition: Auto-assign admin role for fixed credentials
     if ($email === 'admin1@gmail.com' && $password === '12121212') {
         $adminUser = DB::select("SELECT * FROM users WHERE email = ?", [$email]);
 
