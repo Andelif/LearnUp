@@ -53,15 +53,15 @@ class TuitionRequest extends Model
             $params[':subjects'] = '%' . $filters['subjects'] . '%';
         }
 
-        if (!empty($filters['asked_salary_min'])) {
-            $query .= " AND asked_salary >= :asked_salary_min";
-            $params[':asked_salary_min'] = $filters['asked_salary_min'];
-        }
+        // if (!empty($filters['asked_salary_min'])) {
+        //     $query .= " AND asked_salary >= :asked_salary_min";
+        //     $params[':asked_salary_min'] = $filters['asked_salary_min'];
+        // }
 
-        if (!empty($filters['asked_salary_max'])) {
-            $query .= " AND asked_salary <= :asked_salary_max";
-            $params[':asked_salary_max'] = $filters['asked_salary_max'];
-        }
+        // if (!empty($filters['asked_salary_max'])) {
+        //     $query .= " AND asked_salary <= :asked_salary_max";
+        //     $params[':asked_salary_max'] = $filters['asked_salary_max'];
+        // }
 
         if (!empty($filters['location'])) {
             $query .= " AND location LIKE :location";

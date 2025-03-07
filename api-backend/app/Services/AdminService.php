@@ -116,7 +116,7 @@ class AdminService{
                 DB::rollBack();
                 return [
                     'status' => 'error',
-                    'message' => 'Learner not found'
+                    'message' => 'Tutor not found'
                 ];
             }
 

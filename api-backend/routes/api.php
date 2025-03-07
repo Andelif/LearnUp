@@ -12,7 +12,7 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ConfirmedTuitionController;
 
-// Authentication Routes
+
 
 
 Route::post('/register', [UserController::class, 'register']);
@@ -21,6 +21,7 @@ Route::get('/tuition-requests/all', [TuitionRequestController::class, 'index']);
 Route::get('/tuition-requests/{id}', [TuitionRequestController::class, 'show']);
 Route::get('/tuition-requests/filter', [TuitionRequestController::class, 'filterTuitionRequests']);
 
+// Authentication Routes
 
 Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/user', [UserController::class, 'getUser']);

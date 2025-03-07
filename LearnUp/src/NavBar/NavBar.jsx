@@ -10,6 +10,7 @@ const NavBar = () => {
   const [showDropdown, setShowDropdown] = useState(false);
   const navigate = useNavigate();
 
+
   const handleClick=()=>{
     navigate("/");
   }
@@ -59,7 +60,7 @@ const NavBar = () => {
 
           {showDropdown && (
             <div className="dropdown-menu">
-            <Link to="/ProfilePage" className="dropdown-item">Profile</Link> {/* Link to profile page */}
+           <Link to="/ProfilePage" className="dropdown-item">Profile</Link> {/* Link to profile page */}
             <button className="dropdown-item" onClick={handleLogout}>Logout</button> {/* Logout button */}
           </div>
           )}
