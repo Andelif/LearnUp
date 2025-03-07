@@ -58,7 +58,7 @@ Rendering Method:
 
 UI Design:
 
-     ## [Figma Link](https://www.figma.com/design/Fzj0GcPvfdRMbjPLvjbcrd/LearnUp?m=auto&t=xquyMiVgqsoUJdpw-1)
+    ## [Figma Link](https://www.figma.com/design/Fzj0GcPvfdRMbjPLvjbcrd/LearnUp?m=auto&t=xquyMiVgqsoUJdpw-1)
 
 Project Features:
 
