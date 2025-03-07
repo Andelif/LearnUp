@@ -70,7 +70,7 @@ class MessageController extends Controller
         if($role === "tutor")
         {
             
-            $matchedUsers = DB::select("SELECT l.user_id, l.full_name, 'learner' AS role, a.tution_id
+            $matchedUsers = DB::select("SELECT l.user_id, l.full_name, 'learner' AS role, a.tution_id, a.ApplicationID
                                         FROM learners l JOIN applications a ON l.LearnerID = a.learner_id 
                                             WHERE a.matched = true AND a.tutor_id = 
                                                 (SELECT TutorID FROM tutors WHERE user_id = ?)"
@@ -80,7 +80,7 @@ class MessageController extends Controller
         }elseif($role === "learner")
         {
             
-            $matchedUsers = DB::select("SELECT t.user_id, t.full_name, 'tutor' AS role, a.tution_id
+            $matchedUsers = DB::select("SELECT t.user_id, t.full_name, 'tutor' AS role, a.tution_id, a.ApplicationID
                                         FROM tutors t JOIN applications a ON t.TutorID = a.tutor_id 
                                             WHERE a.matched = true AND a.learner_id = 
                                                 (SELECT LearnerID FROM learners WHERE user_id = ?)"

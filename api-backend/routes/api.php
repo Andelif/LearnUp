@@ -10,6 +10,7 @@ use App\Http\Controllers\MessageController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ConfirmedTuitionController;
 
 // Authentication Routes
 
@@ -83,5 +84,14 @@ Route::middleware(['auth:sanctum'])->group(function () {
     //Dashboard Route
     Route::get('/dashboard/{userId}/{role}', [DashboardController::class, 'getDashboardStats']);
 
+
+    //Confirmed Tution
+    Route::resource('confirmed-tuitions', ConfirmedTuitionController::class);
+
+    Route::get('/confirmed-tuitions', [ConfirmedTuitionController::class, 'index']);  
+    Route::post('/confirmed-tuitions', [ConfirmedTuitionController::class, 'store']);
+    Route::put('/confirmed-tuitions/{id}', [ConfirmedTuitionController::class, 'update']);
+    Route::delete('/confirmed-tuitions/{id}', [ConfirmedTuitionController::class, 'destroy']);
+    
 
 });

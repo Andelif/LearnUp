@@ -2,6 +2,7 @@ import React, { useState, useEffect, useContext } from "react";
 import { storeContext } from "../context/contextProvider";
 import axios from "axios";
 import "./Inbox.css";
+import { toast } from "react-toastify";
 
 const Inbox = () => {
   const { user, token } = useContext(storeContext);
@@ -9,9 +10,11 @@ const Inbox = () => {
   const [selectedUser, setSelectedUser] = useState(null);
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
+  const [showConfirmForm, setShowConfirmForm] = useState(false);
+  const [finalizedSalary, setFinalizedSalary] = useState("");
+  const [finalizedDays, setFinalizedDays] = useState("");
   const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
 
-  // Fetch Matched Users
   useEffect(() => {
     const fetchMatchedUsers = async () => {
       try {
@@ -22,6 +25,7 @@ const Inbox = () => {
 
         if (response.status === 200 && Array.isArray(response.data)) {
           setMatchedUsers(response.data);
+          console.log(response.data);
         }
       } catch (err) {
         console.error("Error fetching matched users:", err);
@@ -31,7 +35,6 @@ const Inbox = () => {
     fetchMatchedUsers();
   }, []);
 
-  // Fetch Messages when a user is selected
   useEffect(() => {
     if (selectedUser) {
       fetchMessages(selectedUser.user_id);
@@ -65,27 +68,60 @@ const Inbox = () => {
     }
   };
 
-  const rejectTutor = async () => {
-    if (!selectedUser) return;
+  const confirmTutor = async (e) => {
+    e.preventDefault();
+    if (!finalizedSalary || !finalizedDays) {
+      alert("Please fill all fields.");
+      return;
+    }
+    
+
+    //console.log("Selected Users: ", selectedUser);
+    //console.log("Matched Users: ", matchedUsers);
 
     try {
-      await axios.post(
-        `${apiBaseUrl}/api/reject-tutor`,
-        { tutor_id: selectedUser.user_id, tution_id: selectedUser.tution_id },
+
+      
+      const response = await axios.post(
+        `${apiBaseUrl}/api/confirmed-tuitions`,
+        {
+          application_id: selectedUser.ApplicationID,
+          tution_id: selectedUser.tution_id,
+          FinalizedSalary: finalizedSalary,
+          FinalizedDays: finalizedDays,
+          Status: "Ongoing",
+        },
         { headers: { Authorization: `Bearer ${token}` }, withCredentials: true }
       );
 
-      alert("Tutor rejected successfully.");
-      setSelectedUser(null); // Close chat window
+      if (response.status === 201) {
+        toast.success("Tutor confirmed successfully", { autoClose: 2000 });
+        setShowConfirmForm(false);
+        setSelectedUser(null);
+      }
+
+
     } catch (err) {
-      console.error("Error rejecting tutor:", err);
-      alert("Failed to reject tutor.");
+      if(err.response && err.response.status === 512){
+        toast.error("You have already confirmed this tutor", { autoClose: 2000 });
+
+      }else{
+
+      console.error("Error confirming tutor:", err);
+      alert("Failed to confirm tutor.");
+
+
     }
-  };  
+
+    }
+
+
+  };
 
   return (
     <div className="inbox-container">
-      {/* Sidebar with Matched Users */}
+
+      
       <div className="inbox-sidebar">
         <h3>Chats</h3>
         <ul>
@@ -101,7 +137,6 @@ const Inbox = () => {
         </ul>
       </div>
 
-      {/* Chat Window */}
       <div className="inbox-chat">
         {selectedUser ? (
           <>
@@ -122,19 +157,37 @@ const Inbox = () => {
               <button onClick={sendMessage}>Send</button>
             </div>
 
-            {/* Reject Tutor Button (Only for Learners) */}
             {user?.role === "learner" && (
               <div className="action-buttons">
-                <button className="reject-btn" onClick={rejectTutor}>Reject Tutor</button>
+                <button className="confirm-btn" onClick={() => setShowConfirmForm(true)}>Confirm Tutor</button>
               </div>
             )}
 
-
+            
           </>
         ) : (
-          <p>Select a user to chat.</p>
+          <></>
         )}
       </div>
+
+      {showConfirmForm && (
+              <div className="confirm-form">
+                <h3>Confirm Tutor</h3>
+                <form onSubmit={confirmTutor}>
+                  <label>
+                    Finalized Salary:
+                    <input type="number" value={finalizedSalary} onChange={(e) => setFinalizedSalary(e.target.value)} required />
+                  </label>
+                  <label>
+                    Finalized Days:
+                    <input type="text" value={finalizedDays} onChange={(e) => setFinalizedDays(e.target.value)} required />
+                  </label>
+                  <button type="submit">Confirm</button>
+                  <button type="button" onClick={() => setShowConfirmForm(false)}>Cancel</button>
+                </form>
+              </div>
+            )}
+
     </div>
   );
 };
