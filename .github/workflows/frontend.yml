@@ -1,8 +1,9 @@
-name: Frontend CI
+name: Frontend CI/CD
 
 on:
   push:
     branches:
+      - main
       - dev
   pull_request:
 
@@ -14,6 +15,9 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
 
+      - name: Verify Directory Structure (Debugging)
+        run: ls -R  # Helps confirm the folder structure
+
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
@@ -21,14 +25,16 @@ jobs:
           cache: "npm"
 
       - name: Install Dependencies
-        working-directory: LearnUp
-        run: npm install
+        run: |
+          cd LearnUp
+          npm install
 
-      # Remove or modify if you don't have a lint script
       - name: Run Linting
-        working-directory: frontend
-        run: npm run lint || echo "No lint script found, skipping..."
+        run: |
+          cd LearnUp
+          npm run lint || echo "No lint script found, skipping..."
 
       - name: Build React App
-        working-directory: frontend
-        run: npm run build
+        run: |
+          cd LearnUp
+          npm run build

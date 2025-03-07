@@ -1,4 +1,4 @@
-name: Backend CI
+name: Backend CI/CD
 
 on:
   push:
@@ -25,6 +25,9 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
 
+      - name: Verify Directory Structure (Debugging)
+        run: ls -R  # Helps confirm the folder structure
+
       - name: Set up PHP
         uses: shivammathur/setup-php@v2
         with:
@@ -33,23 +36,25 @@ jobs:
           coverage: none
 
       - name: Install Dependencies
-        working-directory: backend-api
         run: |
+          cd api-backend
           composer install --no-dev --prefer-dist
           cp .env.example .env
           php artisan key:generate
 
       - name: Run Migrations
-        working-directory: backend-api
         env:
           DB_CONNECTION: mysql
-          DB_HOST: mysql
+          DB_HOST: 127.0.0.1
           DB_PORT: 3306
           DB_DATABASE: learnup_db
           DB_USERNAME: user
           DB_PASSWORD: password
-        run: php artisan migrate --force
+        run: |
+          cd api-backend
+          php artisan migrate --force
 
       - name: Run Tests
-        working-directory: backend-api
-        run: php artisan test
+        run: |
+          cd api-backend
+          php artisan test
