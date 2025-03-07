@@ -15,11 +15,11 @@ jobs:
         env:
           MYSQL_ROOT_PASSWORD: root
           MYSQL_DATABASE: learnup_db
-          MYSQL_USER: user
-          MYSQL_PASSWORD: password
+          MYSQL_USER: root   # ✅ Changed from 'user' to 'root' for consistency
+          MYSQL_PASSWORD: 
         ports:
           - 3306:3306
-        options: --health-cmd="mysqladmin ping --host=localhost --user=root --password=root" --health-interval=10s --health-timeout=5s --health-retries=3
+        options: --health-cmd="mysqladmin ping --host=127.0.0.1 --user=root --password=password" --health-interval=10s --health-timeout=5s --health-retries=3  # ✅ Fixed credentials
 
     steps:
       - name: Checkout Code
@@ -48,10 +48,12 @@ jobs:
           DB_HOST: 127.0.0.1
           DB_PORT: 3306
           DB_DATABASE: learnup_db
-          DB_USERNAME: user
-          DB_PASSWORD: password
+          DB_USERNAME: root  # ✅ Matches MySQL setup
+          DB_PASSWORD: 
         run: |
           cd api-backend
+          cp .env.example .env   # ✅ Ensures .env exists before migrations
+          php artisan key:generate
           php artisan migrate --force
 
       - name: Run Tests
