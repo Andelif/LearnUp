@@ -7,7 +7,7 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: learnup_db
-      MYSQL_USER: user
+      MYSQL_USER: root
       MYSQL_PASSWORD: password
     ports:
       - "3306:3306"
@@ -33,7 +33,7 @@ services:
     environment:
       DB_HOST: mysql
       DB_DATABASE: learnup_db
-      DB_USERNAME: user  # ✅ Fix: Match with MYSQL_USER
+      DB_USERNAME: root  # ✅ Fix: Match with MYSQL_USER
       DB_PASSWORD: password  # ✅ Fix: Match with MYSQL_PASSWORD
 
   # React Frontend (LearnUp)
