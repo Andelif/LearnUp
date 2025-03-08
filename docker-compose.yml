@@ -15,11 +15,9 @@ services:
     volumes:
       - mysql_data:/var/lib/mysql
     healthcheck:
-      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -proot || exit 1"]
-      interval: 10s
-      retries: 5
-      start_period: 20s
-      timeout: 5s
+      test: ["CMD", "mysqladmin", "ping", "-h", "mysql"]
+      retries: 10
+      timeout: 10s
 
   # Laravel Backend (api-backend)
   backend:
