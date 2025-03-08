@@ -100,5 +100,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
     //Payment Routes
     Route::post('/payment/initiate', [PaymentController::class, 'initiatePayment']);
 
+    Route::put('/confirmed-tuitions/{id}', [ConfirmedTuitionController::class, 'update']);
+    
+    
 
 });

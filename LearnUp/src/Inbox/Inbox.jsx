@@ -100,16 +100,23 @@ const Inbox = () => {
 
       if (response.status === 201) {
         toast.success("Tutor confirmed successfully", { autoClose: 2000 });
-        navigate("/dashboard", { state: { finalizedSalary, selectedUser } });
         setShowConfirmForm(false);
         setSelectedUser(null);
       }
+
+
     } catch (err) {
-      if (err.response?.status === 400) {
+      if(err.response && err.response.status === 512){
         toast.error("You have already confirmed this tutor", { autoClose: 2000 });
-      } else {
-        toast.error("Failed to confirm tutor.", { autoClose: 2000 });
-      }
+
+      }else{
+
+      console.error("Error confirming tutor:", err);
+      alert("Failed to confirm tutor.");
+
+
+    }
+
     }
 
 

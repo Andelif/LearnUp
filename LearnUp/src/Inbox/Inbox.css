@@ -176,6 +176,23 @@
       /* box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); */
   }
   
+<<<<<<< Updated upstream
+  
+=======
+  .inbox-container {
+    
+      /* background: white; */
+      width: auto;
+      height: 500px;
+      border-radius: 10px;
+      display: flex
+  ;
+      flex-direction: row;
+      justify-content: space-between;
+      /* box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); */
+  }
+>>>>>>> Stashed changes
+  
   
   
   .inbox-header {
@@ -282,9 +299,20 @@
 
   }
 
+<<<<<<< Updated upstream
+=======
+  .inbox-sidebar{
+
+  }
+
+>>>>>>> Stashed changes
   .inbox-chat{
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
     background: white;
   }
+<<<<<<< Updated upstream
+  
+>>>>>>> Stashed changes
+=======
   
 >>>>>>> Stashed changes
