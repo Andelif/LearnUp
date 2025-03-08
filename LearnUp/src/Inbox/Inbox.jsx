@@ -100,6 +100,7 @@ const Inbox = () => {
 
       if (response.status === 201) {
         toast.success("Tutor confirmed successfully", { autoClose: 2000 });
+<<<<<<< Updated upstream
         navigate("/dashboard", { state: { finalizedSalary, selectedUser } });
         setShowConfirmForm(false);
         setSelectedUser(null);
@@ -112,6 +113,27 @@ const Inbox = () => {
       }
     }
 
+=======
+        setShowConfirmForm(false);
+        setSelectedUser(null);
+      }
+
+
+    } catch (err) {
+      if(err.response && err.response.status === 512){
+        toast.error("You have already confirmed this tutor", { autoClose: 2000 });
+
+      }else{
+
+      console.error("Error confirming tutor:", err);
+      alert("Failed to confirm tutor.");
+
+
+    }
+
+    }
+
+>>>>>>> Stashed changes
 
   };
 
