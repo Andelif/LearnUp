@@ -1,7 +1,7 @@
 <?php
-$host = getenv("DB_HOST") ?: "127.0.0.1"; 
+$host = "mysql"; 
 $username = "root"; 
-$password = getenv("DB_PASSWORD") ?: ""; 
+$password = "root"; 
 $database = "learnup_db"; 
 
 $conn = new mysqli($host, $username, $password, $database);
