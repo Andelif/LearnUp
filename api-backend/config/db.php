@@ -1,14 +1,15 @@
 <?php
-$host = "mysql"; // Change from "localhost" to "mysql" (Docker service name)
-$username = "root"; // Default MySQL username
-$password = "root"; // Match the MySQL password from Docker Compose
-$database = "learnup_db"; // Database name
+$host = getenv("DB_HOST") ?: "127.0.0.1"; 
+$username = "root"; 
+$password = getenv("DB_PASSWORD") ?: ""; 
+$database = "learnup_db"; 
 
-// Create a connection
 $conn = new mysqli($host, $username, $password, $database);
 
-// Check connection
 if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
+    die("Connection failed: " . $conn->connect_error . "\nHost: $host | User: $username | DB: $database");
+} else {
+    echo "Connected successfully!";
 }
+
 ?>

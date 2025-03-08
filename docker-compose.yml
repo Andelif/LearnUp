@@ -4,6 +4,7 @@ services:
     image: mysql:8.0
     container_name: learnup_mysql
     restart: always
+    command: --default-authentication-plugin=mysql_native_password --bind-address=0.0.0.0
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: learnup_db
@@ -14,13 +15,17 @@ services:
     volumes:
       - mysql_data:/var/lib/mysql
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "mysql"]  
-      retries: 3
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -proot || exit 1"]
+      interval: 10s
+      retries: 5
+      start_period: 20s
       timeout: 5s
 
   # Laravel Backend (api-backend)
   backend:
-    build: ./api-backend
+    build:
+      context: ./api-backend
+      dockerfile: Dockerfile
     container_name: learnup_backend
     restart: always
     depends_on:
@@ -31,10 +36,13 @@ services:
     volumes:
       - ./api-backend:/var/www
     environment:
+      DB_CONNECTION: mysql
       DB_HOST: mysql
+      DB_PORT: 3306
       DB_DATABASE: learnup_db
-      DB_USERNAME: root  # ✅ Fix: Match with MYSQL_USER
-      DB_PASSWORD: root  # ✅ Fix: Match with MYSQL_PASSWORD
+      DB_USERNAME: root  
+      DB_PASSWORD: root
+
 
   # React Frontend (LearnUp)
   frontend:
@@ -47,6 +55,6 @@ services:
       - "3000:3000"
     volumes:
       - ./LearnUp:/app
-
+    command: "npm run dev"
 volumes:
   mysql_data:

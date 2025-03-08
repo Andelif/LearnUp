@@ -5,7 +5,9 @@ FROM node:18
 WORKDIR /app
 
 # Copy package.json and install dependencies
-COPY package.json .
+COPY package.json package-lock.json ./
+
+# Install dependencies
 RUN npm install
 
 # Copy other frontend files
@@ -18,4 +20,4 @@ RUN npm run build
 EXPOSE 3000
 
 # Start the React app
-CMD ["npm", "start"]
+CMD ["npm","run", "dev"]
