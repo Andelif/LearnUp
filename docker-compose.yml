@@ -7,14 +7,14 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: root
       MYSQL_DATABASE: learnup_db
-      MYSQL_USER: root
-      MYSQL_PASSWORD: password
+      
+      
     ports:
       - "3306:3306"
     volumes:
       - mysql_data:/var/lib/mysql
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "mysql"]  # ✅ Fix: Use "mysql" instead of "localhost"
+      test: ["CMD", "mysqladmin", "ping", "-h", "mysql"]  
       retries: 3
       timeout: 5s
 
@@ -34,7 +34,7 @@ services:
       DB_HOST: mysql
       DB_DATABASE: learnup_db
       DB_USERNAME: root  # ✅ Fix: Match with MYSQL_USER
-      DB_PASSWORD: password  # ✅ Fix: Match with MYSQL_PASSWORD
+      DB_PASSWORD: root  # ✅ Fix: Match with MYSQL_PASSWORD
 
   # React Frontend (LearnUp)
   frontend:
