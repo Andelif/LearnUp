@@ -1,9 +1,9 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use App\Services\MessageService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 
 class MessageController extends Controller
@@ -14,6 +14,7 @@ class MessageController extends Controller
     {
         $this->messageService = $messageService;
     }
+
     public function sendMessage(Request $request)
     {
         $request->validate([
@@ -25,62 +26,24 @@ class MessageController extends Controller
         return response()->json($response, 201);
     }
 
-    // Get messages between the authenticated user and another user
     public function getMessages($userId)
     {
         $messages = $this->messageService->getMessages($userId);
         return response()->json($messages);
     }
 
-    // Mark messages as seen
     public function markAsSeen($senderId)
     {
         $response = $this->messageService->markAsSeen($senderId);
         return response()->json($response);
     }
 
-    // Fetch matched users for messaging
     public function getMatchedUsers()
     {
-        $user = Auth::user();
-
-
-        $userRole = DB::select("SELECT role FROM users WHERE id = ?", 
-            [$user->id]);
-            
-        $role = $userRole[0]->role;    
-               
-
-
-        if($role === "tutor")
-        {
-            
-            $matchedUsers = DB::select("SELECT l.user_id, l.full_name, 'learner' AS role, a.tution_id, a.ApplicationID
-                                        FROM learners l JOIN applications a ON l.LearnerID = a.learner_id 
-                                            WHERE a.matched = true AND a.tutor_id = 
-                                                (SELECT TutorID FROM tutors WHERE user_id = ?)"
-                                                , [ $user->id]);
-
-            
-        }elseif($role === "learner")
-        {
-            
-            $matchedUsers = DB::select("SELECT t.user_id, t.full_name, 'tutor' AS role, a.tution_id, a.ApplicationID
-                                        FROM tutors t JOIN applications a ON t.TutorID = a.tutor_id 
-                                            WHERE a.matched = true AND a.learner_id = 
-                                                (SELECT LearnerID FROM learners WHERE user_id = ?)"
-                                                , [ $user->id]);
-
-            
-        } else {
-            $matchedUsers = []; 
-        }
-
+        $matchedUsers = $this->messageService->getMatchedUsers();
         return response()->json($matchedUsers);
-
     }
 
-    // Reject Tutor API
     public function rejectTutor(Request $request)
     {
         $request->validate([
@@ -96,5 +59,4 @@ class MessageController extends Controller
 
         return response()->json($response);
     }
-
 }

@@ -10,6 +10,8 @@ use App\Services\TutorService;
 use App\Services\LearnerService;
 use App\Services\ApplicationService;
 use App\Services\NotificationService;
+use App\Services\ConfirmedTuitionService;
+use App\Services\MessageService;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -47,9 +49,15 @@ class AppServiceProvider extends ServiceProvider
 
         $this->app->bind(NotificationService::class, function ($app) {
             return new NotificationService();
-        });    
+        });  
+        $this->app->bind(ConfirmedTuitionService::class, function ($app) {
+            return new ConfirmedTuitionService();
+        });  
         $this->app->bind(DashboardService::class, function ($app) {
             return new DashboardService();
+        });
+        $this->app->singleton(MessageService::class, function ($app) {
+            return new MessageService();
         });
     }
 

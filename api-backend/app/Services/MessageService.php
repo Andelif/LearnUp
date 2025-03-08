@@ -9,36 +9,40 @@ class MessageService
 {
     public function sendMessage($sentTo, $content)
     {
-        $user = Auth::user();
-
-        DB::insert("INSERT INTO messages (SentBy, SentTo, Content) VALUES (?, ?, ?)", [
-            $user->id,
-            $sentTo,
-            $content
+        // Logic to send the message to the recipient
+        // Assuming a `messages` table to save the message
+        DB::table('messages')->insert([
+            'sent_to' => $sentTo,
+            'content' => $content,
+            'sent_by' => Auth::id(),
+            'created_at' => now(),
+            'updated_at' => now(),
         ]);
 
-        return ['message' => 'Message sent successfully'];
+        return ['message' => 'Message sent successfully!'];
     }
 
     public function getMessages($userId)
     {
-        $user = Auth::user();
+        // Fetch messages between the authenticated user and the provided user
+        $messages = DB::select("
+            SELECT m.*, u.full_name AS sender_name
+            FROM messages m
+            JOIN users u ON m.sent_by = u.id
+            WHERE (m.sent_by = ? AND m.sent_to = ?) OR (m.sent_by = ? AND m.sent_to = ?)
+            ORDER BY m.created_at ASC
+        ", [Auth::id(), $userId, $userId, Auth::id()]);
 
-        return DB::select("
-            SELECT * FROM messages 
-            WHERE (SentBy = ? AND SentTo = ?) OR (SentBy = ? AND SentTo = ?)
-            ORDER BY TimeStamp ASC", 
-            [$user->id, $userId, $userId, $user->id]
-        );
+        return $messages;
     }
 
     public function markAsSeen($senderId)
     {
-        $user = Auth::user();
-
-        DB::update("UPDATE messages SET Status = 'Seen' WHERE SentBy = ? AND SentTo = ? AND Status = 'Delivered'", [
-            $senderId, $user->id
-        ]);
+        // Mark the messages as seen for the current user and the provided sender
+        DB::table('messages')
+            ->where('sent_by', $senderId)
+            ->where('sent_to', Auth::id())
+            ->update(['seen' => true]);
 
         return ['message' => 'Messages marked as seen'];
     }
@@ -46,54 +50,42 @@ class MessageService
     public function getMatchedUsers()
     {
         $user = Auth::user();
-        $roleData = DB::select("SELECT role FROM users WHERE id = ?", [$user->id]);
-        
-        if (empty($roleData)) {
-            return [];
+        $userRole = DB::select("SELECT role FROM users WHERE id = ?", [$user->id]);
+        $role = $userRole[0]->role;
+
+        if ($role === 'tutor') {
+            $matchedUsers = DB::select("
+                SELECT l.user_id, l.full_name, 'learner' AS role, a.tution_id, a.ApplicationID
+                FROM learners l
+                JOIN applications a ON l.LearnerID = a.learner_id
+                WHERE a.matched = true AND a.tutor_id = (SELECT TutorID FROM tutors WHERE user_id = ?)
+            ", [$user->id]);
+        } elseif ($role === 'learner') {
+            $matchedUsers = DB::select("
+                SELECT t.user_id, t.full_name, 'tutor' AS role, a.tution_id, a.ApplicationID
+                FROM tutors t
+                JOIN applications a ON t.TutorID = a.tutor_id
+                WHERE a.matched = true AND a.learner_id = (SELECT LearnerID FROM learners WHERE user_id = ?)
+            ", [$user->id]);
+        } else {
+            $matchedUsers = [];
         }
 
-        $role = $roleData[0]->role;
-
-        if ($role === "tutor") {
-            return DB::select("
-                SELECT l.user_id, l.full_name, 'learner' AS role, a.tution_id
-                FROM learners l 
-                JOIN applications a ON l.LearnerID = a.learner_id 
-                WHERE a.matched = true AND a.tutor_id = 
-                    (SELECT TutorID FROM tutors WHERE user_id = ?)", 
-                [$user->id]
-            );
-        } elseif ($role === "learner") {
-            return DB::select("
-                SELECT t.user_id, t.full_name, 'tutor' AS role, a.tution_id
-                FROM tutors t 
-                JOIN applications a ON t.TutorID = a.tutor_id 
-                WHERE a.matched = true AND a.learner_id = 
-                    (SELECT LearnerID FROM learners WHERE user_id = ?)", 
-                [$user->id]
-            );
-        }
-
-        return [];
+        return $matchedUsers;
     }
 
     public function rejectTutor($tutorId, $tutionId)
     {
-        $user = Auth::user();
-        $learner = DB::select("SELECT LearnerID FROM learners WHERE user_id = ?", [$user->id]);
+        // Logic to reject a tutor
+        $updateResponse = DB::table('applications')
+            ->where('tutor_id', $tutorId)
+            ->where('tution_id', $tutionId)
+            ->update(['status' => 'Rejected']);
 
-        if (empty($learner)) {
-            return ['error' => 'Only learners can reject tutors'];
+        if ($updateResponse) {
+            return ['message' => 'Tutor rejected successfully'];
         }
 
-        $learnerId = $learner[0]->LearnerID;
-
-        DB::update("UPDATE applications SET status = 'Cancelled' WHERE tutor_id = ? AND learner_id = ? AND tution_id = ?", [
-            $tutorId,
-            $learnerId,
-            $tutionId
-        ]);
-
-        return ['message' => 'Tutor rejected successfully.'];
+        return ['error' => 'Unable to reject tutor'];
     }
 }
