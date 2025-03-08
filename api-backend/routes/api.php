@@ -11,11 +11,8 @@ use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\AdminController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ConfirmedTuitionController;
-<<<<<<< Updated upstream
 use App\Http\Controllers\PaymentController;
 
-=======
->>>>>>> Stashed changes
 
 
 
@@ -95,7 +92,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     Route::get('/confirmed-tuitions', [ConfirmedTuitionController::class, 'index']);  
     Route::post('/confirmed-tuitions', [ConfirmedTuitionController::class, 'store']);
-<<<<<<< Updated upstream
     Route::get('/confirmed-tuition/invoice/{tutionId}', [ConfirmedTuitionController::class, 'getPaymentVoucher']);
     Route::post('/payment-marked/{tutionId}', [ConfirmedTuitionsController::class, 'markPayment']);
     Route::delete('/confirmed-tuitions/{id}', [ConfirmedTuitionController::class, 'destroy']);
@@ -104,10 +100,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
     //Payment Routes
     Route::post('/payment/initiate', [PaymentController::class, 'initiatePayment']);
 
-=======
     Route::put('/confirmed-tuitions/{id}', [ConfirmedTuitionController::class, 'update']);
-    Route::delete('/confirmed-tuitions/{id}', [ConfirmedTuitionController::class, 'destroy']);
     
->>>>>>> Stashed changes
+    
 
 });

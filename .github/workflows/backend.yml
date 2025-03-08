@@ -15,8 +15,8 @@ jobs:
         env:
           MYSQL_ROOT_PASSWORD: root
           MYSQL_DATABASE: learnup_db
-          MYSQL_USER: root  # Add this ✅
-          MYSQL_PASSWORD: root  # Add this ✅
+          
+          
         ports:
           - 3306:3306
         options: --health-cmd="mysqladmin ping --host=mysql --user=root --password=root"
