@@ -48,7 +48,7 @@ jobs:
           DB_PORT: 3306
           DB_DATABASE: learnup_db
           DB_USERNAME: root  # ✅ Match the MySQL setup
-          DB_PASSWORD: password  # ✅ Set the correct password
+          DB_PASSWORD: root  # ✅ Set the correct password
         run: |
           cd api-backend
           cp .env.example .env   # ✅ Ensures .env exists before migrations
