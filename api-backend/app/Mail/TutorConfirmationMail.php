@@ -9,7 +9,7 @@ use Illuminate\Queue\SerializesModels;
 
 class TutorConfirmationMail extends Mailable
 {
-    use Queueable, SerializesModels;
+    use SerializesModels;
 
     public $application;
 
@@ -20,8 +20,11 @@ class TutorConfirmationMail extends Mailable
 
     public function build()
     {
-        return $this->subject('Tuition Confirmation & Payment Received')
-                    ->view('emails.tutor_confirmation')
-                    ->with(['application' => $this->application]);
+        return $this->view('emails.tutor_confirmation')
+                    ->with([
+                        'application_id' => $this->application->ApplicationID,
+                        'tutor_name' => $this->application->tutor_name,  // Assuming there's a tutor name
+                        'amount' => $this->application->amount,
+                    ]);
     }
 }

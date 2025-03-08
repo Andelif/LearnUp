@@ -14,12 +14,11 @@ const Dashboard = () => {
   const [stats, setStats] = useState({
     appliedJobs: 0,
     shortlistedJobs: 0,
+    confirmedJobs: 0,
     cancelledJobs: 0
   });
   const [matchedUsers, setMatchedUsers] = useState([]);
   
-
-
   useEffect(() => {
     if (user?.id && user?.role && apiBaseUrl) {
       fetchStats();
@@ -67,6 +66,7 @@ const Dashboard = () => {
       setMatchedUsers([]); // Ensure it's always an array
     }
   };
+
   return (
     <div className="dashboard-container">
       <aside className="sidebar">
@@ -80,12 +80,17 @@ const Dashboard = () => {
         <Link to="/jobBoard" className="sidebar-link">Job Board</Link>
         {user?.role === "learner" && <Link to='/myTuitions' className="sidebar-link">My Tuitions</Link>}
 
-       <div>
+        {user?.role === 'tutor' && (
+          <Link to={`/voucher/${stats.confirmedJobs.tuition_id}`} className="btn btn-primary">
+            View Payment Voucher
+          </Link>
+        )}
+
+        <div>
           <Link to="/inbox" className="sidebar-link">
             Chat
           </Link>
         </div> 
-
       </aside>
 
       <main className="dashboard-main">
@@ -100,9 +105,10 @@ const Dashboard = () => {
             <p>{user?.role === "tutor" ? "Shortlisted Jobs" : "Shortlisted Tutors"}</p> 
           </div>
 
-          
-          <div className="stat-box"> <h2>0</h2> <p>{user?.role === "tutor" ? "Confirmed Jobs" : "Confirmed Tutors"}</p> </div>
-
+          <div className="stat-box"> 
+            <h2>{user?.role === "tutor" ? stats.confirmedJobs : stats.confirmedTutors}</h2> 
+            <p>{user?.role === "tutor" ? "Confirmed Jobs" : "Confirmed Tutors"}</p> 
+          </div>
 
           <div className="stat-box"> 
             <h2>{user?.role === "tutor" ? stats.cancelledJobs : stats.cancelledTutors}</h2> 
@@ -114,8 +120,6 @@ const Dashboard = () => {
           <h3>Notice Board</h3>
           <p>"Tutor of the Month, December 2024" is Md. Abidur Rahman...</p>
         </div>
-
-        
 
         <div className="info-boxes">
           <div className="info-box">
