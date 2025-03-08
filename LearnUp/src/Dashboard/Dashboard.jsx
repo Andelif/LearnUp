@@ -18,13 +18,36 @@ const Dashboard = () => {
     cancelledJobs: 0
   });
   const [matchedUsers, setMatchedUsers] = useState([]);
-  
+  const [tuitionId, setTuitionId] = useState(null); // New state for tuition ID
+
   useEffect(() => {
     if (user?.id && user?.role && apiBaseUrl) {
       fetchStats();
       fetchMatchedUsers();
+      fetchTuitionDetails(); // Fetch tuition ID when the component mounts
     }
   }, [user, apiBaseUrl]);
+
+  // Fetch tuition details to get the correct tuition ID
+  const fetchTuitionDetails = async () => {
+    try {
+      const response = await axios.get(`${apiBaseUrl}/api/confirmed-tuitions`, {
+        headers: { Authorization: `Bearer ${token}` },
+        withCredentials: true
+      });
+      console.log(response.data);
+      if (response.data && response.data[0].tution_id) {
+        setTuitionId(response.data[0].tution_id); // Store tuition ID in state
+        console.log(tuitionId);
+      } else {
+        console.error("Tuition ID not found in response");
+        setTuitionId(null);
+      }
+    } catch (error) {
+      console.error("Error fetching tuition details:", error);
+      setTuitionId(null);
+    }
+  };
 
   const fetchStats = async () => {
     if (!user?.id || !user?.role || !apiBaseUrl) return;
@@ -54,7 +77,7 @@ const Dashboard = () => {
         headers: { Authorization: `Bearer ${token}` },
         withCredentials: true,
       });
-  
+
       if (response.status === 200 && Array.isArray(response.data)) {
         setMatchedUsers(response.data);
       } else {
@@ -80,8 +103,8 @@ const Dashboard = () => {
         <Link to="/jobBoard" className="sidebar-link">Job Board</Link>
         {user?.role === "learner" && <Link to='/myTuitions' className="sidebar-link">My Tuitions</Link>}
 
-        {user?.role === 'tutor' && (
-          <Link to={`/voucher/${stats.confirmedJobs.tuition_id}`} className="btn btn-primary">
+        {user?.role === 'tutor' && tuitionId && (
+          <Link to={`/voucher/${tuitionId}`} className="btn btn-primary">
             View Payment Voucher
           </Link>
         )}

@@ -1,7 +1,7 @@
 <?php
-$host = "mysql"; // Change from "localhost" to "mysql" (Docker service name)
+$host = '127.0.0.1'; // Change from "localhost" to "mysql" (Docker service name)
 $username = "root"; // Default MySQL username
-$password = "root"; // Match the MySQL password from Docker Compose
+$password = ''; // Match the MySQL password from Docker Compose
 $database = "learnup_db"; // Database name
 
 // Create a connection

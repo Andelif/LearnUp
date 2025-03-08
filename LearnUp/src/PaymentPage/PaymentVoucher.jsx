@@ -22,7 +22,7 @@ const PaymentVoucher = () => {
         const fetchVoucher = async () => {
             try {
                 const { data } = await axios.get(
-                    `${apiBaseUrl}/api/confirmed-tuition/voucher/${tutionId}`,
+                    `${apiBaseUrl}/api/confirmed-tuition/invoice/${tutionId}`,
                     {
                         headers: { Authorization: `Bearer ${token}` },
                     }
