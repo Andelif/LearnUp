@@ -1,8 +1,8 @@
 <?php
-$host = "localhost"; // Your database host
-$username = "root"; // Default XAMPP MySQL username
-$password = ""; // Default XAMPP MySQL password is empty
-$database = "learnup_db"; // Your database name
+$host = "mysql"; // Change from "localhost" to "mysql" (Docker service name)
+$username = "root"; // Default MySQL username
+$password = "root"; // Match the MySQL password from Docker Compose
+$database = "learnup_db"; // Database name
 
 // Create a connection
 $conn = new mysqli($host, $username, $password, $database);

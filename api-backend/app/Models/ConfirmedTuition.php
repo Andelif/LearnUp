@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Models;
 
-use Illuminate\Http\Request;
-use App\Models\ConfirmedTuition;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Database\Eloquent\Model;;
 
-class ConfirmedTuitionController extends Controller
+class ConfirmedTuition extends Model
 {
     public function index()
     {
