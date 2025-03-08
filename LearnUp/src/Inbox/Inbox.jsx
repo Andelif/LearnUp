@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useContext } from "react";
 import { storeContext } from "../context/contextProvider";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import "./Inbox.css";
 import { toast } from "react-toastify";
@@ -14,6 +15,8 @@ const Inbox = () => {
   const [finalizedSalary, setFinalizedSalary] = useState("");
   const [finalizedDays, setFinalizedDays] = useState("");
   const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
+  const navigate=useNavigate();
+
 
   useEffect(() => {
     const fetchMatchedUsers = async () => {
@@ -93,26 +96,20 @@ const Inbox = () => {
         },
         { headers: { Authorization: `Bearer ${token}` }, withCredentials: true }
       );
+      console.log("API Response:", response);
 
       if (response.status === 201) {
         toast.success("Tutor confirmed successfully", { autoClose: 2000 });
+        navigate("/dashboard", { state: { finalizedSalary, selectedUser } });
         setShowConfirmForm(false);
         setSelectedUser(null);
       }
-
-
     } catch (err) {
-      if(err.response && err.response.status === 512){
+      if (err.response?.status === 400) {
         toast.error("You have already confirmed this tutor", { autoClose: 2000 });
-
-      }else{
-
-      console.error("Error confirming tutor:", err);
-      alert("Failed to confirm tutor.");
-
-
-    }
-
+      } else {
+        toast.error("Failed to confirm tutor.", { autoClose: 2000 });
+      }
     }
 
 

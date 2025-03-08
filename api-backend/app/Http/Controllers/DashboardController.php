@@ -28,6 +28,9 @@ class DashboardController extends Controller
             
             $shortlistedJobs = DB::select("SELECT COUNT(*) as count FROM applications WHERE status = 'Shortlisted' AND tutor_id = 
                                             (SELECT TutorID FROM tutors WHERE user_id = ?)", [$userId])[0]->count;
+            $confirmedJobs = DB::select("SELECT COUNT(*) as count FROM applications WHERE tutor_id = 
+                                        ( SELECT TutorID FROM tutors WHERE user_id = ?) AND status = 'Confirmed'", [$userId])[0]->count;                                
+    
 
             $cancelledJobs = DB::select("SELECT COUNT(*) as count FROM applications WHERE tutor_id = 
                                             (SELECT TutorID FROM tutors WHERE user_id = ?) AND status = 'Cancelled'", [$userId])[0]->count;
@@ -36,6 +39,7 @@ class DashboardController extends Controller
             return response()->json([
                 'appliedJobs' => $appliedJobs,
                 'shortlistedJobs' => $shortlistedJobs,
+                'confirmedJobs'=> $confirmedJobs,
                 'cancelledJobs' => $cancelledJobs,
             ]);
 
@@ -51,6 +55,8 @@ class DashboardController extends Controller
 
             $shortlistedTutors = DB::select("SELECT COUNT(*) as count FROM applications WHERE learner_id = 
                                             (SELECT LearnerID FROM learners WHERE user_id = ?) AND status = 'Shortlisted'", [$userId])[0]->count;
+            $confirmedTutors = DB::select("SELECT COUNT(*) as count FROM applications WHERE learner_id = 
+                                            (SELECT LearnerID FROM learners WHERE user_id = ?) AND status = 'Confirmed'", [$userId])[0]->count;                                
 
             $cancelledTutors = DB::select("SELECT COUNT(*) as count FROM applications WHERE learner_id = 
                                             (SELECT LearnerID FROM learners WHERE user_id = ?) AND status = 'Cancelled'", [$userId])[0]->count;
@@ -59,6 +65,7 @@ class DashboardController extends Controller
             return response()->json([
                 'appliedRequests' => $appliedRequests,
                 'shortlistedTutors' => $shortlistedTutors,
+                'confirmedTutors' =>$confirmedTutors,
                 'cancelledTutors' => $cancelledTutors,
             ]);
         }

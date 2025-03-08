@@ -92,7 +92,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     Route::get('/confirmed-tuitions', [ConfirmedTuitionController::class, 'index']);  
     Route::post('/confirmed-tuitions', [ConfirmedTuitionController::class, 'store']);
-    Route::put('/confirmed-tuitions/{id}', [ConfirmedTuitionController::class, 'update']);
+    Route::get('/confirmed-tuition/invoice/{tutionId}', [ConfirmedTuitionController::class, 'getPaymentVoucher']);
+    Route::post('/payment-marked/{tutionId}', [ConfirmedTuitionsController::class, 'markPayment']);
     Route::delete('/confirmed-tuitions/{id}', [ConfirmedTuitionController::class, 'destroy']);
    
     
