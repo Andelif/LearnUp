@@ -122,6 +122,25 @@ const Inbox = () => {
 
   };
 
+  const rejectTutor = async () => {
+    if (!selectedUser) return;
+
+    try {
+      await axios.post(
+        `${apiBaseUrl}/api/reject-tutor`,
+        { tutor_id: selectedUser.user_id, tution_id: selectedUser.tution_id },
+        { headers: { Authorization: `Bearer ${token}` }, withCredentials: true }
+      );
+
+      alert("Tutor rejected successfully.");
+      setSelectedUser(null); // Close chat window
+    } catch (err) {
+      console.error("Error rejecting tutor:", err);
+      alert("Failed to reject tutor.");
+    }
+  };  
+
+
   return (
     <div className="inbox-container">
 
@@ -164,6 +183,7 @@ const Inbox = () => {
             {user?.role === "learner" && (
               <div className="action-buttons">
                 <button className="confirm-btn" onClick={() => setShowConfirmForm(true)}>Confirm Tutor</button>
+                <button className="reject-btn" onClick={rejectTutor}>Reject Tutor</button>
               </div>
             )}
 
