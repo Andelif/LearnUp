@@ -10,32 +10,40 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import AdminSidebar from './admin/AdminSidebar/AdminSidebar';
 
+const AppContent = () => {
+  const { user } = useContext(storeContext);
+  const isAdmin = user?.role === "admin";
+
+  return (
+    <Router>
+      <div className="app-container">
+        <NavBar />
+        <div className="main-content">
+          {isAdmin && <AdminSidebar />}
+          <AppRoutes />
+        </div>
+        {!isAdmin && <Footer />}
+      </div>
+      <ToastContainer
+        position="top-right"
+        autoClose={3000}
+        hideProgressBar={false}
+        closeOnClick
+        pauseOnHover
+        draggable
+        theme="colored"
+      />
+    </Router>
+  );
+};
+
 const App = () => {
-  const {user}=useContext(storeContext);
-  const isAdmin= user?.role === "admin";
   return (
     <ContextProvider>
-      <Router>
-        <div className="app-container">
-          <NavBar />
-          <div className="main-content">
-            {isAdmin && <AdminSidebar/>}
-            <AppRoutes />
-          </div>
-          { <Footer />}
-        </div>
-        <ToastContainer
-          position="top-right" // More conventional position
-          autoClose={3000} // Toast disappears in 3 seconds
-          hideProgressBar={false}
-          closeOnClick
-          pauseOnHover
-          draggable
-          theme="colored" // Try "light" or "dark" if needed
-        />
-      </Router>
+      <AppContent />
     </ContextProvider>
   );
-}
+};
+
 
 export default App;
