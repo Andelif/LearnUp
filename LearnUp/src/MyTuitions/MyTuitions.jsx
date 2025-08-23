@@ -1,66 +1,50 @@
 import React, { useContext, useState, useEffect } from "react";
-import axios from "axios";
 import { storeContext } from "../context/contextProvider";
-import "./MyTuitions.css"; // Corrected import
+import "./MyTuitions.css";
 
 const MyTuitions = () => {
+  const { api } = useContext(storeContext); // 👈 use shared axios client
   const [requests, setRequests] = useState([]);
   const [editingRequest, setEditingRequest] = useState(null);
-  const [loading, setLoading] = useState(true); // Loading state
-  const { token } = useContext(storeContext);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    axios
-      .get("http://localhost:8000/api/tuition-requests", {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      .then((response) => {
-        setRequests(response.data);
-        setLoading(false); // Stop loading
-      })
-      .catch((error) => {
+    let alive = true;
+    (async () => {
+      try {
+        const { data } = await api.get("/api/tuition-requests");
+        if (alive) setRequests(data);
+      } catch (error) {
         console.error("Error fetching tuition requests:", error);
-        setLoading(false); // Stop loading in case of error
-      });
-  }, [token]);
+      } finally {
+        if (alive) setLoading(false);
+      }
+    })();
+    return () => { alive = false; };
+  }, [api]);
 
   const handleDelete = async (id) => {
     if (!window.confirm("Are you sure you want to delete this request?")) return;
-
     try {
-      await axios.delete(`http://localhost:8000/api/tuition-requests/${id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-
-      setRequests(requests.filter((request) => request.TutionID !== id));
+      await api.delete(`/api/tuition-requests/${id}`);
+      setRequests((prev) => prev.filter((r) => r.TutionID !== id));
     } catch (error) {
       console.error("Error deleting tuition request:", error);
     }
   };
 
-  const handleEditClick = (request) => {
-    setEditingRequest(request);
-  };
+  const handleEditClick = (request) => setEditingRequest(request);
 
   const handleSaveEdit = async (e) => {
     e.preventDefault();
-
     try {
-      await axios.put(
-        `http://localhost:8000/api/tuition-requests/${editingRequest.TutionID}`,
-        editingRequest,
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
+      await api.put(`/api/tuition-requests/${editingRequest.TutionID}`, editingRequest, {
+        headers: { "Content-Type": "application/json" },
+      });
+      setRequests((prev) =>
+        prev.map((r) => (r.TutionID === editingRequest.TutionID ? editingRequest : r))
       );
-
-      setRequests(
-        requests.map((request) =>
-          request.TutionID === editingRequest.TutionID ? editingRequest : request
-        )
-      );
-
-      setEditingRequest(null); // Exit edit mode
+      setEditingRequest(null);
     } catch (error) {
       console.error("Error updating tuition request:", error);
     }
@@ -93,10 +77,7 @@ const MyTuitions = () => {
                   type="text"
                   value={editingRequest.class}
                   onChange={(e) =>
-                    setEditingRequest((prevState) => ({
-                      ...prevState,
-                      class: e.target.value,
-                    }))
+                    setEditingRequest((p) => ({ ...p, class: e.target.value }))
                   }
                   placeholder="Class"
                 />
@@ -104,10 +85,7 @@ const MyTuitions = () => {
                   type="text"
                   value={editingRequest.subjects}
                   onChange={(e) =>
-                    setEditingRequest((prevState) => ({
-                      ...prevState,
-                      subjects: e.target.value,
-                    }))
+                    setEditingRequest((p) => ({ ...p, subjects: e.target.value }))
                   }
                   placeholder="Subjects"
                 />
@@ -115,10 +93,7 @@ const MyTuitions = () => {
                   type="number"
                   value={editingRequest.asked_salary}
                   onChange={(e) =>
-                    setEditingRequest((prevState) => ({
-                      ...prevState,
-                      asked_salary: e.target.value,
-                    }))
+                    setEditingRequest((p) => ({ ...p, asked_salary: e.target.value }))
                   }
                   placeholder="Salary"
                 />
@@ -126,10 +101,7 @@ const MyTuitions = () => {
                   type="text"
                   value={editingRequest.location}
                   onChange={(e) =>
-                    setEditingRequest((prevState) => ({
-                      ...prevState,
-                      location: e.target.value,
-                    }))
+                    setEditingRequest((p) => ({ ...p, location: e.target.value }))
                   }
                   placeholder="Location"
                 />
@@ -137,17 +109,12 @@ const MyTuitions = () => {
                   type="text"
                   value={editingRequest.days}
                   onChange={(e) =>
-                    setEditingRequest((prevState) => ({
-                      ...prevState,
-                      days: e.target.value,
-                    }))
+                    setEditingRequest((p) => ({ ...p, days: e.target.value }))
                   }
                   placeholder="Days"
                 />
                 <div className="button-group">
-                  <button type="submit" className="save-btn">
-                    Save
-                  </button>
+                  <button type="submit" className="save-btn">Save</button>
                   <button
                     type="button"
                     className="cancel-btn"
@@ -164,10 +131,7 @@ const MyTuitions = () => {
                     {request.class} - {request.subjects}
                   </h3>
                   <div className="button-group">
-                    <button
-                      className="edit-btn"
-                      onClick={() => handleEditClick(request)}
-                    >
+                    <button className="edit-btn" onClick={() => handleEditClick(request)}>
                       Edit
                     </button>
                     <button
@@ -178,19 +142,10 @@ const MyTuitions = () => {
                     </button>
                   </div>
                 </div>
-                <p>
-                  <strong>Salary:</strong> {request.asked_salary} BDT
-                </p>
-                <p>
-                  <strong>Location:</strong> {request.location}
-                </p>
-                <p>
-                  <strong>Days:</strong> {request.days}
-                </p>
-                <p>
-                  <strong>Date:</strong> {request.updated_at}
-                </p>
-                
+                <p><strong>Salary:</strong> {request.asked_salary} BDT</p>
+                <p><strong>Location:</strong> {request.location}</p>
+                <p><strong>Days:</strong> {request.days}</p>
+                <p><strong>Date:</strong> {request.updated_at}</p>
               </div>
             )
           )}

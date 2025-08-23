@@ -3,68 +3,52 @@ import { useContext, useState, useEffect } from "react";
 import { FaEnvelope, FaCalendarAlt, FaFileInvoice } from "react-icons/fa";
 import { storeContext } from "../context/contextProvider";
 import { Link } from "react-router-dom";
-import axios from "axios";
 
 const Dashboard = () => {
-  const { user, token } = useContext(storeContext);
-  const [apiBaseUrl, setApiBaseUrl] = useState(
-    import.meta.env.VITE_API_BASE_URL || "http://localhost:8000"
-  );
+  const { api, user } = useContext(storeContext);
+
   const [error, setError] = useState("");
   const [stats, setStats] = useState({
     appliedJobs: 0,
     shortlistedJobs: 0,
     confirmedJobs: 0,
-    cancelledJobs: 0
+    cancelledJobs: 0,
   });
   const [matchedUsers, setMatchedUsers] = useState([]);
-  const [tuitionId, setTuitionId] = useState(null); // New state for tuition ID
+  const [tuitionId, setTuitionId] = useState(null);
 
   useEffect(() => {
-    if (user?.id && user?.role && apiBaseUrl) {
+    if (user?.id && user?.role) {
       fetchStats();
       fetchMatchedUsers();
-      fetchTuitionDetails(); // Fetch tuition ID when the component mounts
+      fetchTuitionDetails();
     }
-  }, [user, apiBaseUrl]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.id, user?.role, api]);
 
-  // Fetch tuition details to get the correct tuition ID
   const fetchTuitionDetails = async () => {
     try {
-      const response = await axios.get(`${apiBaseUrl}/api/confirmed-tuitions`, {
-        headers: { Authorization: `Bearer ${token}` },
-        withCredentials: true
-      });
-      console.log(response.data);
-      if (response.data && response.data[0].tution_id) {
-        setTuitionId(response.data[0].tution_id); // Store tuition ID in state
-        console.log(tuitionId);
+      const { data } = await api.get(`/api/confirmed-tuitions`);
+      if (Array.isArray(data) && data[0]?.tution_id) {
+        setTuitionId(data[0].tution_id);
       } else {
-        console.error("Tuition ID not found in response");
         setTuitionId(null);
       }
-    } catch (error) {
-      console.error("Error fetching tuition details:", error);
+    } catch (err) {
+      console.error("Error fetching tuition details:", err);
       setTuitionId(null);
     }
   };
 
   const fetchStats = async () => {
-    if (!user?.id || !user?.role || !apiBaseUrl) return;
-
     try {
-      console.log("Fetching stats from:", `${apiBaseUrl}/api/dashboard/${user.id}/${user.role}`);
-      const response = await axios.get(`${apiBaseUrl}/api/dashboard/${user.id}/${user.role}`, {
-        headers: { Authorization: `Bearer ${token}` },
-        withCredentials: true,
-      });
-
-      if (response.status !== 200 || typeof response.data !== "object") {
+      const { data } = await api.get(`/api/dashboard/${user.id}/${user.role}`);
+      if (data && typeof data === "object") {
+        setStats(data);
+        setError("");
+      } else {
         throw new Error("Invalid API response");
       }
-
-      console.log("Stats received:", response.data);
-      setStats(response.data);
     } catch (err) {
       console.error("Failed to fetch dashboard stats:", err);
       setError("Failed to load statistics. Please try again.");
@@ -73,20 +57,13 @@ const Dashboard = () => {
 
   const fetchMatchedUsers = async () => {
     try {
-      const response = await axios.get(`${apiBaseUrl}/api/matched-users`, {
-        headers: { Authorization: `Bearer ${token}` },
-        withCredentials: true,
-      });
-
-      if (response.status === 200 && Array.isArray(response.data)) {
-        setMatchedUsers(response.data);
-      } else {
-        setMatchedUsers([]); // Fallback to an empty array if response is not an array
-      }
+      const { data } = await api.get(`/api/matched-users`);
+      setMatchedUsers(Array.isArray(data) ? data : []);
+      setError("");
     } catch (err) {
       console.error("Error fetching matched users:", err);
       setError("Failed to load matched users.");
-      setMatchedUsers([]); // Ensure it's always an array
+      setMatchedUsers([]);
     }
   };
 
@@ -100,42 +77,45 @@ const Dashboard = () => {
           <h3>{user?.name}</h3>
           <p>{user?.email}</p>
         </div>
-        <Link to="/jobBoard" className="sidebar-link">Job Board</Link>
-        {user?.role === "learner" && <Link to='/myTuitions' className="sidebar-link">My Tuitions</Link>}
 
-        {user?.role === 'tutor' && tuitionId && (
+        <Link to="/jobBoard" className="sidebar-link">Job Board</Link>
+        {user?.role === "learner" && (
+          <Link to="/myTuitions" className="sidebar-link">My Tuitions</Link>
+        )}
+
+        {user?.role === "tutor" && tuitionId && (
           <Link to={`/voucher/${tuitionId}`} className="btn btn-primary">
             View Payment Voucher
           </Link>
         )}
 
         <div>
-          <Link to="/inbox" className="sidebar-link">
-            Chat
-          </Link>
-        </div> 
+          <Link to="/inbox" className="sidebar-link">Chat</Link>
+        </div>
       </aside>
 
       <main className="dashboard-main">
+        {error && <p className="error">{error}</p>}
+
         <div className="stats-container">
-          <div className="stat-box"> 
-            <h2>{user?.role === "tutor" ? stats.appliedJobs : stats.appliedRequests}</h2> 
-            <p>{user?.role === "tutor" ? "Applied Jobs" : "Applied Requests"}</p> 
+          <div className="stat-box">
+            <h2>{user?.role === "tutor" ? stats.appliedJobs : stats.appliedRequests}</h2>
+            <p>{user?.role === "tutor" ? "Applied Jobs" : "Applied Requests"}</p>
           </div>
 
-          <div className="stat-box"> 
-            <h2>{user?.role === "tutor" ? stats.shortlistedJobs : stats.shortlistedTutors}</h2> 
-            <p>{user?.role === "tutor" ? "Shortlisted Jobs" : "Shortlisted Tutors"}</p> 
+          <div className="stat-box">
+            <h2>{user?.role === "tutor" ? stats.shortlistedJobs : stats.shortlistedTutors}</h2>
+            <p>{user?.role === "tutor" ? "Shortlisted Jobs" : "Shortlisted Tutors"}</p>
           </div>
 
-          <div className="stat-box"> 
-            <h2>{user?.role === "tutor" ? stats.confirmedJobs : stats.confirmedTutors}</h2> 
-            <p>{user?.role === "tutor" ? "Confirmed Jobs" : "Confirmed Tutors"}</p> 
+          <div className="stat-box">
+            <h2>{user?.role === "tutor" ? stats.confirmedJobs : stats.confirmedTutors}</h2>
+            <p>{user?.role === "tutor" ? "Confirmed Jobs" : "Confirmed Tutors"}</p>
           </div>
 
-          <div className="stat-box"> 
-            <h2>{user?.role === "tutor" ? stats.cancelledJobs : stats.cancelledTutors}</h2> 
-            <p>{user?.role === "tutor" ? "Cancelled Jobs" : "Cancelled Tutors"}</p> 
+          <div className="stat-box">
+            <h2>{user?.role === "tutor" ? stats.cancelledJobs : stats.cancelledTutors}</h2>
+            <p>{user?.role === "tutor" ? "Cancelled Jobs" : "Cancelled Tutors"}</p>
           </div>
         </div>
 

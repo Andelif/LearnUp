@@ -1,29 +1,22 @@
 import React, { useEffect, useState, useContext } from "react";
-import axios from "axios";
 import { storeContext } from "../context/contextProvider";
 import "./Notification.css";
 
 const Notification = () => {
-  const { user, token, url } = useContext(storeContext);
+  const { api, user } = useContext(storeContext);
   const [notifications, setNotifications] = useState([]);
   const [error, setError] = useState("");
 
   useEffect(() => {
     fetchNotifications();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const fetchNotifications = async () => {
     try {
-      const response = await axios.get(`${url}/api/notifications`, {
-        headers: { Authorization: `Bearer ${token}` },
-        withCredentials: true,
-      });
-
-      if (Array.isArray(response.data)) {
-        setNotifications(response.data);
-      } else {
-        setNotifications([]);
-      }
+      const { data } = await api.get("/api/notifications");
+      setNotifications(Array.isArray(data) ? data : []);
+      setError("");
     } catch (err) {
       console.error("Error fetching notifications:", err);
       setError("Failed to fetch notifications.");
@@ -33,14 +26,10 @@ const Notification = () => {
 
   const markAsRead = async (id) => {
     try {
-      await axios.put(`${url}/api/notifications/${id}/read`, {}, {
-        headers: { Authorization: `Bearer ${token}` },
-        withCredentials: true,
-      });
-
+      await api.put(`/api/notifications/${id}/read`, {});
       setNotifications((prev) =>
-        prev.map((notif) =>
-          notif.NotificationID === id ? { ...notif, Status: "Read" } : notif
+        prev.map((n) =>
+          n.NotificationID === id ? { ...n, Status: "Read" } : n
         )
       );
     } catch (err) {
@@ -59,23 +48,33 @@ const Notification = () => {
         <ul className="notification-list">
           {notifications
             .filter((notif) => {
-              // Ensure the notification is visible to the user
+              // show to everyone / all learners / all tutors / specific user
               return (
                 notif.view === "everyone" ||
-                (notif.view === "all_learner" && user.role === "Learner") ||
-                (notif.view === "all_tutor" && user.role === "Tutor") ||
-                notif.view == user.id // Specific notifications for the user
+                (notif.view === "all_learner" && user?.role === "learner") ||
+                (notif.view === "all_tutor" && user?.role === "tutor") ||
+                notif.view == user?.id
               );
             })
             .map((notif) => (
-              <li key={notif.NotificationID} className={`notification-item ${notif.Status === "Unread" ? "unread" : ""}`}>
+              <li
+                key={notif.NotificationID}
+                className={`notification-item ${
+                  notif.Status === "Unread" ? "unread" : ""
+                }`}
+              >
                 <div className="notification-content">
                   <p className="notification-type">{notif.Type}</p>
                   <p className="notification-message">{notif.Message}</p>
-                  <p className="notification-time">{new Date(notif.TimeSent).toLocaleString()}</p>
+                  <p className="notification-time">
+                    {new Date(notif.TimeSent).toLocaleString()}
+                  </p>
                 </div>
                 {notif.Status === "Unread" && (
-                  <button className="mark-read-btn" onClick={() => markAsRead(notif.NotificationID)}>
+                  <button
+                    className="mark-read-btn"
+                    onClick={() => markAsRead(notif.NotificationID)}
+                  >
                     Mark as Read
                   </button>
                 )}

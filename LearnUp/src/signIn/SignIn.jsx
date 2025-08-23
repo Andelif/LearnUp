@@ -1,82 +1,60 @@
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useContext } from "react";
 import { storeContext } from "../context/contextProvider";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
-import { redirect, useNavigate } from "react-router-dom";
-import axios from "axios";
+import { useNavigate } from "react-router-dom";
 import "./SignIn.css";
 
 const SignIn = () => {
-  const [formData, setFormData] = useState({
-    email: "",
-    password: "",
-  });
+  const [formData, setFormData] = useState({ email: "", password: "" });
   const [passwordVisible, setPasswordVisible] = useState(false);
-  
-  const { setUser, setToken } = useContext(storeContext);
-  const [selectedUser, setSelectedUser] = useState(""); // Default is empty (admin if not selected)
+  const [selectedUser, setSelectedUser] = useState(""); // if empty, treat as "admin"
   const [error, setError] = useState("");
-  const navigate = useNavigate();
-  
-  const [apiBaseUrl, setApiBaseUrl] = useState("");
-  
-  useEffect(() => {
-    setApiBaseUrl(import.meta.env.VITE_API_BASE_URL || "http://localhost:8000");
-  }, []);
 
-  // Handle form input change
+  const navigate = useNavigate();
+
+  // 👇 pull the shared axios instance + setters from context
+  const { api, setUser, setToken } = useContext(storeContext);
+
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-  const handleSignUp = () => {
-    navigate('/signup');
-  }
+  const handleSignUp = () => navigate("/signup");
 
-  // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
 
-    // Determine role: If no selection, assume "admin"
+    // If no selection, assume admin
     const role = selectedUser || "admin";
-  
+
     try {
-      const response = await axios.post(`${apiBaseUrl}/api/login`, {
+      const { data } = await api.post("/api/login", {
         ...formData,
-        role, // Send selected role (or default to "admin")
-      }, {
-        headers: {
-          "Content-Type": "application/json",
-        },
+        role, // harmless extra field; your backend ignores it except for admin shortcut
       });
-  
-      const { token, user,redirect } = response.data;
-  
+
+      const { token, user, redirect } = data || {};
+
       if (!token) {
         setError("Authentication failed! No token received.");
         return;
       }
 
-      // Validate user role before setting session
-      if (user.role !== role) {
+      // Optional role sanity check
+      if (user?.role && user.role !== role) {
         setError(`You are registered as a ${user.role}. Please log in with the correct role.`);
         return;
       }
-  
+
       setUser(user);
       setToken(token);
-  
-      localStorage.setItem("token", token);
       localStorage.setItem("user", JSON.stringify(user));
-      console.log(redirect);
-      navigate(redirect);
-  
+
+      navigate(redirect || "/");
     } catch (err) {
-      if (err.response?.data?.message) {
-        setError(err.response.data.message);
-      } else {
-        setError("Login failed. Please try again.");
-      }
+      if (err.response?.data?.message) setError(err.response.data.message);
+      else setError("Login failed. Please try again.");
     }
   };
 
@@ -94,15 +72,17 @@ const SignIn = () => {
             <h2><span>Welcome</span> Back</h2>
             <p>Sign in to continue your journey.</p>
 
-            {/* User Selection (Optional) */}
+            {/* User Selection */}
             <div className="user-selection">
               <button
+                type="button"
                 className={`user-btn ${selectedUser === "learner" ? "active" : ""}`}
                 onClick={() => setSelectedUser("learner")}
               >
                 Learner
               </button>
               <button
+                type="button"
                 className={`user-btn ${selectedUser === "tutor" ? "active" : ""}`}
                 onClick={() => setSelectedUser("tutor")}
               >
@@ -114,7 +94,7 @@ const SignIn = () => {
             <form onSubmit={handleSubmit}>
               <label className="input-label">Email</label>
               <input
-                type="text"
+                type="email"
                 name="email"
                 className="input-field"
                 placeholder="Enter your email"
@@ -134,7 +114,12 @@ const SignIn = () => {
                   onChange={handleChange}
                   required
                 />
-                <span className="password-toggle" onClick={() => setPasswordVisible(!passwordVisible)}>
+                <span
+                  className="password-toggle"
+                  onClick={() => setPasswordVisible((v) => !v)}
+                  role="button"
+                  tabIndex={0}
+                >
                   {passwordVisible ? <FaEyeSlash /> : <FaEye />}
                 </span>
               </div>
@@ -145,12 +130,13 @@ const SignIn = () => {
 
               <button className="login-button" type="submit">Sign In</button>
             </form>
-            
+
             <br />
             <div className="or-divider"><span>Or</span></div>
 
             <div className="signup-option">
-              Don't have an account? <a className="signup-link" onClick={handleSignUp}> Sign Up</a>
+              Don't have an account?{" "}
+              <a className="signup-link" onClick={handleSignUp}>Sign Up</a>
             </div>
           </div>
         </div>

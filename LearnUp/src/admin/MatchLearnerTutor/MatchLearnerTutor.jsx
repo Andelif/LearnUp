@@ -1,59 +1,52 @@
-import React, { useEffect, useState } from "react";
-import axios from "axios";
+import React, { useEffect, useState, useContext } from "react";
+import { storeContext } from "../../context/contextProvider";
 import { toast } from "react-toastify";
 import "./MatchLearnerTutor.css";
 
 const MatchLearnerAndTutor = () => {
+  const { api } = useContext(storeContext);
+
   const [tuitionRequests, setTuitionRequests] = useState([]);
   const [applications, setApplications] = useState([]);
   const [selectedTuitionID, setSelectedTuitionID] = useState(null);
-  const [loading, setLoading] = useState(true); // Added loading state
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    axios
-      .get("http://localhost:8000/api/admin/tuition-requests", {
-        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-      })
-      .then((response) => {
-        setTuitionRequests(response.data);
-        setLoading(false); // Set loading to false after data is loaded
-      })
-      .catch((error) => {
+    let alive = true;
+    (async () => {
+      try {
+        const { data } = await api.get("/api/admin/tuition-requests");
+        if (alive) setTuitionRequests(Array.isArray(data) ? data : []);
+      } catch (error) {
         console.error("Error fetching tuition requests:", error);
-        setLoading(false); // Ensure loading is stopped even on error
-      });
-  }, []);
+      } finally {
+        if (alive) setLoading(false);
+      }
+    })();
+    return () => { alive = false; };
+  }, [api]);
 
-  const fetchApplications = (TutionID) => {
+  const fetchApplications = async (TutionID) => {
     setSelectedTuitionID(TutionID);
-    axios
-      .get(`http://localhost:8000/api/admin/applications/${TutionID}`, {
-        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-      })
-      .then((response) => {
-        setApplications(response.data);
-      })
-      .catch((error) => {
-        toast.error("Failed to match");
-        console.error("Error fetching applications:", error);
-      });
+    try {
+      const { data } = await api.get(`/api/admin/applications/${TutionID}`);
+      setApplications(Array.isArray(data) ? data : []);
+    } catch (error) {
+      toast.error("Failed to load applications");
+      console.error("Error fetching applications:", error);
+    }
   };
 
-  const matchTutor = (applicationID) => {
-    axios.post(
-        "http://localhost:8000/api/admin/match-tutor",
-        { application_id: applicationID },
-        { headers: { Authorization: `Bearer ${localStorage.getItem("token")}` } }
-      ).then((response) => {
-        toast.success("Tutor matched successfully!");
-        fetchApplications(selectedTuitionID);
-      })
-      .catch((error) => {
-        console.error("Error matching tutor:", error);
-      });
+  const matchTutor = async (applicationID) => {
+    try {
+      await api.post("/api/admin/match-tutor", { application_id: applicationID });
+      toast.success("Tutor matched successfully!");
+      if (selectedTuitionID) fetchApplications(selectedTuitionID);
+    } catch (error) {
+      console.error("Error matching tutor:", error);
+    }
   };
 
-  // Show loading page when data is being fetched
   if (loading) {
     return (
       <div className="loader-container">
@@ -72,8 +65,8 @@ const MatchLearnerAndTutor = () => {
       <table border="1">
         <thead>
           <tr>
-            <th>ID</th>           
-            <th>Class</th>         
+            <th>ID</th>
+            <th>Class</th>
             <th>Subjects</th>
             <th>Curriculum</th>
             <th>Days</th>
@@ -85,22 +78,24 @@ const MatchLearnerAndTutor = () => {
         <tbody>
           {tuitionRequests.map((request) => (
             <tr key={request.TutionID}>
-              <td>{request.TutionID}</td>              
-              <td>{request.class}</td>         
+              <td>{request.TutionID}</td>
+              <td>{request.class}</td>
               <td>{request.subjects}</td>
               <td>{request.curriculum}</td>
               <td>{request.days}</td>
               <td>{request.location}</td>
               <td>{request.asked_salary}</td>
               <td>
-                <button onClick={() => fetchApplications(request.TutionID)}>Applications</button>
+                <button onClick={() => fetchApplications(request.TutionID)}>
+                  Applications
+                </button>
               </td>
             </tr>
           ))}
         </tbody>
       </table>
 
-      {/* Applications Table (Shown only when a tuition request is selected) */}
+      {/* Applications Table */}
       {selectedTuitionID && (
         <>
           <h3>Applications for Tuition ID: {selectedTuitionID}</h3>
@@ -115,6 +110,7 @@ const MatchLearnerAndTutor = () => {
                 <th>Preferred Salary</th>
                 <th>Preferred Location</th>
                 <th>Preferred Time</th>
+                <th></th>
               </tr>
             </thead>
             <tbody>
@@ -130,7 +126,9 @@ const MatchLearnerAndTutor = () => {
                   <td>{app.preferred_time}</td>
                   <td>
                     {!app.matched && (
-                      <button onClick={() => matchTutor(app.ApplicationID)}>Match</button>
+                      <button onClick={() => matchTutor(app.ApplicationID)}>
+                        Match
+                      </button>
                     )}
                   </td>
                 </tr>
