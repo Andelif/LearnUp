@@ -3,6 +3,29 @@
 use Illuminate\Contracts\Http\Kernel;
 use Illuminate\Http\Request;
 
+$allowedOrigins = [
+    'http://localhost:5173',
+    'https://learn-up-two.vercel.app',   // your Vercel domain
+];
+$origin = $_SERVER['HTTP_ORIGIN'] ?? '';
+
+if ($origin && (in_array($origin, $allowedOrigins, true) || preg_match('#^https://.*\.vercel\.app$#', $origin))) {
+    header('Access-Control-Allow-Origin: ' . $origin);
+    header('Vary: Origin');
+} else {
+    // allow public GETs from anywhere if you want (or delete this line)
+    // header('Access-Control-Allow-Origin: *');
+}
+
+header('Access-Control-Allow-Methods: GET, POST, PUT, PATCH, DELETE, OPTIONS');
+header('Access-Control-Allow-Headers: Content-Type, Authorization, X-Requested-With, Accept, Origin');
+header('Access-Control-Max-Age: 86400');
+
+if (($_SERVER['REQUEST_METHOD'] ?? '') === 'OPTIONS') {
+    http_response_code(204);
+    exit; // short-circuit preflight
+}
+
 define('LARAVEL_START', microtime(true));
 
 /*

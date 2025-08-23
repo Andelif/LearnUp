@@ -14,15 +14,12 @@ return [
 
     // (optional) allow Vercel preview deployments for this project
     'allowed_origins_patterns' => [
-        '#^https://learn-up-[\w-]+\.vercel\.app$#',
+        '#^https://.*\.vercel\.app$#',
     ],
 
     // be explicit so Authorization is definitely allowed
-    'allowed_headers' => ['Authorization', 'Content-Type', 'X-Requested-With'],
+    'allowed_headers' => ['*'],   // includes Authorization, Content-Type, etc.
     'exposed_headers' => [],
-
     'max_age' => 0,
-
-    // token mode -> keep false
-    'supports_credentials' => false,
+    'supports_credentials' => false, 
 ];
