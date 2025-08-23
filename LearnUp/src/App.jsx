@@ -22,17 +22,9 @@ const App = () => {
             {isAdmin && <AdminSidebar/>}
             <AppRoutes />
           </div>
-          {!isAdmin && <Footer />}
+          { <Footer />}
         </div>
-        <ToastContainer
-          position="top-right" // More conventional position
-          autoClose={3000} // Toast disappears in 3 seconds
-          hideProgressBar={false}
-          closeOnClick
-          pauseOnHover
-          draggable
-          theme="colored" // Try "light" or "dark" if needed
-        />
+        
       </Router>
     </ContextProvider>
   );

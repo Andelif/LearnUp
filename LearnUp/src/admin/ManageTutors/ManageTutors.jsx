@@ -1,21 +1,45 @@
-import React, { useEffect, useState } from "react";
-import axios from "axios";
+import React, { useContext, useEffect, useState } from "react";
+import { storeContext } from "../../context/contextProvider";
+import "./ManageTutors.css";
 
 const ManageTutors = () => {
+  const { api } = useContext(storeContext);
   const [tutors, setTutors] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    axios
-      .get("http://localhost:8000/api/admin/tutors", {
-        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
-      })
-      .then((response) => {
-        setTutors(response.data);
-      })
-      .catch((error) => {
+    let alive = true;
+    (async () => {
+      try {
+        const { data } = await api.get("/api/admin/tutors");
+        if (alive) setTutors(Array.isArray(data) ? data : []);
+      } catch (error) {
         console.error("Error fetching tutors:", error);
-      });
-  }, []);
+      } finally {
+        if (alive) setLoading(false);
+      }
+    })();
+    return () => { alive = false; };
+  }, [api]);
+
+  const handleDelete = async (tutorId) => {
+    if (!window.confirm("Are you sure you want to delete this tutor?")) return;
+    try {
+      await api.delete(`/api/admin/tutors/${tutorId}`);
+      setTutors((prev) => prev.filter((t) => t.TutorID !== tutorId));
+    } catch (error) {
+      console.error("Error deleting tutor:", error);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="loader-container">
+        <div className="loader"></div>
+        <p className="loading-text">Loading...</p>
+      </div>
+    );
+  }
 
   return (
     <div>
@@ -30,6 +54,7 @@ const ManageTutors = () => {
             <th>Availability</th>
             <th>Qualifications</th>
             <th>Experience</th>
+            <th></th>
           </tr>
         </thead>
         <tbody>
@@ -42,6 +67,9 @@ const ManageTutors = () => {
               <td>{tutor.availability}</td>
               <td>{tutor.qualifications}</td>
               <td>{tutor.experience}</td>
+              <td>
+                <button onClick={() => handleDelete(tutor.TutorID)}>Delete</button>
+              </td>
             </tr>
           ))}
         </tbody>

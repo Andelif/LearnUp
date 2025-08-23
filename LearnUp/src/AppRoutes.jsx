@@ -18,6 +18,7 @@ import AdminRoutes from './AdminRoutes';
 import ProfilePage from './ProfilePage/ProfilePage';
 import MyTuitions from './MyTuitions/MyTuitions';
 import Inbox from './Inbox/Inbox';
+import PaymentVoucher from './PaymentPage/PaymentVoucher';
 
 
 
@@ -41,6 +42,7 @@ const AppRoutes = () => {
     
     <Route path="/admin/*" element={<AdminRoutes />} />
     <Route path="/inbox" element={<Inbox />} />
+    <Route path="/voucher/:tutionId" element={<PaymentVoucher />} />
     
    </Routes>
   )
