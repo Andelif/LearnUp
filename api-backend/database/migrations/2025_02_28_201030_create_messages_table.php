@@ -6,33 +6,36 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     *
-     * @return void
-     */
-    public function up()
+    public function up(): void
     {
-        DB::statement("CREATE TABLE messages (
-            MessageID BIGINT AUTO_INCREMENT PRIMARY KEY,
-            SentBy BIGINT unsigned NOT NULL, -- Foreign key referencing users table
-            SentTo BIGINT unsigned NOT NULL, -- Foreign key referencing users table
-            Content TEXT NOT NULL,
-            TimeStamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            Status ENUM('Delivered', 'Failed', 'Seen') DEFAULT 'Delivered',
-            FOREIGN KEY (SentBy) REFERENCES users(id) ON DELETE CASCADE,
-            FOREIGN KEY (SentTo) REFERENCES users(id) ON DELETE CASCADE
-        ) ENGINE=InnoDB;
-        ");
+        Schema::create('messages', function (Blueprint $table) {
+            $table->id('MessageID');
+
+            // Foreign keys to users
+            $table->foreignId('SentBy')
+                  ->constrained('users')
+                  ->onDelete('cascade');
+
+            $table->foreignId('SentTo')
+                  ->constrained('users')
+                  ->onDelete('cascade');
+
+            $table->text('Content');
+
+            // TZ-aware timestamp with default now()
+            $table->timestampTz('TimeStamp')->useCurrent();
+
+            // ENUM → CHECK in Postgres
+            $table->enum('Status', ['Delivered', 'Failed', 'Seen'])
+                  ->default('Delivered');
+
+            // If you want created_at/updated_at as well
+            // $table->timestampsTz();
+        });
     }
 
-    /**
-     * Reverse the migrations.
-     *
-     * @return void
-     */
-    public function down()
+    public function down(): void
     {
-        DB::statement("DROP TABLE IF EXISTS messages");
+        Schema::dropIfExists('messages');
     }
 };

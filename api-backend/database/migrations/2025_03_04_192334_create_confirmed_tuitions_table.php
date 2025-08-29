@@ -1,28 +1,42 @@
 <?php
 
-
 use Illuminate\Database\Migrations\Migration;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
 
 class CreateConfirmedTuitionsTable extends Migration
 {
-    public function up()
+    public function up(): void
     {
-        DB::statement("CREATE TABLE ConfirmedTuitions (
-            ConfirmedTuitionID BIGINT AUTO_INCREMENT PRIMARY KEY,
-            application_id BIGINT NOT NULL,
-            tution_id BIGINT NOT NULL,
-            FinalizedSalary DECIMAL(10,2) NOT NULL,
-            FinalizedDays VARCHAR(255) NOT NULL,
-            Status ENUM('Ongoing', 'Ended') DEFAULT 'Ongoing',
-            ConfirmedDate TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            FOREIGN KEY (application_id) REFERENCES applications(ApplicationID) ON DELETE CASCADE,
-            FOREIGN KEY (tution_id) REFERENCES tuition_requests(TutionID) ON DELETE CASCADE
-        )ENGINE=InnoDB");
+        Schema::create('confirmed_tuitions', function (Blueprint $table) {
+            // PK
+            $table->id('ConfirmedTuitionID');
+
+            // FKs
+            $table->foreignId('application_id')
+                  ->constrained('applications', 'ApplicationID')
+                  ->onDelete('cascade');
+
+            $table->foreignId('tution_id') // keeping your existing column name
+                  ->constrained('tuition_requests', 'TutionID')
+                  ->onDelete('cascade');
+
+            $table->decimal('FinalizedSalary', 10, 2);
+            $table->string('FinalizedDays');
+
+            // Enum -> CHECK constraint in Postgres
+            $table->enum('Status', ['Ongoing', 'Ended'])->default('Ongoing');
+
+            // Default now(), timezone-aware
+            $table->timestampTz('ConfirmedDate')->useCurrent();
+
+            // (Optional) also track created_at/updated_at:
+            // $table->timestampsTz();
+        });
     }
 
-    public function down()
+    public function down(): void
     {
-        DB::statement("DROP TABLE IF EXISTS ConfirmedTuitions");
+        Schema::dropIfExists('confirmed_tuitions');
     }
 }
