@@ -1,30 +1,27 @@
-# --- Base PHP image
 FROM php:8.2-cli
 
-# Install system deps + Postgres PDO driver
+# System deps + Postgres PDO driver
 RUN apt-get update && apt-get install -y git unzip libpq-dev \
     && docker-php-ext-install pdo_pgsql
 
-# Install Composer (copy from official composer image)
+# Composer
 COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+ENV COMPOSER_ALLOW_SUPERUSER=1
 
-# Workdir inside the image
 WORKDIR /app
 
-# Copy composer files first for better layer caching
-COPY composer.json composer.lock ./
-RUN composer install --no-interaction --prefer-dist --optimize-autoloader
-
-# Copy the rest of the app
+# Copy the whole app first so composer scripts (which call "artisan") can run
 COPY . .
 
-# Ensure runtime dirs are writable
+# Install PHP deps (runs Laravel's post-scripts safely because artisan exists now)
+RUN composer install --no-interaction --prefer-dist --optimize-autoloader
+
+# Ensure writable dirs
 RUN mkdir -p storage bootstrap/cache \
     && chmod -R 775 storage bootstrap/cache || true
 
-# Default port Render expects your app to bind to
+# Render expects your app to bind to PORT
 ENV PORT=10000
 EXPOSE 10000
 
-# Default command (Render can override via "Docker Command", but this is fine)
 CMD ["php", "-S", "0.0.0.0:10000", "-t", "public"]
