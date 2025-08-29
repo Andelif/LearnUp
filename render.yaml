@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: learnup-backend
+    env: php
+    rootDir: api-backend
+    buildCommand: |
+      composer install --no-interaction --prefer-dist --optimize-autoloader
+      php artisan config:clear
+      php artisan route:clear
+      php artisan view:clear
+      php artisan optimize
+    startCommand: php -S 0.0.0.0:10000 -t public
+    postDeployCommand: php artisan migrate --force && php artisan storage:link || true
+    plan: free
+    region: oregon
