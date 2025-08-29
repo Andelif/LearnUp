@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\LearnerController;
@@ -102,6 +103,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
 
     Route::put('/confirmed-tuitions/{id}', [ConfirmedTuitionController::class, 'update']);
     
-    
+    Route::get('/migrate', function () {
+        Artisan::call('migrate', ['--force' => true]);
+        return "Migrations run successfully!";
+    });
 
 });
