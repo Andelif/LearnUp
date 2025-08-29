@@ -1,6 +1,7 @@
 <?php
 
 return [
+
     // Only your API routes (adjust if you also hit /login outside /api)
     'paths' => ['api/*', 'login', 'register'],
 
@@ -23,4 +24,5 @@ return [
 
     // IMPORTANT for token mode: no cookies => false
     'supports_credentials' => false,
+
 ];
