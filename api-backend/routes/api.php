@@ -105,7 +105,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
     
     Route::get('/migrate', function () {
         Artisan::call('migrate', ['--force' => true]);
-        return "Migrations run successfully!";
+        return response()->json(['message' => '✅ Migrations run successfully!']);
     });
 
 });
