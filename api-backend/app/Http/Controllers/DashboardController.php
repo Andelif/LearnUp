@@ -2,74 +2,38 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
 use App\Services\DashboardService;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
 
 class DashboardController extends Controller
 {
-    protected $dashboardService;
+    protected DashboardService $dashboardService;
 
     public function __construct(DashboardService $dashboardService)
     {
         $this->dashboardService = $dashboardService;
     }
 
+    /**
+     * GET /api/dashboard/{userId}/{role}
+     * Auth required. Users can only see their own dashboard unless admin.
+     */
     public function getDashboardStats($userId, $role)
     {
-        if ($role === 'tutor') {
-
-
-
-            
-            $appliedJobs = DB::select("SELECT COUNT(*) as count FROM applications WHERE tutor_id = 
-                                        (SELECT TutorID FROM tutors WHERE user_id = ?)", [$userId])[0]->count;
-
-            
-            $shortlistedJobs = DB::select("SELECT COUNT(*) as count FROM applications WHERE status = 'Shortlisted' AND tutor_id = 
-                                            (SELECT TutorID FROM tutors WHERE user_id = ?)", [$userId])[0]->count;
-            $confirmedJobs = DB::select("SELECT COUNT(*) as count FROM applications WHERE tutor_id = 
-                                        ( SELECT TutorID FROM tutors WHERE user_id = ?) AND status = 'Confirmed'", [$userId])[0]->count;                                
-    
-
-            $cancelledJobs = DB::select("SELECT COUNT(*) as count FROM applications WHERE tutor_id = 
-                                            (SELECT TutorID FROM tutors WHERE user_id = ?) AND status = 'Cancelled'", [$userId])[0]->count;
-
-
-            return response()->json([
-                'appliedJobs' => $appliedJobs,
-                'shortlistedJobs' => $shortlistedJobs,
-                'confirmedJobs'=> $confirmedJobs,
-                'cancelledJobs' => $cancelledJobs,
-            ]);
-
-
-
-        } elseif ($role === 'learner') {
-
-
-
-            
-            $appliedRequests = DB::select("SELECT COUNT(*) as count FROM tuition_requests WHERE LearnerID = 
-                                            (SELECT LearnerID FROM learners WHERE user_id = ?)", [$userId])[0]->count;
-
-            $shortlistedTutors = DB::select("SELECT COUNT(*) as count FROM applications WHERE learner_id = 
-                                            (SELECT LearnerID FROM learners WHERE user_id = ?) AND status = 'Shortlisted'", [$userId])[0]->count;
-            $confirmedTutors = DB::select("SELECT COUNT(*) as count FROM applications WHERE learner_id = 
-                                            (SELECT LearnerID FROM learners WHERE user_id = ?) AND status = 'Confirmed'", [$userId])[0]->count;                                
-
-            $cancelledTutors = DB::select("SELECT COUNT(*) as count FROM applications WHERE learner_id = 
-                                            (SELECT LearnerID FROM learners WHERE user_id = ?) AND status = 'Cancelled'", [$userId])[0]->count;
-
-
-            return response()->json([
-                'appliedRequests' => $appliedRequests,
-                'shortlistedTutors' => $shortlistedTutors,
-                'confirmedTutors' =>$confirmedTutors,
-                'cancelledTutors' => $cancelledTutors,
-            ]);
+        $auth = Auth::user();
+        if (!$auth) {
+            return response()->json(['message' => 'Unauthorized'], 401);
+        }
+        if ($auth->role !== 'admin' && (int)$auth->id !== (int)$userId) {
+            return response()->json(['message' => 'Forbidden'], 403);
         }
 
-        return response()->json($stats);
+        $stats = $this->dashboardService->getDashboardStats((int)$userId, (string)$role);
+
+        if (!empty($stats['error'])) {
+            return response()->json(['message' => $stats['error']], 400);
+        }
+
+        return response()->json($stats, 200);
     }
 }

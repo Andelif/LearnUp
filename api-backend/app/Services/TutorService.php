@@ -2,50 +2,62 @@
 
 namespace App\Services;
 
+use App\Models\Tutor;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Auth;
 
-class TutorService{
+class TutorService
+{
+    private function normalizeGender(?string $gender): ?string
+    {
+        if ($gender === null) return null;
+        $g = strtolower(trim($gender));
+        return match ($g) {
+            'male','m'   => 'Male',
+            'female','f' => 'Female',
+            'other','o'  => 'Other',
+            default      => null,
+        };
+    }
+
+    /** Admin can view all; controller restricts who calls this. */
     public function getAllTutors()
     {
-        return DB::select("SELECT * FROM tutors");
+        return Tutor::orderBy('id', 'desc')->get();
     }
-    public function updateOrCreateTutorProfile($request)
+
+    public function getTutorByUserId(int $userId): ?Tutor
     {
-        DB::insert("REPLACE INTO tutors (user_id, full_name, address, contact_number, gender, preferred_salary, qualification, experience, currently_studying_in) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", [
-            Auth::id(),
-            $request->full_name,
-            $request->address,
-            $request->contact_number,
-            $request->gender,
-            $request->preferred_salary,
-            $request->qualification,
-            $request->experience,
-            $request->currently_studying_in
-        ]);
+        return Tutor::where('user_id', $userId)->first();
     }
-    public function getTutorById($id)
+
+    /** Create or update a tutor profile for a given user_id (Postgres-safe). */
+    public function upsertForUser(int $userId, array $data): Tutor
     {
-        return DB::select("SELECT * FROM tutors WHERE user_id = ?", [$id]);
+        // Provide safe defaults to satisfy NOT NULL / CHECK constraints
+        $payload = [
+            'full_name'              => $data['full_name']              ?? '',
+            'address'                => $data['address']                ?? '',
+            'contact_number'         => $data['contact_number']         ?? null,
+            'gender'                 => $this->normalizeGender($data['gender'] ?? null),
+            'preferred_salary'       => isset($data['preferred_salary']) ? (int)$data['preferred_salary'] : 0,
+            'qualification'          => $data['qualification']          ?? '',
+            'experience'             => isset($data['experience']) ? (int)$data['experience'] : 0,
+            'currently_studying_in'  => $data['currently_studying_in']  ?? '',
+            'preferred_location'     => $data['preferred_location']     ?? '',
+            'preferred_time'         => $data['preferred_time']         ?? '',
+            'availability'           => $data['availability']           ?? '',
+        ];
+
+        return DB::transaction(function () use ($userId, $payload) {
+            return Tutor::updateOrCreate(
+                ['user_id' => $userId],
+                $payload
+            );
+        });
     }
-    public function updateTutorProfile($request, $id)
+
+    public function deleteByUserId(int $userId): int
     {
-        DB::update("UPDATE tutors SET full_name = ?, address = ?, contact_number = ?, gender = ?, preferred_salary = ?, qualification = ?, experience = ?, currently_studying_in = ?, preferred_location = ?, preferred_time = ? WHERE user_id = ?", [
-            $request->full_name,
-            $request->address,
-            $request->contact_number,
-            $request->gender,
-            $request->preferred_salary,
-            $request->qualification,
-            $request->experience,
-            $request->currently_studying_in,
-            $request->preferred_location,
-            $request->preferred_time,
-            $id
-        ]);
-    }
-    public function deleteTutor($id)
-    {
-        DB::delete("DELETE FROM tutors WHERE user_id = ?", [$id]);
+        return Tutor::where('user_id', $userId)->delete();
     }
 }

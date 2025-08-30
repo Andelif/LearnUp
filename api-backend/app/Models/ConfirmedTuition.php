@@ -2,32 +2,32 @@
 
 namespace App\Models;
 
-use Illuminate\Support\Facades\DB;
-use Illuminate\Database\Eloquent\Model;;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class ConfirmedTuition extends Model
 {
-    public function index()
-    {
-        return response()->json(ConfirmedTuition::getAllConfirmedTuitions());
-    }
+    use HasFactory;
 
-    public function show($id)
-    {
-        return response()->json(ConfirmedTuition::getConfirmedTuitionById($id));
-    }
+    // If your table name is snake_case (recommended), change this to 'confirmed_tuitions'.
+    protected $table = 'ConfirmedTuitions';
 
-    public function store(Request $request)
-    {
-        $data = $request->validate([
-            'ApplicationID' => 'required|integer',
-            'TuitionID' => 'required|integer',
-            'FinalizedSalary' => 'required|numeric',
-            'FinalizedDays' => 'required|string',
-            'Status' => 'required|in:Ongoing,Ended'
-        ]);
-        
-        ConfirmedTuition::createConfirmedTuition($data);
-        return response()->json(['message' => 'Confirmed Tuition created successfully']);
-    }
+    // Your PK appears to be ConfirmedTuitionID
+    protected $primaryKey = 'ConfirmedTuitionID';
+    public $incrementing = true;
+
+    // If the table doesn't have created_at/updated_at:
+    public $timestamps = false;
+
+    protected $fillable = [
+        'application_id',  // -> applications.ApplicationID
+        'tution_id',       // -> tuition_requests.TutionID  (note: tution)
+        'FinalizedSalary',
+        'FinalizedDays',
+        'Status',          // 'Ongoing' | 'Ended'
+    ];
+
+    protected $casts = [
+        'FinalizedSalary' => 'float',
+    ];
 }

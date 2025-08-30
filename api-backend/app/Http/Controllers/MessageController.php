@@ -2,126 +2,80 @@
 
 namespace App\Http\Controllers;
 
+use App\Services\MessageService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 
 class MessageController extends Controller
 {
-    // Send a message
+    protected MessageService $svc;
+
+    public function __construct(MessageService $svc)
+    {
+        $this->svc = $svc;
+    }
+
+    /** POST /api/messages */
     public function sendMessage(Request $request)
     {
-        $user = Auth::user();
-
-        $request->validate([
-            'SentTo' => 'required|exists:users,ID',
+        $validator = Validator::make($request->all(), [
+            'SentTo'  => 'required|integer|exists:users,id',
             'Content' => 'required|string|max:2000',
         ]);
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 400);
+        }
 
-        DB::insert("INSERT INTO messages (SentBy, SentTo, Content) VALUES (?, ?, ?)", [
-            $user->id,
-            $request->SentTo,
-            $request->Content
-        ]);
+        $r = $this->svc->sendMessage((int)$validator->validated()['SentTo'], $validator->validated()['Content']);
 
-        return response()->json(['message' => 'Message sent successfully'], 201);
+        if (!empty($r['error'])) return response()->json(['message' => $r['error']], $r['status'] ?? 400);
+        return response()->json(['message' => $r['message'], 'data' => $r['data']], $r['status'] ?? 201);
     }
 
-    // Get messages between the authenticated user and another user
+    /** GET /api/messages/{userId} */
     public function getMessages($userId)
     {
-        $user = Auth::user();
-
-        $messages = DB::select("
-            SELECT * FROM messages 
-            WHERE (SentBy = ? AND SentTo = ?) OR (SentBy = ? AND SentTo = ?)
-            ORDER BY TimeStamp ASC", 
-            [$user->id, $userId, $userId, $user->id]
-        );
-
-        return response()->json($messages);
+        $rows = $this->svc->getMessages((int)$userId);
+        if (isset($rows['error'])) {
+            return response()->json(['message' => $rows['error']], $rows['status']);
+        }
+        return response()->json($rows, 200);
     }
 
-    // Mark messages as seen
+    /** PUT /api/messages/seen/{senderId} */
     public function markAsSeen($senderId)
     {
-        $user = Auth::user();
-
-        DB::update("UPDATE messages SET Status = 'Seen' WHERE SentBy = ? AND SentTo = ? AND Status = 'Delivered'", [
-            $senderId, $user->id
-        ]);
-
-        return response()->json(['message' => 'Messages marked as seen']);
+        $r = $this->svc->markAsSeen((int)$senderId);
+        if (!empty($r['error'])) return response()->json(['message' => $r['error']], $r['status']);
+        return response()->json(['message' => $r['message'], 'updated' => $r['updated']], $r['status']);
     }
 
-    // Fetch matched users for messaging
+    /** GET /api/matched-users */
     public function getMatchedUsers()
     {
-        $user = Auth::user();
-
-
-        $userRole = DB::select("SELECT role FROM users WHERE id = ?", 
-            [$user->id]);
-            
-        $role = $userRole[0]->role;    
-               
-
-
-        if($role === "tutor")
-        {
-            
-            $matchedUsers = DB::select("SELECT l.user_id, l.full_name, 'learner' AS role, a.tution_id, a.ApplicationID
-                                        FROM learners l JOIN applications a ON l.LearnerID = a.learner_id 
-                                            WHERE a.matched = true AND a.tutor_id = 
-                                                (SELECT TutorID FROM tutors WHERE user_id = ?)"
-                                                , [ $user->id]);
-
-            
-        }elseif($role === "learner")
-        {
-            
-            $matchedUsers = DB::select("SELECT t.user_id, t.full_name, 'tutor' AS role, a.tution_id, a.ApplicationID
-                                        FROM tutors t JOIN applications a ON t.TutorID = a.tutor_id 
-                                            WHERE a.matched = true AND a.learner_id = 
-                                                (SELECT LearnerID FROM learners WHERE user_id = ?)"
-                                                , [ $user->id]);
-
-            
-        } else {
-            $matchedUsers = []; 
+        $rows = $this->svc->getMatchedUsers();
+        if (isset($rows['error'])) {
+            return response()->json(['message' => $rows['error']], $rows['status']);
         }
-
-        return response()->json($matchedUsers);
-
+        return response()->json($rows, 200);
     }
 
-    // Reject Tutor API
+    /** POST /api/reject-tutor */
     public function rejectTutor(Request $request)
     {
-        $user = Auth::user();
-
-        $request->validate([
-            'tutor_id' => 'required|exists:tutors,user_id',
-            'tution_id' => 'required|exists:applications,tution_id',
+        $validator = Validator::make($request->all(), [
+            // IMPORTANT: this must be the Tutor's **TutorID** (PK), not user_id
+            'tutor_id'  => 'required|integer|exists:tutors,TutorID',
+            // 'tution_id' uses your applications column spelling
+            'tution_id' => 'required|integer|exists:applications,tution_id',
         ]);
-
-        // Ensure the user is a learner
-        $learner = DB::select("SELECT LearnerID FROM learners WHERE user_id = ?", [$user->id]);
-
-        if (empty($learner)) {
-            return response()->json(['error' => 'Only learners can reject tutors'], 403);
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 400);
         }
 
-        $learnerId = $learner[0]->LearnerID;
+        $r = $this->svc->rejectTutor((int)$validator->validated()['tutor_id'], (int)$validator->validated()['tution_id']);
 
-        // Update application status
-        DB::update("UPDATE applications SET status = 'Cancelled' WHERE tutor_id = ? AND learner_id = ? AND tution_id = ?", [
-            $request->tutor_id,
-            $learnerId,
-            $request->tution_id
-        ]);
-
-        return response()->json(['message' => 'Tutor rejected successfully.']);
+        if (!empty($r['error'])) return response()->json(['message' => $r['error']], $r['status']);
+        return response()->json(['message' => $r['message']], $r['status']);
     }
-
 }

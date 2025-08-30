@@ -53,14 +53,14 @@ const SignUp = () => {
       setSuccess("Registration successful! Redirecting...");
       setTimeout(() => navigate("/signIn"), 2000);
     } catch (err) {
-      if (err.response?.data?.errors) {
-        const msgs = Object.values(err.response.data.errors).flat().join(" ");
-        setError(msgs);
-      } else if (err.response?.data?.message) {
-        setError(err.response.data.message);
-      } else {
-        setError("Registration failed. Please try again.");
-      }
+      const data = err.response?.data;
+      const msg =
+        (data?.errors && Object.values(data.errors).flat().join(" ")) ||
+        data?.error ||
+        data?.details ||
+        data?.message ||
+        "Registration failed. Please try again.";
+      setError(msg);
     }
   };
 

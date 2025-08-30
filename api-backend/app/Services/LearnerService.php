@@ -2,45 +2,61 @@
 
 namespace App\Services;
 
+use App\Models\Learner;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Auth;
 
-class LearnerService{
+class LearnerService
+{
+    private function normalizeGender(?string $gender): ?string
+    {
+        if ($gender === null) return null;
+        $g = strtolower(trim($gender));
+        return match ($g) {
+            'male','m'   => 'Male',
+            'female','f' => 'Female',
+            'other','o'  => 'Other',
+            default      => null,
+        };
+    }
+
+    /** Admin: all learners; otherwise we’ll fetch per-user in controller */
     public function getAllLearners()
     {
-        return DB::select("SELECT * FROM learners");
+        return Learner::orderBy('id', 'desc')->get();
     }
 
-    public function createOrUpdateLearner($request)
+    public function getLearnerByUserId(int $userId): ?Learner
     {
-        return DB::insert("REPLACE INTO learners (user_id, full_name, guardian_full_name, contact_number, gender, address) VALUES (?, ?, ?, ?, ?, ?)", [
-            Auth::id(),
-            $request->full_name,
-            $request->guardian_full_name,
-            $request->contact_number,
-            $request->gender,
-            $request->address
-        ]);
-    }
-    public function getLearnerById($id)
-    {
-        $learner = DB::select("SELECT * FROM learners WHERE user_id = ?", [$id]);
-        return $learner ? $learner[0] : null;
+        return Learner::where('user_id', $userId)->first();
     }
 
-    public function updateLearner($request, $id)
+    /** Create or update the learner row for a given user_id */
+    public function upsertForUser(int $userId, array $data): Learner
     {
-        return DB::update("UPDATE learners SET full_name = ?, guardian_full_name = ?, contact_number = ?, gender = ?, address = ? WHERE user_id = ?", [
-            $request->full_name,
-            $request->guardian_full_name,
-            $request->contact_number,
-            $request->gender,
-            $request->address,
-            $id
-        ]);
+        $payload = [
+            'full_name'              => $data['full_name']              ?? '',
+            'guardian_full_name'     => $data['guardian_full_name']     ?? null,
+            'contact_number'         => $data['contact_number']         ?? null,
+            'guardian_contact_number'=> $data['guardian_contact_number']?? null,
+            'gender'                 => $this->normalizeGender($data['gender'] ?? null),
+            'address'                => $data['address']                ?? null,
+        ];
+
+        return DB::transaction(function () use ($userId, $payload) {
+            return Learner::updateOrCreate(
+                ['user_id' => $userId],
+                $payload
+            );
+        });
     }
-    public function deleteLearner($id)
+
+    public function updateForUser(int $userId, array $data): Learner
     {
-        return DB::delete("DELETE FROM learners WHERE user_id = ?", [$id]);
+        return $this->upsertForUser($userId, $data);
+    }
+
+    public function deleteByUserId(int $userId): int
+    {
+        return Learner::where('user_id', $userId)->delete();
     }
 }

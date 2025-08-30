@@ -26,12 +26,18 @@ class UserController extends Controller
     public function register(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'name'              => 'required|string|max:255',
-            'email'             => 'required|email|unique:users,email',
-            'password'          => 'required|string|min:6|confirmed',
-            'role'              => 'required|string|in:learner,tutor,admin',
-            'gender'            => 'nullable|string|in:male,female,other,Male,Female,Other',
-            'contact_number'    => 'nullable|string|max:20',
+            'name'                 => 'required|string|max:255',
+            'email'                => 'required|email|unique:users,email',
+            'password'             => 'required|string|min:6|confirmed',
+            'role'                 => 'required|string|in:learner,tutor,admin',
+            'gender'               => 'nullable|string|in:male,female,other,Male,Female,Other',
+            'contact_number'       => 'nullable|string|max:20',
+            
+            'qualification'        => 'nullable|string|max:255',
+            'experience'           => 'nullable|integer|min:0',
+            'preferred_salary'     => 'nullable|integer|min:0',
+            'availability'         => 'nullable|string|max:255',
+            'address'              => 'nullable|string|max:255',
         ]);
 
         if ($validator->fails()) {
