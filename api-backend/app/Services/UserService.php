@@ -12,12 +12,20 @@ class UserService
     {
         if ($gender === null) return null;
         $g = strtolower(trim($gender));
+        // Return the exact literals your DB CHECK expects
         return match ($g) {
-            'male','m'   => 'Male',
-            'female','f' => 'Female',
-            'other','o'  => 'Other',
-            default      => null,
+            'male', 'm'   => 'Male',
+            'female','f'  => 'Female',
+            'other','o'   => 'Other',
+            default       => null,
         };
+    }
+
+    /** Coerce a mixed truthy/falsey input to a real boolean (or null). */
+    private function toBoolOrNull(mixed $v): ?bool
+    {
+        // Accepts true/false, 1/0, "true"/"false", "1"/"0"
+        return filter_var($v, FILTER_VALIDATE_BOOLEAN, FILTER_NULL_ON_FAILURE);
     }
 
     public function register(array $data): User
@@ -35,19 +43,31 @@ class UserService
             $phone  = $data['contact_number'] ?? null;
 
             if ($data['role'] === 'learner') {
-                $address = $data['address'] ?? '';
+                // Use NULL instead of empty strings for optional text fields
+                $address = isset($data['address']) && $data['address'] !== '' ? $data['address'] : null;
+
                 DB::insert(
                     "INSERT INTO learners (user_id, full_name, contact_number, gender, address)
                      VALUES (?, ?, ?, ?, ?)",
                     [$user->id, $data['name'], $phone, $gender, $address]
                 );
+
             } elseif ($data['role'] === 'tutor') {
-                // Provide safe defaults to satisfy NOT NULL / CHECK constraints
-                $qualification    = $data['qualification']    ?? '';
-                $experience       = isset($data['experience']) ? (int)$data['experience'] : 0;
-                $preferredSalary  = isset($data['preferred_salary']) ? (int)$data['preferred_salary'] : 0;
-                $availability     = $data['availability']     ?? '';
-                $address          = $data['address']          ?? '';
+                // Coerce/clean optional fields — never pass '' to typed columns
+                $qualification   = isset($data['qualification']) && $data['qualification'] !== '' ? $data['qualification'] : null;
+
+                // If your columns allow NULL, prefer null; if NOT NULL, use sensible defaults.
+                $experience      = array_key_exists('experience', $data) && $data['experience'] !== ''
+                    ? (int)$data['experience'] : 0;
+
+                $preferredSalary = array_key_exists('preferred_salary', $data) && $data['preferred_salary'] !== ''
+                    ? (int)$data['preferred_salary'] : 0;
+
+                // availability is BOOLEAN in Postgres → convert; fall back to false if absent/invalid
+                $availabilityParsed = $this->toBoolOrNull($data['availability'] ?? null);
+                $availability       = ($availabilityParsed === null) ? false : $availabilityParsed;
+
+                $address          = isset($data['address']) && $data['address'] !== '' ? $data['address'] : null;
 
                 DB::insert(
                     "INSERT INTO tutors (user_id, full_name, contact_number, gender, qualification, experience, preferred_salary, availability, address)
@@ -60,10 +80,11 @@ class UserService
                         $qualification,
                         $experience,
                         $preferredSalary,
-                        $availability,
-                        $address
+                        $availability, // <- boolean true/false, never ''
+                        $address,
                     ]
                 );
+
             } elseif ($data['role'] === 'admin') {
                 DB::insert(
                     "INSERT INTO admins (user_id, full_name) VALUES (?, ?)",
