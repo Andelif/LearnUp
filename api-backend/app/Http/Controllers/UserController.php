@@ -28,10 +28,10 @@ class UserController extends Controller
         $validator = Validator::make($request->all(), [
             'name'              => 'required|string|max:255',
             'email'             => 'required|email|unique:users,email',
-            'password'          => 'required|string|min:6|confirmed', // expects password_confirmation
+            'password'          => 'required|string|min:6|confirmed',
             'role'              => 'required|string|in:learner,tutor,admin',
+            'gender'            => 'nullable|string|in:male,female,other,Male,Female,Other',
             'contact_number'    => 'nullable|string|max:20',
-            'gender'            => 'nullable|string|in:male,female,other',
         ]);
 
         if ($validator->fails()) {
