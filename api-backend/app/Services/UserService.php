@@ -2,57 +2,61 @@
 
 namespace App\Services;
 
+use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
-use App\Models\User;
 
-class UserService{
-    public function register($data)
+class UserService
+{
+    
+    public function register(array $data): User
     {
-        try {
-            // Insert user into users table
-            DB::insert("INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)", [
-                $data['name'],
-                $data['email'],
-                Hash::make($data['password']),
-                $data['role']
+        return DB::transaction(function () use ($data) {
+            
+            $user = User::create([
+                'name'     => $data['name'],
+                'email'    => $data['email'],
+                'password' => Hash::make($data['password']),
+                'role'     => $data['role'],
             ]);
 
-            // Get the newly created user ID
-            $userId = DB::getPdo()->lastInsertId();
-
-            // Insert into role-specific tables
+            
             if ($data['role'] === 'learner') {
-                DB::insert("INSERT INTO learners (user_id, full_name, contact_number, gender, address) VALUES (?, ?, ?, ?, ?)", [
-                    $userId,
-                    $data['name'],
-                    $data['contact_number'] ?? null,
-                    $data['gender'] ?? null,
-                    null
-                ]);
+                DB::insert(
+                    "INSERT INTO learners (user_id, full_name, contact_number, gender, address)
+                     VALUES (?, ?, ?, ?, ?)",
+                    [
+                        $user->id,
+                        $data['name'],
+                        $data['contact_number'] ?? null,
+                        $data['gender'] ?? null,
+                        null
+                    ]
+                );
             } elseif ($data['role'] === 'tutor') {
-                DB::insert("INSERT INTO tutors (user_id, full_name, contact_number, gender, qualification, experience, preferred_salary, availability, address) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)", [
-                    $userId,
-                    $data['name'],
-                    $data['contact_number'] ?? null,
-                    $data['gender'] ?? null,
-                    null,
-                    null,
-                    null,
-                    null,
-                    null
-                ]);
+                DB::insert(
+                    "INSERT INTO tutors (user_id, full_name, contact_number, gender, qualification, experience, preferred_salary, availability, address)
+                     VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                    [
+                        $user->id,
+                        $data['name'],
+                        $data['contact_number'] ?? null,
+                        $data['gender'] ?? null,
+                        null, null, null, null, null
+                    ]
+                );
             } elseif ($data['role'] === 'admin') {
-                DB::insert("INSERT INTO admins (user_id, full_name) VALUES (?, ?)", [$userId, $data['name']]);
+                DB::insert(
+                    "INSERT INTO admins (user_id, full_name) VALUES (?, ?)",
+                    [$user->id, $data['name']]
+                );
             }
 
-            return $userId;
-        } catch (\Exception $e) {
-            throw new \Exception("Registration failed: " . $e->getMessage());
-        }
+            return $user;
+        });
     }
-    
-    public function updateProfile($userId, $name)
+
+    public function updateProfile(int $userId, string $name): void
     {
         DB::update("UPDATE users SET name = ? WHERE id = ?", [$name, $userId]);
     }

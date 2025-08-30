@@ -43,10 +43,13 @@ const SignUp = () => {
 
     try {
       // token-based register → backend returns { message, user, token }
-      await api.post("/api/register", formData, {
+      const res = await api.post("/api/register", formData, {
         headers: { "Content-Type": "application/json" },
       });
 
+      const { token, user } = res.data;
+      localStorage.setItem("token", token);
+      
       setSuccess("Registration successful! Redirecting...");
       setTimeout(() => navigate("/signIn"), 2000);
     } catch (err) {
