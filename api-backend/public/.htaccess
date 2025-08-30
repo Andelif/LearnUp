@@ -1,20 +1,26 @@
-<IfModule mod_rewrite.c>
-    <IfModule mod_negotiation.c>
-        Options -MultiViews -Indexes
-    </IfModule>
+# Laravel public/.htaccess (restore)
+<IfModule mod_negotiation.c>
+    Options -MultiViews -Indexes
+</IfModule>
 
+<IfModule mod_rewrite.c>
     RewriteEngine On
 
-    # Handle Authorization Header
+    # Handle Authorization header (needed on some hosts)
     RewriteCond %{HTTP:Authorization} .
     RewriteRule .* - [E=HTTP_AUTHORIZATION:%{HTTP:Authorization}]
 
-    # Redirect Trailing Slashes If Not A Folder...
+    # Redirect trailing slashes if not a directory
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteCond %{REQUEST_URI} (.+)/$
     RewriteRule ^ %1 [L,R=301]
 
-    # Send Requests To Front Controller...
+    # --- CORS preflight: let OPTIONS hit Laravel ---
+    RewriteCond %{REQUEST_METHOD} =OPTIONS
+    RewriteRule ^ index.php [L]
+    # ----------------------------------------------
+
+    # Send requests to front controller
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteRule ^ index.php [L]

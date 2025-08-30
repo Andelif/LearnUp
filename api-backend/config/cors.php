@@ -1,7 +1,7 @@
 <?php
 
 return [
-    
+
     'paths' => ['api/*', 'login', 'register'],
 
     'allowed_methods' => ['*'],
@@ -23,4 +23,5 @@ return [
 
     
     'supports_credentials' => false,
+
 ];
