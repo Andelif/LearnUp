@@ -1,77 +1,155 @@
 <?php
 
 namespace App\Http\Controllers;
+
 use App\Services\TutorService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 
 class TutorController extends Controller
 {
-    protected $tutorService;
+    protected TutorService $tutorService;
 
-    
     public function __construct(TutorService $tutorService)
     {
         $this->tutorService = $tutorService;
     }
 
+    /**
+     * GET /api/tutors
+     * - Admin: list all tutors
+     * - Tutor: return own profile
+     */
     public function index()
     {
-        if (Auth::user()->role !== 'tutor') {
-            return response()->json(['message' => 'Unauthorized'], 403);
+        $user = Auth::user();
+        if (!$user) return response()->json(['message' => 'Unauthorized'], 401);
+
+        if ($user->role === 'admin') {
+            return response()->json($this->tutorService->getAllTutors(), 200);
         }
 
-        $tutors = $this->tutorService->getAllTutors();
-        return response()->json($tutors);
+        if ($user->role !== 'tutor') {
+            return response()->json(['message' => 'Forbidden: not a tutor'], 403);
+        }
+
+        $me = $this->tutorService->getTutorByUserId($user->id);
+        return response()->json($me, 200);
     }
 
+    /**
+     * POST /api/tutors
+     * Create or update current tutor’s profile
+     */
     public function store(Request $request)
     {
-        if (Auth::user()->role !== 'tutor') {
-            return response()->json(['message' => 'Unauthorized'], 403);
+        $user = Auth::user();
+        if (!$user || $user->role !== 'tutor') {
+            return response()->json(['message' => 'Forbidden: not a tutor'], 403);
         }
 
-        $this->tutorService->updateOrCreateTutorProfile($request);
+        $validator = Validator::make($request->all(), [
+            'full_name'              => 'required|string|max:255',
+            'address'                => 'nullable|string|max:255',
+            'contact_number'         => 'nullable|string|max:20',
+            'gender'                 => 'nullable|string|in:male,female,other,Male,Female,Other',
+            'preferred_salary'       => 'nullable|integer|min:0',
+            'qualification'          => 'nullable|string|max:255',
+            'experience'             => 'nullable|integer|min:0',
+            'currently_studying_in'  => 'nullable|string|max:255',
+            'preferred_location'     => 'nullable|string|max:255',
+            'preferred_time'         => 'nullable|string|max:255',
+            'availability'           => 'nullable|string|max:255',
+        ]);
 
-        return response()->json(['message' => 'Tutor profile updated successfully'], 201);
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 400);
+        }
+
+        $row = $this->tutorService->upsertForUser($user->id, $validator->validated());
+
+        return response()->json([
+            'message' => 'Tutor profile saved',
+            'data'    => $row,
+        ], 201);
     }
 
-    public function show($id)
+    /**
+     * GET /api/tutors/{userId}
+     * Only the owner (or admin) can view.
+     */
+    public function show($userId)
     {
-        $tutor = $this->tutorService->getTutorById($id);
+        $user = Auth::user();
+        if (!$user) return response()->json(['message' => 'Unauthorized'], 401);
 
-        if (!$tutor || (Auth::id() !== $tutor[0]->user_id && Auth::user()->role !== 'admin')) {
-            return response()->json(['message' => 'Unauthorized'], 403);
+        if ($user->role !== 'admin' && $user->id != (int)$userId) {
+            return response()->json(['message' => 'Forbidden'], 403);
         }
 
-        return response()->json($tutor[0]);
-    }
-   
+        $row = $this->tutorService->getTutorByUserId((int)$userId);
+        if (!$row) return response()->json(['message' => 'Not found'], 404);
 
-    public function update(Request $request, $id)
-    {
-        $tutor = $this->tutorService->getTutorById($id);
-
-        if (!$tutor || Auth::id() !== $tutor[0]->user_id) {
-            return response()->json(['message' => 'Unauthorized'], 403);
-        }
-
-        $this->tutorService->updateTutorProfile($request, $id);
-
-        return response()->json(['message' => 'Tutor profile updated successfully']);
+        return response()->json($row, 200);
     }
 
-    public function destroy($id)
+    /**
+     * PUT /api/tutors/{userId}
+     * Only the owner (or admin) can update.
+     */
+    public function update(Request $request, $userId)
     {
-        $tutor = $this->tutorService->getTutorById($id);
+        $user = Auth::user();
+        if (!$user) return response()->json(['message' => 'Unauthorized'], 401);
 
-        if (!$tutor || (Auth::id() !== $tutor[0]->user_id && Auth::user()->role !== 'admin')) {
-            return response()->json(['message' => 'Unauthorized'], 403);
+        if ($user->role !== 'admin' && $user->id != (int)$userId) {
+            return response()->json(['message' => 'Forbidden'], 403);
         }
 
-        $this->tutorService->deleteTutor($id);
+        $validator = Validator::make($request->all(), [
+            'full_name'              => 'sometimes|required|string|max:255',
+            'address'                => 'sometimes|nullable|string|max:255',
+            'contact_number'         => 'sometimes|nullable|string|max:20',
+            'gender'                 => 'sometimes|nullable|string|in:male,female,other,Male,Female,Other',
+            'preferred_salary'       => 'sometimes|nullable|integer|min:0',
+            'qualification'          => 'sometimes|nullable|string|max:255',
+            'experience'             => 'sometimes|nullable|integer|min:0',
+            'currently_studying_in'  => 'sometimes|nullable|string|max:255',
+            'preferred_location'     => 'sometimes|nullable|string|max:255',
+            'preferred_time'         => 'sometimes|nullable|string|max:255',
+            'availability'           => 'sometimes|nullable|string|max:255',
+        ]);
 
-        return response()->json(['message' => 'Tutor profile deleted successfully']);
+        if ($validator->fails()) {
+            return response()->json(['errors' => $validator->errors()], 400);
+        }
+
+        $row = $this->tutorService->upsertForUser((int)$userId, $validator->validated());
+
+        return response()->json([
+            'message' => 'Tutor profile updated successfully',
+            'data'    => $row,
+        ], 200);
+    }
+
+    /**
+     * DELETE /api/tutors/{userId}
+     * Only the owner (or admin).
+     */
+    public function destroy($userId)
+    {
+        $user = Auth::user();
+        if (!$user) return response()->json(['message' => 'Unauthorized'], 401);
+
+        if ($user->role !== 'admin' && $user->id != (int)$userId) {
+            return response()->json(['message' => 'Forbidden'], 403);
+        }
+
+        $deleted = $this->tutorService->deleteByUserId((int)$userId);
+
+        return response()->json([
+            'message' => $deleted ? 'Tutor profile deleted successfully' : 'Nothing to delete',
+        ], 200);
     }
 }

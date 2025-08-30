@@ -2,35 +2,31 @@
 
 namespace App\Models;
 
-use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Application extends Model
 {
+    use HasFactory;
+
+    protected $table = 'applications';
+
+    // Your table uses ApplicationID as PK
     protected $primaryKey = 'ApplicationID';
     public $incrementing = true;
 
-    // Create a new application
-    public static function createApplication($data)
-    {
-        DB::insert("INSERT INTO applications (tution_id, learner_id, tutor_id, matched) VALUES (?, ?, ?, ?)", [
-            $data['tution_id'],
-            $data['learner_id'],
-            $data['tutor_id'],
-            false
-        ]);
-        return DB::getPdo()->lastInsertId();
-    }
+    // If the table doesn't have created_at/updated_at, keep false:
+    public $timestamps = false;
 
-    // Fetch application by ID
-    public static function findById($application_id)
-    {
-        return DB::select("SELECT * FROM applications WHERE ApplicationID = ?", [$application_id])[0] ?? null;
-    }
+    protected $fillable = [
+        'tution_id',   // references tuition_requests.TutionID (note: tution_id)
+        'learner_id',  // references learners.LearnerID
+        'tutor_id',    // references tutors.TutorID
+        'matched',
+        'status',      // e.g., Applied, Shortlisted, Confirmed, Cancelled
+    ];
 
-    // Get all applications for a tutor
-    public static function getApplicationsByTutor($tutor_id)
-    {
-        return DB::select("SELECT * FROM applications WHERE tutor_id = ?", [$tutor_id]);
-    }
+    protected $casts = [
+        'matched' => 'boolean',
+    ];
 }

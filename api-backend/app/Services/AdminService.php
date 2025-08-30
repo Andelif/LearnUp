@@ -2,215 +2,202 @@
 
 namespace App\Services;
 
+use App\Models\Admin;
+use App\Models\Learner;
+use App\Models\Tutor;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Auth;
 
-class AdminService{
+class AdminService
+{
+    /** List all admins (controller restricts to admin role). */
     public function getAllAdmins()
     {
-        return DB::select("SELECT * FROM admins");
+        return Admin::orderBy('id', 'desc')->get();
     }
 
-    public function createAdmin($data, $userId)
+    /** Create an admin record for a user if not exists. */
+    public function createAdmin(array $data, int $userId): array
     {
-        $exists = DB::select("SELECT * FROM admins WHERE user_id = ?", [$userId]);
-        if ($exists) {
+        if (Admin::where('user_id', $userId)->exists()) {
             return ['error' => 'User is already an admin'];
         }
 
-        DB::insert("INSERT INTO admins (user_id, full_name, address, contact_number, permission_req) VALUES (?, ?, ?, ?, ?)", [
-            $userId,
-            $data['full_name'],
-            $data['address'],
-            $data['contact_number'],
-            $data['permission_req']
+        $admin = Admin::create([
+            'user_id'        => $userId,
+            'full_name'      => $data['full_name'] ?? '',
+            'address'        => $data['address'] ?? '',
+            'contact_number' => $data['contact_number'] ?? null,
+            'permission_req' => (bool)($data['permission_req'] ?? false),
+            'match_made'     => (int)($data['match_made'] ?? 0),
+            'task_assigned'  => (int)($data['task_assigned'] ?? 0),
         ]);
 
-        return ['message' => 'Admin profile updated successfully'];
+        return ['message' => 'Admin profile updated successfully', 'data' => $admin];
     }
 
-    public function getAdminById($id)
+    public function getAdminById(int $id): ?\App\Models\Admin
     {
-        return DB::select("SELECT * FROM admins WHERE AdminID = ?", [$id]);
+        return Admin::find($id);
     }
 
-    public function updateAdmin($id, $data)
+    public function updateAdmin(int $id, array $data): array
     {
-        DB::update("UPDATE admins SET full_name = ?, address = ?, contact_number = ?, permission_req = ? WHERE AdminID = ?", [
-            $data['full_name'],
-            $data['address'],
-            $data['contact_number'],
-            $data['permission_req'],
-            $id
-        ]);
+        $admin = Admin::find($id);
+        if (!$admin) {
+            return ['error' => 'Admin not found'];
+        }
 
-        return ['message' => 'Admin updated successfully'];
+        $admin->fill([
+            'full_name'      => $data['full_name']      ?? $admin->full_name,
+            'address'        => $data['address']        ?? $admin->address,
+            'contact_number' => $data['contact_number'] ?? $admin->contact_number,
+            'permission_req' => isset($data['permission_req']) ? (bool)$data['permission_req'] : $admin->permission_req,
+        ])->save();
+
+        return ['message' => 'Admin updated successfully', 'data' => $admin];
     }
 
-    public function deleteAdmin($id)
+    public function deleteAdmin(int $id): array
     {
-        DB::delete("DELETE FROM admins WHERE AdminID = ?", [$id]);
-        return ['message' => 'Admin deleted successfully'];
+        $deleted = Admin::where('id', $id)->delete();
+        return ['message' => $deleted ? 'Admin deleted successfully' : 'Nothing to delete'];
     }
 
     public function getLearners()
     {
-        return DB::select("SELECT * FROM learners");
+        // If your learners PK is LearnerID, ordering by id is harmless; we keep it simple here.
+        return Learner::orderBy('id', 'desc')->get();
     }
-    public function deleteLearner($learnerId)
+
+    /** Delete learner row and associated user (transactional). */
+    public function deleteLearner(int $learnerId): array
     {
-        DB::beginTransaction();
-
-        try {
-            
-            $learner = DB::select('SELECT * FROM learners WHERE LearnerID = ?', [$learnerId]);
-
-            if (empty($learner)) {
-               
-                DB::rollBack();
-                return [
-                    'status' => 'error',
-                    'message' => 'Learner not found'
-                ];
+        return DB::transaction(function () use ($learnerId) {
+            $learner = Learner::find($learnerId);
+            if (!$learner) {
+                return ['status' => 'error', 'message' => 'Learner not found'];
             }
 
-            
-            DB::statement('DELETE FROM learners WHERE LearnerID = ?', [$learnerId]);
+            $userId = $learner->user_id;
 
-            
-            DB::statement('DELETE FROM users WHERE id = (SELECT user_id FROM learners WHERE LearnerID = ? LIMIT 1)', [$learnerId]);
+            $learner->delete();
+            DB::table('users')->where('id', $userId)->delete();
 
-           
-            DB::commit();
-
-            return [
-                'status' => 'success',
-                'message' => 'Learner and associated user deleted successfully'
-            ];
-        } catch (Exception $e) {
-           
-            DB::rollBack();
-
-            
-            return [
-                'status' => 'error',
-                'message' => 'An error occurred while deleting the learner: ' . $e->getMessage()
-            ];
-        }
+            return ['status' => 'success', 'message' => 'Learner and associated user deleted successfully'];
+        });
     }
 
     public function getTutors()
     {
-        return DB::select("SELECT * FROM tutors");
+        return Tutor::orderBy('id', 'desc')->get();
     }
-    public function deleteTutor($tutorId)
+
+    /** Delete tutor row and associated user (transactional). */
+    public function deleteTutor(int $tutorId): array
     {
-        DB::beginTransaction();
-
-        try {
-            
-            $tutor = DB::select('SELECT * FROM tutors WHERE TutorID = ?', [$tutorId]);
-
-            if (empty($tutor)) {
-               
-                DB::rollBack();
-                return [
-                    'status' => 'error',
-                    'message' => 'Tutor not found'
-                ];
+        return DB::transaction(function () use ($tutorId) {
+            $tutor = Tutor::find($tutorId);
+            if (!$tutor) {
+                return ['status' => 'error', 'message' => 'Tutor not found'];
             }
 
-            
-            DB::statement('DELETE FROM tutors WHERE TutorID = ?', [$tutorId]);
+            $userId = $tutor->user_id;
 
-            
-            DB::statement('DELETE FROM users WHERE id = (SELECT user_id FROM tutors WHERE TutorID = ? LIMIT 1)', [$tutorId]);
+            $tutor->delete();
+            DB::table('users')->where('id', $userId)->delete();
 
-           
-            DB::commit();
-
-            return [
-                'status' => 'success',
-                'message' => 'Tutor and associated user deleted successfully'
-            ];
-        } catch (Exception $e) {
-           
-            DB::rollBack();
-
-            
-            return [
-                'status' => 'error',
-                'message' => 'An error occurred while deleting the tutor: ' . $e->getMessage()
-            ];
-        }
+            return ['status' => 'success', 'message' => 'Tutor and associated user deleted successfully'];
+        });
     }
-
 
     public function getTuitionRequests()
     {
-        return DB::select("SELECT * FROM tuition_requests");
+        // Order by the correct PK used in your schema
+        return DB::table('tuition_requests')->orderBy('TutionID', 'desc')->get();
     }
 
     public function getApplications()
     {
-        return DB::select("SELECT * FROM applications");
+        // Order by the correct PK used in your schema
+        return DB::table('applications')->orderBy('ApplicationID', 'desc')->get();
     }
 
-    public function getApplicationsByTuitionID($tutionID)
+    /**
+     * Applications for a given tuition request (joins tutor profile columns).
+     * Uses a.tution_id (note spelling) and a.ApplicationID, and tutors.TutorID.
+     */
+    public function getApplicationsByTuitionID(int $tuitionId)
     {
-        return DB::select("
-            SELECT a.ApplicationID, 
-                   t.full_name AS tutor_name, 
-                   t.experience, 
-                   t.qualification,
-                   t.currently_studying_in,
-                   t.preferred_salary,
-                   t.preferred_location,
-                   t.preferred_time
-            FROM applications a
-            JOIN tutors t ON a.tutor_id = t.TutorID
-            WHERE a.tution_id = ?", [$tutionID]);
+        return DB::table('applications as a')
+            ->join('tutors as t', 'a.tutor_id', '=', 't.TutorID') // <-- TutorID PK
+            ->where('a.tution_id', $tuitionId)                    // <-- tution_id column
+            ->get([
+                'a.ApplicationID as application_id',              // <-- ApplicationID PK
+                't.full_name as tutor_name',
+                't.experience',
+                't.qualification',
+                't.currently_studying_in',
+                't.preferred_salary',
+                't.preferred_location',
+                't.preferred_time',
+            ]);
     }
 
-    public function matchTutor($applicationId)
+    /**
+     * Mark application as matched & notify both parties.
+     * Uses ApplicationID, and resolves learner/tutor via LearnerID/TutorID.
+     */
+    public function matchTutor(int $applicationId): array
     {
-        $application = DB::select("SELECT * FROM applications WHERE ApplicationID = ?", [$applicationId]);
+        return DB::transaction(function () use ($applicationId) {
+            // Use ApplicationID as per your schema
+            $application = DB::table('applications')
+                ->where('ApplicationID', $applicationId)
+                ->first();
 
-        if (empty($application)) {
-            return ['error' => 'Application not found'];
-        }
+            if (!$application) {
+                return ['error' => 'Application not found'];
+            }
 
-        DB::update("UPDATE applications SET matched = 1, status = 'Shortlisted' WHERE ApplicationID = ?", [$applicationId]);
+            DB::table('applications')
+                ->where('ApplicationID', $applicationId)
+                ->update(['matched' => 1, 'status' => 'Shortlisted']);
 
-        $adminId = Auth::id();
-        $application = $application[0];
+            // Resolve user ids of learner and tutor via LearnerID / TutorID
+            $learner = DB::table('learners')
+                ->where('LearnerID', $application->learner_id)
+                ->first();
 
-        $learnerUser = DB::select("SELECT user_id FROM learners WHERE LearnerID = 
-                                    (SELECT learner_id FROM applications WHERE ApplicationID = ?)", [$applicationId]);
+            $tutor = DB::table('tutors')
+                ->where('TutorID', $application->tutor_id)
+                ->first();
 
-        $tutorUser = DB::select("SELECT user_id FROM tutors WHERE TutorID = 
-                                  (SELECT tutor_id FROM applications WHERE ApplicationID = ?)", [$applicationId]);
+            $nowExpr = DB::raw('NOW()');
+            $tuitionId = $application->tution_id; // note spelling
 
-        if (!empty($learnerUser)) {
-            $learnerUserID = $learnerUser[0]->user_id;
-            DB::insert("INSERT INTO notifications (user_id, Message, Type, Status, TimeSent, view) VALUES (?, ?, ?, 'Unread', NOW(), ?)", [
-                $adminId,
-                "A Tutor has been selected for your Tuition ID: {$application->tution_id}.",
-                'Application Update',
-                $learnerUserID
-            ]);
-        }
+            if ($learner && $learner->user_id) {
+                DB::table('notifications')->insert([
+                    'user_id'  => $learner->user_id, // recipient: learner
+                    'Message'  => "A Tutor has been selected for your Tuition ID: {$tuitionId}.",
+                    'Type'     => 'Application Update',
+                    'Status'   => 'Unread',
+                    'TimeSent' => $nowExpr,
+                    'view'     => 0,
+                ]);
+            }
 
-        if (!empty($tutorUser)) {
-            $tutorUserID = $tutorUser[0]->user_id;
-            DB::insert("INSERT INTO notifications (user_id, Message, Type, Status, TimeSent, view) VALUES (?, ?, ?, 'Unread', NOW(), ?)", [
-                $adminId,
-                "You have been selected for Tuition ID: {$application->tution_id}.",
-                'Application Update',
-                $tutorUserID
-            ]);
-        }
+            if ($tutor && $tutor->user_id) {
+                DB::table('notifications')->insert([
+                    'user_id'  => $tutor->user_id, // recipient: tutor
+                    'Message'  => "You have been selected for Tuition ID: {$tuitionId}.",
+                    'Type'     => 'Application Update',
+                    'Status'   => 'Unread',
+                    'TimeSent' => $nowExpr,
+                    'view'     => 0,
+                ]);
+            }
 
-        return ['message' => 'Tutor successfully matched with learner'];
+            return ['message' => 'Tutor successfully matched with learner'];
+        });
     }
 }

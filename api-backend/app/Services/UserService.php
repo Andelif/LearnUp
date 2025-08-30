@@ -8,29 +8,22 @@ use Illuminate\Support\Facades\Hash;
 
 class UserService
 {
-    /**
-     * Normalize gender to match DB constraint ('Male','Female','Other').
-     */
     private function normalizeGender(?string $gender): ?string
     {
         if ($gender === null) return null;
         $g = strtolower(trim($gender));
         return match ($g) {
-            'male', 'm'   => 'Male',
-            'female', 'f' => 'Female',
-            'other', 'o'  => 'Other',
-            default       => null, // will fail validation upstream if provided but invalid
+            'male','m'   => 'Male',
+            'female','f' => 'Female',
+            'other','o'  => 'Other',
+            default      => null,
         };
     }
 
-    /**
-     * Create the user with Eloquent and insert role-specific rows.
-     * Returns the fully-hydrated User model.
-     */
     public function register(array $data): User
     {
         return DB::transaction(function () use ($data) {
-            
+            /** @var \App\Models\User $user */
             $user = User::create([
                 'name'     => $data['name'],
                 'email'    => $data['email'],
@@ -42,16 +35,34 @@ class UserService
             $phone  = $data['contact_number'] ?? null;
 
             if ($data['role'] === 'learner') {
+                $address = $data['address'] ?? '';
                 DB::insert(
                     "INSERT INTO learners (user_id, full_name, contact_number, gender, address)
                      VALUES (?, ?, ?, ?, ?)",
-                    [$user->id, $data['name'], $phone, $gender, null]
+                    [$user->id, $data['name'], $phone, $gender, $address]
                 );
             } elseif ($data['role'] === 'tutor') {
+                // Provide safe defaults to satisfy NOT NULL / CHECK constraints
+                $qualification    = $data['qualification']    ?? '';
+                $experience       = isset($data['experience']) ? (int)$data['experience'] : 0;
+                $preferredSalary  = isset($data['preferred_salary']) ? (int)$data['preferred_salary'] : 0;
+                $availability     = $data['availability']     ?? '';
+                $address          = $data['address']          ?? '';
+
                 DB::insert(
                     "INSERT INTO tutors (user_id, full_name, contact_number, gender, qualification, experience, preferred_salary, availability, address)
                      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
-                    [$user->id, $data['name'], $phone, $gender, null, null, null, null, null]
+                    [
+                        $user->id,
+                        $data['name'],
+                        $phone,
+                        $gender,
+                        $qualification,
+                        $experience,
+                        $preferredSalary,
+                        $availability,
+                        $address
+                    ]
                 );
             } elseif ($data['role'] === 'admin') {
                 DB::insert(

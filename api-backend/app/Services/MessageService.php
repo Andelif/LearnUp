@@ -2,90 +2,146 @@
 
 namespace App\Services;
 
-use Illuminate\Support\Facades\DB;
+use App\Models\Message;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class MessageService
 {
-    public function sendMessage($sentTo, $content)
+    public function sendMessage(int $sentTo, string $content): array
     {
-        // Logic to send the message to the recipient
-        // Assuming a `messages` table to save the message
-        DB::table('messages')->insert([
-            'sent_to' => $sentTo,
-            'content' => $content,
-            'sent_by' => Auth::id(),
-            'created_at' => now(),
-            'updated_at' => now(),
+        $user = Auth::user();
+        if (!$user) return ['error' => 'Unauthorized', 'status' => 401];
+
+        if ($sentTo === (int)$user->id) {
+            return ['error' => 'Cannot send a message to yourself', 'status' => 400];
+        }
+
+        $exists = DB::table('users')->where('id', $sentTo)->exists();
+        if (!$exists) return ['error' => 'Recipient not found', 'status' => 404];
+
+        $row = Message::create([
+            'SentBy'   => $user->id,
+            'SentTo'   => $sentTo,
+            'Content'  => $content,
+            'Status'   => 'Delivered',
+            'TimeStamp'=> now(),
         ]);
 
-        return ['message' => 'Message sent successfully!'];
+        return ['message' => 'Message sent successfully', 'data' => $row, 'status' => 201];
     }
 
-    public function getMessages($userId)
+    public function getMessages(int $otherUserId)
     {
-        // Fetch messages between the authenticated user and the provided user
-        $messages = DB::select("
-            SELECT m.*, u.full_name AS sender_name
-            FROM messages m
-            JOIN users u ON m.sent_by = u.id
-            WHERE (m.sent_by = ? AND m.sent_to = ?) OR (m.sent_by = ? AND m.sent_to = ?)
-            ORDER BY m.created_at ASC
-        ", [Auth::id(), $userId, $userId, Auth::id()]);
+        $user = Auth::user();
+        if (!$user) return ['error' => 'Unauthorized', 'status' => 401];
 
-        return $messages;
+        // Conversation between auth user and other user
+        $rows = DB::table('messages as m')
+            ->leftJoin('users as u', 'u.id', '=', 'm.SentBy')
+            ->where(function ($q) use ($user, $otherUserId) {
+                $q->where('m.SentBy', $user->id)->where('m.SentTo', $otherUserId);
+            })
+            ->orWhere(function ($q) use ($user, $otherUserId) {
+                $q->where('m.SentBy', $otherUserId)->where('m.SentTo', $user->id);
+            })
+            ->orderBy('m.TimeStamp', 'asc')
+            ->get([
+                'm.MessageID',
+                'm.SentBy',
+                'm.SentTo',
+                'm.Content',
+                'm.Status',
+                'm.TimeStamp',
+                'u.name as sender_name',
+            ]);
+
+        return $rows;
     }
 
-    public function markAsSeen($senderId)
+    public function markAsSeen(int $senderId): array
     {
-        // Mark the messages as seen for the current user and the provided sender
-        DB::table('messages')
-            ->where('sent_by', $senderId)
-            ->where('sent_to', Auth::id())
-            ->update(['seen' => true]);
+        $user = Auth::user();
+        if (!$user) return ['error' => 'Unauthorized', 'status' => 401];
 
-        return ['message' => 'Messages marked as seen'];
+        $updated = DB::table('messages')
+            ->where('SentBy', $senderId)
+            ->where('SentTo', $user->id)
+            ->where('Status', 'Delivered')
+            ->update(['Status' => 'Seen']);
+
+        return ['message' => 'Messages marked as seen', 'updated' => $updated, 'status' => 200];
     }
 
+    /**
+     * Return matched counterpart users for the current user (tutor ↔ learner).
+     * Uses applications.matched = true and maps through TutorID/LearnerID.
+     */
     public function getMatchedUsers()
     {
         $user = Auth::user();
-        $userRole = DB::select("SELECT role FROM users WHERE id = ?", [$user->id]);
-        $role = $userRole[0]->role;
+        if (!$user) return ['error' => 'Unauthorized', 'status' => 401];
+
+        $role = DB::table('users')->where('id', $user->id)->value('role');
 
         if ($role === 'tutor') {
-            $matchedUsers = DB::select("
-                SELECT l.user_id, l.full_name, 'learner' AS role, a.tution_id, a.ApplicationID
-                FROM learners l
-                JOIN applications a ON l.LearnerID = a.learner_id
-                WHERE a.matched = true AND a.tutor_id = (SELECT TutorID FROM tutors WHERE user_id = ?)
-            ", [$user->id]);
-        } elseif ($role === 'learner') {
-            $matchedUsers = DB::select("
-                SELECT t.user_id, t.full_name, 'tutor' AS role, a.tution_id, a.ApplicationID
-                FROM tutors t
-                JOIN applications a ON t.TutorID = a.tutor_id
-                WHERE a.matched = true AND a.learner_id = (SELECT LearnerID FROM learners WHERE user_id = ?)
-            ", [$user->id]);
-        } else {
-            $matchedUsers = [];
+            $tutorId = DB::table('tutors')->where('user_id', $user->id)->value('TutorID');
+            if (!$tutorId) return [];
+
+            return DB::table('learners as l')
+                ->join('applications as a', 'l.LearnerID', '=', 'a.learner_id')
+                ->where('a.matched', true)
+                ->where('a.tutor_id', $tutorId)
+                ->get([
+                    'l.user_id',
+                    'l.full_name',
+                    DB::raw("'learner' as role"),
+                    'a.tution_id',
+                    'a.ApplicationID',
+                ]);
         }
 
-        return $matchedUsers;
+        if ($role === 'learner') {
+            $learnerId = DB::table('learners')->where('user_id', $user->id)->value('LearnerID');
+            if (!$learnerId) return [];
+
+            return DB::table('tutors as t')
+                ->join('applications as a', 't.TutorID', '=', 'a.tutor_id')
+                ->where('a.matched', true)
+                ->where('a.learner_id', $learnerId)
+                ->get([
+                    't.user_id',
+                    't.full_name',
+                    DB::raw("'tutor' as role"),
+                    'a.tution_id',
+                    'a.ApplicationID',
+                ]);
+        }
+
+        return []; // admins (or other roles) get empty by default
     }
 
-    public function rejectTutor($tutorId, $tutionId)
+    /**
+     * Learner rejects a tutor for a specific tuition (sets status = 'Cancelled').
+     * Expects tutor_id to be the **TutorID** (not the tutor user_id).
+     */
+    public function rejectTutor(int $tutorId, int $tutionId): array
     {
-        // Logic to reject a tutor
-        $updateResponse = DB::table('applications')
-            ->where('tutor_id', $tutorId)
+        $user = Auth::user();
+        if (!$user) return ['error' => 'Unauthorized', 'status' => 401];
+
+        $learnerId = DB::table('learners')->where('user_id', $user->id)->value('LearnerID');
+        if (!$learnerId) return ['error' => 'Only learners can reject tutors', 'status' => 403];
+
+        $updated = DB::table('applications')
+            ->where('tutor_id', $tutorId)     // TutorID
+            ->where('learner_id', $learnerId) // LearnerID
             ->where('tution_id', $tutionId)
-            ->update(['status' => 'Rejected']);
+            ->update(['status' => 'Cancelled', 'matched' => false]);
 
-        if ($updateResponse) {
-            return ['message' => 'Tutor rejected successfully'];
+        if ($updated > 0) {
+            return ['message' => 'Tutor rejected successfully', 'status' => 200];
         }
-
-        return ['error' => 'Unable to reject tutor'];
+        return ['error' => 'Unable to reject tutor (no matching application found)', 'status' => 404];
     }
 }
