@@ -43,13 +43,26 @@ const FindTutors = () => {
       return;
     }
 
+    const payload = {
+      subjects: formData.subjects,
+      class: formData.class,
+      location: formData.location,
+      asked_salary: Number(formData.asked_salary) || 0,
+      days: Number(formData.days) || 0,
+      curriculum: formData.curriculum,
+      learner_id: user?.id, // keep only if backend expects it; otherwise remove
+    };
+
     try {
-      const res = await api.post("/api/tuition-requests", {
-        ...formData,
-        learner_id: user?.id, // keep if your backend expects it
+      const res = await api.post("/api/tuition-requests", payload, {
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          Authorization: `Bearer ${token}`,
+        },
       });
 
-      if (res.status === 201) {
+      if (res.status === 201 || res.status === 200) {
         toast.success("Tuition requirement submitted successfully!");
         setFormData({
           subjects: "",
@@ -63,8 +76,13 @@ const FindTutors = () => {
         toast.error(res.data?.message || "Something went wrong!");
       }
     } catch (err) {
+      const msg =
+        err?.response?.data?.message ||
+        err?.response?.data?.error ||
+        err?.message ||
+        "Failed to submit. Try again later.";
       console.error(err);
-      toast.error("Failed to submit. Try again later.");
+      toast.error(msg);
     }
   };
 
@@ -105,7 +123,7 @@ const FindTutors = () => {
         <label>
           Budget:
           <input
-            type="text"
+            type="number"
             name="asked_salary"
             value={formData.asked_salary}
             onChange={handleChange}
@@ -115,7 +133,7 @@ const FindTutors = () => {
         <label>
           Days:
           <input
-            type="text"
+            type="number"
             name="days"
             value={formData.days}
             onChange={handleChange}
