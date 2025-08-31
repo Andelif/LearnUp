@@ -11,7 +11,12 @@ class Tutor extends Model
 
     protected $table = 'tutors';
 
-    // If your table doesn't have created_at/updated_at, keep this false.
+
+    protected $primaryKey = 'TutorID';
+    public $incrementing = true;
+    protected $keyType = 'int';
+
+
     public $timestamps = false;
 
     protected $fillable = [
@@ -27,6 +32,11 @@ class Tutor extends Model
         'preferred_location',
         'preferred_time',
         'availability',
+    ];
+
+    protected $casts = [
+        'preferred_salary' => 'integer',
+        'availability'     => 'boolean',
     ];
 
     public function user()
