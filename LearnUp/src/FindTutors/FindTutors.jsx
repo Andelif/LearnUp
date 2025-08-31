@@ -5,7 +5,7 @@ import { useNavigate } from "react-router-dom";
 import "./FindTutors.css";
 
 const FindTutors = () => {
-  const { api, user, token } = useContext(storeContext);
+  const { api, token } = useContext(storeContext);
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
@@ -13,7 +13,7 @@ const FindTutors = () => {
     subjects: "",
     asked_salary: "",
     location: "",
-    days: "",
+    days: "",          // STRING per validator
     curriculum: "",
   });
 
@@ -23,20 +23,15 @@ const FindTutors = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // required field check
-    if (
-      !formData.subjects ||
-      !formData.class ||
-      !formData.location ||
-      !formData.asked_salary ||
-      !formData.curriculum ||
-      !formData.days
-    ) {
-      toast.error("Please fill all required fields!");
-      return;
+    // required field check (mirror validator)
+    const required = ["class", "subjects", "asked_salary", "curriculum", "days", "location"];
+    for (const k of required) {
+      if (!String(formData[k]).trim()) {
+        toast.error(`Please fill the ${k.replace("_", " ")} field.`);
+        return;
+      }
     }
 
-    // must be logged in
     if (!token) {
       toast.error("Unauthorized! Please log in first.");
       navigate("/signIn");
@@ -44,13 +39,13 @@ const FindTutors = () => {
     }
 
     const payload = {
-      subjects: formData.subjects,
-      class: formData.class,
-      location: formData.location,
-      asked_salary: Number(formData.asked_salary) || 0,
-      days: Number(formData.days) || 0,
-      curriculum: formData.curriculum,
-      learner_id: user?.id, // keep only if backend expects it; otherwise remove
+      class: String(formData.class).trim(),
+      subjects: String(formData.subjects).trim(),
+      asked_salary: Number(formData.asked_salary) || 0,   // numeric
+      curriculum: String(formData.curriculum).trim(),
+      days: String(formData.days).trim(),                 // string
+      location: String(formData.location).trim(),
+      // NOTE: controller uses auth user; no learner_id required
     };
 
     try {
@@ -63,12 +58,12 @@ const FindTutors = () => {
       });
 
       if (res.status === 201 || res.status === 200) {
-        toast.success("Tuition requirement submitted successfully!");
+        toast.success(res?.data?.message || "Tuition requirement submitted!");
         setFormData({
-          subjects: "",
           class: "",
-          location: "",
+          subjects: "",
           asked_salary: "",
+          location: "",
           days: "",
           curriculum: "",
         });
@@ -76,13 +71,20 @@ const FindTutors = () => {
         toast.error(res.data?.message || "Something went wrong!");
       }
     } catch (err) {
-      const msg =
-        err?.response?.data?.message ||
-        err?.response?.data?.error ||
-        err?.message ||
-        "Failed to submit. Try again later.";
-      console.error(err);
-      toast.error(msg);
+      const errors = err?.response?.data?.errors;
+      if (errors && typeof errors === "object") {
+        const firstKey = Object.keys(errors)[0];
+        const firstMsg = errors[firstKey]?.[0];
+        toast.error(firstMsg || "Validation failed.");
+      } else {
+        const msg =
+          err?.response?.data?.message ||
+          err?.response?.data?.error ||
+          err?.message ||
+          "Failed to submit.";
+        toast.error(msg);
+      }
+      console.error("Tuition create failed:", err?.response?.data || err);
     }
   };
 
@@ -131,9 +133,9 @@ const FindTutors = () => {
           />
         </label>
         <label>
-          Days:
+          Days (e.g. "3" or "Sun-Tue"):
           <input
-            type="number"
+            type="text"          // STRING for validator
             name="days"
             value={formData.days}
             onChange={handleChange}

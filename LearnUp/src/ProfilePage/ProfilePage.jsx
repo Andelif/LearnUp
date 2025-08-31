@@ -5,6 +5,10 @@ import "./ProfilePage.css";
 
 const IMMUTABLE_KEYS = [
   "id",
+  "TutorID",
+  "LearnerID",
+  "tutor_id",
+  "learner_id",
   "user_id",
   "email",
   "created_at",
@@ -13,7 +17,6 @@ const IMMUTABLE_KEYS = [
 ];
 
 const pickEditable = (role, data) => {
-  // Adjust these to match your backend validators exactly
   const base = ["contact_number", "address", "availability"];
   const tutorOnly = [
     "full_name",
@@ -24,20 +27,30 @@ const pickEditable = (role, data) => {
     "currently_studying_in",
     "preferred_location",
   ];
-  const learnerOnly = ["name"]; // if learners can change display name
+  const learnerOnly = ["name"]; // adjust if learners can edit more
   const allow = role === "tutor" ? base.concat(tutorOnly) : base.concat(learnerOnly);
-  return allow.reduce(
-    (o, k) => (k in data ? { ...o, [k]: data[k] } : o),
-    {}
+  return allow.reduce((o, k) => (k in data ? { ...o, [k]: data[k] } : o), {});
+};
+
+// extract primary key regardless of your table's naming
+const extractProfilePk = (rec, role) => {
+  if (!rec || typeof rec !== "object") return null;
+  return (
+    rec.id ??
+    rec.TutorID ??
+    rec.LearnerID ??
+    rec.tutor_id ??
+    rec.learner_id ??
+    null
   );
 };
 
 const ProfilePage = () => {
   const { api, user, token } = useContext(storeContext);
   const [formData, setFormData] = useState({});
-  const [profileId, setProfileId] = useState(null); // learners.id / tutors.id
+  const [profilePk, setProfilePk] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
-  const [isNewProfile, setIsNewProfile] = useState(false); // create vs update
+  const [isNewProfile, setIsNewProfile] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
@@ -55,23 +68,23 @@ const ProfilePage = () => {
     setSuccess("");
     setIsNewProfile(false);
     setIsEditing(false);
-    setProfileId(null);
+    setProfilePk(null);
 
     try {
-      // First try GET /{role}s/:id (if backend maps user_id == id)
-      const direct = await api.get(
-        `/api/${user.role}s/${user.id}`,
-        authHeader
-      );
-      setFormData(direct.data || {});
-      setProfileId(direct.data?.id ?? null);
+      // Try: /{role}s/:id (some backends map this to user id)
+      const direct = await api.get(`/api/${user.role}s/${user.id}`, authHeader);
+      const rec = direct.data || {};
+      setFormData(rec);
+      setProfilePk(extractProfilePk(rec, user.role));
     } catch (e) {
       if (e?.response?.status !== 404) {
-        setError("Failed to fetch user data.");
+        setError(
+          e?.response?.data?.message || e?.message || "Failed to fetch user data."
+        );
         return;
       }
 
-      // Fallback: GET list and find by user_id
+      // Fallback: list all and find by user_id
       try {
         const list = await api.get(`/api/${user.role}s`, authHeader);
         const rec = Array.isArray(list.data)
@@ -80,16 +93,17 @@ const ProfilePage = () => {
 
         if (rec) {
           setFormData(rec);
-          setProfileId(rec.id);
+          setProfilePk(extractProfilePk(rec, user.role));
         } else {
-          // No profile yet -> prepare empty form for creation
           setFormData({ user_id: user.id });
           setIsNewProfile(true);
           setIsEditing(true);
           setError("No profile found. Please create your profile.");
         }
       } catch (err) {
-        setError("Failed to fetch user data.");
+        setError(
+          err?.response?.data?.message || err?.message || "Failed to fetch user data."
+        );
       }
     }
   };
@@ -108,35 +122,37 @@ const ProfilePage = () => {
       const editable = pickEditable(user.role, formData);
 
       if (isNewProfile) {
-        // Creating new profile record; ensure user_id is included
         const payload = { ...editable, user_id: user.id };
-        await api.post(`/api/${user.role}s`, payload, {
+        const res = await api.post(`/api/${user.role}s`, payload, {
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
         });
-        setSuccess("Profile created successfully!");
+        setSuccess(res?.data?.message || "Profile created successfully!");
       } else {
-        if (!profileId) {
+        const pk = profilePk ?? extractProfilePk(formData, user.role);
+        if (!pk) {
           setError("Profile record not found.");
           return;
         }
-        await api.put(`/api/${user.role}s/${profileId}`, editable, {
+        const res = await api.put(`/api/${user.role}s/${pk}`, editable, {
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
         });
-        setSuccess("Profile updated successfully!");
+        setSuccess(res?.data?.message || "Profile updated successfully!");
       }
 
-      setTimeout(() => setIsEditing(false), 1200);
-      // Refresh to pick up any server-calculated fields
+      setTimeout(() => setIsEditing(false), 1000);
       fetchUserData();
     } catch (err) {
       const msg =
-        err?.response?.data?.message || err?.message || "Error saving profile.";
+        err?.response?.data?.message ||
+        err?.response?.data?.error ||
+        err?.message ||
+        "Error saving profile.";
       setError(msg);
     }
   };
@@ -157,8 +173,8 @@ const ProfilePage = () => {
           alt="Profile"
           className="profile-pic"
         />
-        <h3>{user?.name}</h3>
-        <p>{user?.email}</p>
+        <h2 style={{ textAlign: "center" }}>{user?.name}</h2>
+        <p style={{ textAlign: "center" }}>{user?.email}</p>
       </div>
 
       {error && <p className="error-message">{error}</p>}
