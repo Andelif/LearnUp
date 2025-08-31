@@ -16,8 +16,7 @@ class TutorController extends Controller
         $this->tutorService = $tutorService;
     }
 
-    
-
+    /** GET /api/tutors  */
     public function index()
     {
         $user = Auth::user();
@@ -35,8 +34,7 @@ class TutorController extends Controller
         return response()->json($me, 200);
     }
 
-    
-
+    /** POST /api/tutors  (create or update current tutor profile) */
     public function store(Request $request)
     {
         $user = Auth::user();
@@ -51,11 +49,13 @@ class TutorController extends Controller
             'gender'                 => 'nullable|string|in:male,female,other,Male,Female,Other',
             'preferred_salary'       => 'nullable|integer|min:0',
             'qualification'          => 'nullable|string|max:255',
-            'experience'             => 'nullable|integer|min:0',
+            // DB column is varchar(255) → treat as string
+            'experience'             => 'nullable|string|max:255',
             'currently_studying_in'  => 'nullable|string|max:255',
             'preferred_location'     => 'nullable|string|max:255',
             'preferred_time'         => 'nullable|string|max:255',
-            'availability'           => 'nullable|string|max:255',
+            // DB column is boolean → validate as boolean
+            'availability'           => 'nullable|boolean',
         ]);
 
         if ($validator->fails()) {
@@ -70,8 +70,7 @@ class TutorController extends Controller
         ], 201);
     }
 
-    
-
+    /** GET /api/tutors/{userId} */
     public function show($userId)
     {
         $user = Auth::user();
@@ -87,14 +86,11 @@ class TutorController extends Controller
         return response()->json($row, 200);
     }
 
-    
-
+    /** PUT /api/tutors/{userId} */
     public function update(Request $request, $userId)
     {
         $user = Auth::user();
         if (!$user) return response()->json(['message' => 'Unauthorized'], 401);
-
-       
 
         $validator = Validator::make($request->all(), [
             'full_name'              => 'sometimes|required|string|max:255',
@@ -103,11 +99,13 @@ class TutorController extends Controller
             'gender'                 => 'sometimes|nullable|string|in:male,female,other,Male,Female,Other',
             'preferred_salary'       => 'sometimes|nullable|integer|min:0',
             'qualification'          => 'sometimes|nullable|string|max:255',
-            'experience'             => 'sometimes|nullable|integer|min:0',
+            // keep as string, not integer
+            'experience'             => 'sometimes|nullable|string|max:255',
             'currently_studying_in'  => 'sometimes|nullable|string|max:255',
             'preferred_location'     => 'sometimes|nullable|string|max:255',
             'preferred_time'         => 'sometimes|nullable|string|max:255',
-            'availability'           => 'sometimes|nullable|string|max:255',
+            // boolean, not string
+            'availability'           => 'sometimes|nullable|boolean',
         ]);
 
         if ($validator->fails()) {
@@ -122,7 +120,7 @@ class TutorController extends Controller
         ], 200);
     }
 
-    
+    /** DELETE /api/tutors/{userId} */
     public function destroy($userId)
     {
         $user = Auth::user();
