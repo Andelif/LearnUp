@@ -136,7 +136,7 @@ const ProfilePage = () => {
           setError("Profile record not found.");
           return;
         }
-        const res = await api.put(`/api/${user.role}s/${pk}`, editable, {
+        const res = await api.put(`/api/${user.role}s/${user.id}`, editable, {
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,

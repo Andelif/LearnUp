@@ -16,11 +16,8 @@ class TutorController extends Controller
         $this->tutorService = $tutorService;
     }
 
-    /**
-     * GET /api/tutors
-     * - Admin: list all tutors
-     * - Tutor: return own profile
-     */
+    
+
     public function index()
     {
         $user = Auth::user();
@@ -38,10 +35,8 @@ class TutorController extends Controller
         return response()->json($me, 200);
     }
 
-    /**
-     * POST /api/tutors
-     * Create or update current tutor’s profile
-     */
+    
+
     public function store(Request $request)
     {
         $user = Auth::user();
@@ -75,10 +70,8 @@ class TutorController extends Controller
         ], 201);
     }
 
-    /**
-     * GET /api/tutors/{userId}
-     * Only the owner (or admin) can view.
-     */
+    
+
     public function show($userId)
     {
         $user = Auth::user();
@@ -94,18 +87,14 @@ class TutorController extends Controller
         return response()->json($row, 200);
     }
 
-    /**
-     * PUT /api/tutors/{userId}
-     * Only the owner (or admin) can update.
-     */
+    
+
     public function update(Request $request, $userId)
     {
         $user = Auth::user();
         if (!$user) return response()->json(['message' => 'Unauthorized'], 401);
 
-        if ($user->role !== 'admin' && $user->id != (int)$userId) {
-            return response()->json(['message' => 'Forbidden'], 403);
-        }
+       
 
         $validator = Validator::make($request->all(), [
             'full_name'              => 'sometimes|required|string|max:255',
@@ -133,10 +122,7 @@ class TutorController extends Controller
         ], 200);
     }
 
-    /**
-     * DELETE /api/tutors/{userId}
-     * Only the owner (or admin).
-     */
+    
     public function destroy($userId)
     {
         $user = Auth::user();
