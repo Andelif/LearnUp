@@ -56,7 +56,10 @@ class TuitionRequestController extends Controller
         if (!empty($result['error'])) {
             return response()->json(['error' => $result['error']], $result['status'] ?? 400);
         }
-        return response()->json(['message' => $result['message'], 'data' => $result['data']], $result['status'] ?? 201);
+        return response()->json(
+            ['message' => $result['message'], 'data' => $result['data']],
+            $result['status'] ?? 201
+        );
     }
 
     /** GET /api/tuition-requests/filter  (public) */
@@ -88,7 +91,10 @@ class TuitionRequestController extends Controller
         if (!empty($result['error'])) {
             return response()->json(['error' => $result['error']], $result['status'] ?? 400);
         }
-        return response()->json(['message' => $result['message'], 'data' => $result['data']], $result['status'] ?? 200);
+        return response()->json(
+            ['message' => $result['message'], 'data' => $result['data']],
+            $result['status'] ?? 200
+        );
     }
 
     /** DELETE /api/tuition-requests/{id}  (owner or admin) */
