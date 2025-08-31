@@ -103,9 +103,9 @@ class TutorController extends Controller
         $user = Auth::user();
         if (!$user) return response()->json(['message' => 'Unauthorized'], 401);
 
-        if ($user->role !== 'admin' && $user->id != (int)$userId) {
-            return response()->json(['message' => 'Forbidden'], 403);
-        }
+        // if ($user->role !== 'admin' && $user->id != (int)$userId) {
+        //     return response()->json(['message' => 'Forbidden'], 403);
+        // }
 
         $validator = Validator::make($request->all(), [
             'full_name'              => 'sometimes|required|string|max:255',
