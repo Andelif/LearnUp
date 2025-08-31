@@ -16,12 +16,7 @@ const IMMUTABLE_KEYS = [
   "email_verified_at",
 ];
 
-/**
- * Whitelist of editable fields that match your backend validators.
- * - LearnerController expects: full_name (required on POST), guardian_full_name, contact_number,
- *   guardian_contact_number, gender, address
- * - Tutor fields kept from your prior setup
- */
+/** Whitelist fields that match your backend validators / columns */
 const pickEditable = (role, data) => {
   const tutorOnly = [
     "full_name",
@@ -31,6 +26,7 @@ const pickEditable = (role, data) => {
     "experience",
     "currently_studying_in",
     "preferred_location",
+    "preferred_time",
     "contact_number",
     "address",
     "availability",
@@ -49,19 +45,6 @@ const pickEditable = (role, data) => {
   return allow.reduce((o, k) => (k in data ? { ...o, [k]: data[k] } : o), {});
 };
 
-// extract primary key regardless of your table's naming (used for tutors if needed)
-const extractProfilePk = (rec, role) => {
-  if (!rec || typeof rec !== "object") return null;
-  return (
-    rec.id ??
-    rec.TutorID ??
-    rec.LearnerID ??
-    rec.tutor_id ??
-    rec.learner_id ??
-    null
-  );
-};
-
 const DEFAULT_LEARNER_FIELDS = {
   full_name: "",
   guardian_full_name: "",
@@ -71,10 +54,23 @@ const DEFAULT_LEARNER_FIELDS = {
   address: "",
 };
 
+const DEFAULT_TUTOR_FIELDS = {
+  full_name: "",
+  address: "",
+  contact_number: "",
+  gender: "",
+  preferred_salary: "",
+  qualification: "",
+  experience: "",
+  currently_studying_in: "",
+  preferred_location: "",
+  preferred_time: "",
+  availability: true, // your DB column is boolean
+};
+
 const ProfilePage = () => {
   const { api, user, token } = useContext(storeContext);
   const [formData, setFormData] = useState({});
-  const [profilePk, setProfilePk] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
   const [isNewProfile, setIsNewProfile] = useState(false);
   const [error, setError] = useState("");
@@ -94,36 +90,25 @@ const ProfilePage = () => {
     setSuccess("");
     setIsNewProfile(false);
     setIsEditing(false);
-    setProfilePk(null);
 
     try {
-      // Your LearnerController expects user.id in the path:
-      // GET /api/learners/{userId}
-      const idForShow =
-        user.role === "learner" ? user.id : user.id; // keep user.id for tutors too if your TutorController is similar
-      const direct = await api.get(`/api/${user.role}s/${idForShow}`, authHeader);
-      const rec = direct.data || {};
-      setFormData(rec);
-      setProfilePk(extractProfilePk(rec, user.role));
+      // IMPORTANT: always hit with users.id (not TutorID/LearnerID)
+      const { data } = await api.get(`/api/${user.role}s/${user.id}`, authHeader);
+      setFormData(data || {});
     } catch (e) {
-      // If not found, prep a "create" form
+      // If not found, prep a "create" form with defaults
       if (e?.response?.status === 404) {
-        if (user.role === "learner") {
-          // Pre-fill the required full_name from user.name so POST doesn't fail validator
-          setFormData({
-            user_id: user.id,
-            ...DEFAULT_LEARNER_FIELDS,
-            full_name: user?.name || "",
-          });
-        } else {
-          setFormData({ user_id: user.id }); // tutor defaults if needed
-        }
+        const base =
+          user.role === "tutor"
+            ? { ...DEFAULT_TUTOR_FIELDS }
+            : { ...DEFAULT_LEARNER_FIELDS, full_name: user?.name || "" };
+
+        setFormData({ user_id: user.id, ...base });
         setIsNewProfile(true);
         setIsEditing(true);
         setError("No profile found. Please create your profile.");
         return;
       }
-
       setError(
         e?.response?.data?.message || e?.message || "Failed to fetch user data."
       );
@@ -131,8 +116,29 @@ const ProfilePage = () => {
   };
 
   const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+    const { name, value, type, checked } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: type === "checkbox" ? checked : value,
+    }));
+  };
+
+  const normalizeForSubmit = (role, editable) => {
+    if (role !== "tutor") return editable;
+    const out = { ...editable };
+    if (out.preferred_salary !== undefined && out.preferred_salary !== "") {
+      const n = Number(out.preferred_salary);
+      if (!Number.isNaN(n)) out.preferred_salary = n;
+    }
+    // availability is boolean in DB; support text "true"/"false" just in case
+    if (out.availability !== undefined) {
+      if (typeof out.availability === "string") {
+        const s = out.availability.toLowerCase().trim();
+        if (["true", "1", "yes"].includes(s)) out.availability = true;
+        else if (["false", "0", "no"].includes(s)) out.availability = false;
+      }
+    }
+    return out;
   };
 
   const handleSubmit = async (e) => {
@@ -141,15 +147,15 @@ const ProfilePage = () => {
     setSuccess("");
 
     try {
-      const editable = pickEditable(user.role, formData);
+      let editable = pickEditable(user.role, formData);
+      editable = normalizeForSubmit(user.role, editable);
 
       if (isNewProfile) {
-        // LearnerController@store expects full_name (required)
+        // learner POST validator requires full_name
         if (user.role === "learner" && !editable.full_name) {
           setError("Full name is required.");
           return;
         }
-
         const payload = { ...editable, user_id: user.id };
         const res = await api.post(`/api/${user.role}s`, payload, {
           headers: {
@@ -159,17 +165,8 @@ const ProfilePage = () => {
         });
         setSuccess(res?.data?.message || "Profile created successfully!");
       } else {
-        /**
-         * IMPORTANT:
-         * - For learners, your controller expects /api/learners/{userId} (users.id), not LearnerID.
-         * - For tutors, keep supporting profile PK if your TutorController uses PK; otherwise user.id.
-         */
-        const endpointId =
-          user.role === "learner"
-            ? user.id
-            : profilePk ?? extractProfilePk(formData, user.role) ?? user.id;
-
-        const res = await api.put(`/api/${user.role}s/${endpointId}`, editable, {
+        // ALWAYS users.id for both roles
+        const res = await api.put(`/api/${user.role}s/${user.id}`, editable, {
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
@@ -178,7 +175,7 @@ const ProfilePage = () => {
         setSuccess(res?.data?.message || "Profile updated successfully!");
       }
 
-      setTimeout(() => setIsEditing(false), 1000);
+      setTimeout(() => setIsEditing(false), 800);
       fetchUserData();
     } catch (err) {
       const msg =
@@ -190,22 +187,25 @@ const ProfilePage = () => {
     }
   };
 
-  // What to show as editable/display fields
+  // Fields to render as inputs
   const keysForDisplay = Object.keys(formData).filter(
     (k) => !IMMUTABLE_KEYS.includes(k)
   );
 
-  // If we're creating a brand-new learner profile, make sure the expected fields appear
-  const ensureLearnerCreateKeys =
-    isNewProfile && user.role === "learner" && keysForDisplay.length === 0;
+  // On brand-new create, ensure default fields present
+  const ensureDefaults =
+    isNewProfile && keysForDisplay.length === 0
+      ? user.role === "tutor"
+        ? Object.keys(DEFAULT_TUTOR_FIELDS)
+        : Object.keys(DEFAULT_LEARNER_FIELDS)
+      : keysForDisplay;
 
-  const displayPairs = (ensureLearnerCreateKeys
-    ? Object.keys(DEFAULT_LEARNER_FIELDS)
-    : keysForDisplay
-  ).map((key) => ({
+  const displayPairs = ensureDefaults.map((key) => ({
     key,
     label: key.replace(/_/g, " ").replace(/([A-Z])/g, " $1").trim(),
-    value: formData[key] ?? "",
+    value: formData[key] ?? (user.role === "tutor"
+      ? DEFAULT_TUTOR_FIELDS[key]
+      : DEFAULT_LEARNER_FIELDS[key]),
   }));
 
   return (
@@ -231,7 +231,7 @@ const ProfilePage = () => {
             displayPairs.map(({ key, label, value }) => (
               <div key={key} className="info-item">
                 <strong>{label}:</strong>
-                <p>{value ?? "N/A"}</p>
+                <p>{String(value ?? "N/A")}</p>
               </div>
             ))
           )}
@@ -244,17 +244,33 @@ const ProfilePage = () => {
         <div className="edit-form-container">
           <h2>{isNewProfile ? "Create Profile" : "Edit Profile"}</h2>
           <form onSubmit={handleSubmit}>
-            {displayPairs.map(({ key, label }) => (
-              <div key={key} className="form-group">
-                <label>{label}:</label>
-                <input
-                  type="text"
-                  name={key}
-                  value={formData[key] ?? ""}
-                  onChange={handleInputChange}
-                />
-              </div>
-            ))}
+            {displayPairs.map(({ key, label }) => {
+              // boolean checkbox for tutor availability
+              if (user.role === "tutor" && key === "availability") {
+                return (
+                  <div key={key} className="form-group">
+                    <label>{label}:</label>
+                    <input
+                      type="checkbox"
+                      name={key}
+                      checked={!!formData[key]}
+                      onChange={handleInputChange}
+                    />
+                  </div>
+                );
+              }
+              return (
+                <div key={key} className="form-group">
+                  <label>{label}:</label>
+                  <input
+                    type="text"
+                    name={key}
+                    value={formData[key] ?? ""}
+                    onChange={handleInputChange}
+                  />
+                </div>
+              );
+            })}
             <div className="button-group">
               <button type="submit" className="save-btn">
                 Save

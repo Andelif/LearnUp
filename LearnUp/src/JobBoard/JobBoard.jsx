@@ -82,7 +82,7 @@ const JobBoard = () => {
         ) : (
           filteredJobs.map((job) => (
             <div key={job.TutionID} className="job-card">
-              <h3>{job.class} - {job.subjects || job.subject}</h3>
+              <h3>Class:{job.class} - {job.subjects || job.subject}</h3>
               <p><strong>Salary:</strong> {job.asked_salary} BDT</p>
               <p><strong>Location:</strong> {job.location}</p>
               <p><strong>Days:</strong> {job.days}</p>
