@@ -2,111 +2,85 @@
 
 namespace App\Models;
 
+use Illuminate\Support\Facades\DB;
 use Illuminate\Foundation\Auth\User as Authenticatable;
-use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
 
-    /** Table & PK are Laravel defaults: users.id (bigint, increments) */
     protected $fillable = [
-        'name',
-        'email',
-        'password',
-        'role',
+        'name', 'email', 'password', 'role'
     ];
 
     protected $hidden = [
-        'password',
-        'remember_token',
+        'password', 'remember_token',
     ];
 
-    protected $casts = [
-        'email_verified_at' => 'datetime',
-    ];
-
-    /** Roles (convenience) */
-    public function isLearner(): bool { return $this->role === 'learner'; }
-    public function isTutor(): bool   { return $this->role === 'tutor'; }
-    public function isAdmin(): bool   { return $this->role === 'admin'; }
-
-    /** === Relationships === */
-
-    /** One-to-one to learners by FK learners.user_id -> users.id */
-    public function learner()
+    // Fetch user by ID
+    public static function findById($id)
     {
-        return $this->hasOne(Learner::class, 'user_id', 'id');
+        return DB::select("SELECT * FROM users WHERE id = ?", [$id])[0] ?? null;
     }
 
-    /** One-to-one to tutors by FK tutors.user_id -> users.id */
-    public function tutor()
+    // Fetch user by email
+    public static function findByEmail($email)
     {
-        return $this->hasOne(Tutor::class, 'user_id', 'id');
+        return DB::select("SELECT * FROM users WHERE email = ?", [$email])[0] ?? null;
     }
 
-    /**
-     * User -> Learner -> TuitionRequest (hasManyThrough with custom keys)
-     * users.id -> learners.user_id
-     * learners.LearnerID -> tuition_requests.LearnerID
-     */
-    public function tuitionRequests()
+    // Create a new user
+    public static function createUser($data)
     {
-        return $this->hasManyThrough(
-            TuitionRequest::class,  // final
-            Learner::class,         // through
-            'user_id',              // firstKey (on learners referencing users)
-            'LearnerID',            // secondKey (on tuition_requests referencing learners)
-            'id',                   // localKey (on users)
-            'LearnerID'             // secondLocalKey (PK on learners)
-        );
+        DB::insert("INSERT INTO users (name, email, password, role) VALUES (?, ?, ?, ?)", [
+            $data['name'],
+            $data['email'],
+            bcrypt($data['password']),
+            $data['role']
+        ]);
+        return DB::getPdo()->lastInsertId();
     }
 
-    /**
-     * Applications as LEARNER via learners.LearnerID -> applications.learner_id
-     */
-    public function applicationsAsLearner()
+    // Define relationships using raw queries
+    public static function getLearner($id)
     {
-        return $this->hasManyThrough(
-            Application::class,
-            Learner::class,
-            'user_id',
-            'learner_id',
-            'id',
-            'LearnerID'
-        );
+        return DB::select("SELECT * FROM learners WHERE user_id = ?", [$id])[0] ?? null;
     }
 
-    /**
-     * Applications as TUTOR via tutors.TutorID -> applications.tutor_id
-     */
-    public function applicationsAsTutor()
+    public static function getTutor($id)
     {
-        return $this->hasManyThrough(
-            Application::class,
-            Tutor::class,
-            'user_id',
-            'tutor_id',
-            'id',
-            'TutorID'
-        );
+        return DB::select("SELECT * FROM tutors WHERE user_id = ?", [$id])[0] ?? null;
     }
 
-    /** Messages & notifications (SentBy/SentTo are user ids in your schema) */
-    public function sentMessages()
+    public static function getTuitionRequests($id)
     {
-        return $this->hasMany(Message::class, 'SentBy', 'id');
+        return DB::select("SELECT * FROM tuition_requests WHERE learner_id = ?", [$id]);
     }
 
-    public function receivedMessages()
+    public static function getApplications($id)
     {
-        return $this->hasMany(Message::class, 'SentTo', 'id');
+        return DB::select("SELECT * FROM applications WHERE tutor_id = ?", [$id]);
     }
 
-    public function notifications()
+    // Role-based helper methods
+    public static function isLearner($id)
     {
-        return $this->hasMany(Notification::class, 'user_id', 'id');
+        $user = self::findById($id);
+        return $user && $user->role === 'learner';
+    }
+
+    public static function isTutor($id)
+    {
+        $user = self::findById($id);
+        return $user && $user->role === 'tutor';
+    }
+
+    public static function isAdmin($id)
+    {
+        $user = self::findById($id);
+        return $user && $user->role === 'admin';
     }
 }
