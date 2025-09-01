@@ -10,20 +10,31 @@ class Message extends Model
     use HasFactory;
 
     protected $table = 'messages';
-
     protected $primaryKey = 'MessageID';
     public $incrementing = true;
-    public $timestamps = false; // uses TimeStamp column instead
+
+    /** No created_at/updated_at; table uses TimeStamp column */
+    public $timestamps = false;
 
     protected $fillable = [
         'SentBy',
         'SentTo',
         'Content',
-        'Status',     // e.g., 'Delivered' | 'Seen'
-        'TimeStamp',  // datetime
+        'Status',     // 'Delivered' | 'Seen'
+        'TimeStamp',
     ];
 
     protected $casts = [
         'TimeStamp' => 'datetime',
     ];
+
+    public function sender()
+    {
+        return $this->belongsTo(User::class, 'SentBy', 'id');
+    }
+
+    public function recipient()
+    {
+        return $this->belongsTo(User::class, 'SentTo', 'id');
+    }
 }

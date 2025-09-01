@@ -10,23 +10,43 @@ class Application extends Model
     use HasFactory;
 
     protected $table = 'applications';
-
-    // Your table uses ApplicationID as PK
     protected $primaryKey = 'ApplicationID';
     public $incrementing = true;
 
-    // If the table doesn't have created_at/updated_at, keep false:
-    public $timestamps = false;
+    /** created_at / updated_at EXIST */
+    public $timestamps = true;
 
     protected $fillable = [
-        'tution_id',   // references tuition_requests.TutionID (note: tution_id)
-        'learner_id',  // references learners.LearnerID
-        'tutor_id',    // references tutors.TutorID
+        'tution_id',     // FK -> tuition_requests.TutionID  (note: tution*)
+        'learner_id',    // FK -> learners.LearnerID
+        'tutor_id',      // FK -> tutors.TutorID
         'matched',
-        'status',      // e.g., Applied, Shortlisted, Confirmed, Cancelled
+        'status',
+        'payment_status',
     ];
 
     protected $casts = [
         'matched' => 'boolean',
     ];
+
+    public function tuitionRequest()
+    {
+        return $this->belongsTo(TuitionRequest::class, 'tution_id', 'TutionID');
+    }
+
+    public function learner()
+    {
+        return $this->belongsTo(Learner::class, 'learner_id', 'LearnerID');
+    }
+
+    public function tutor()
+    {
+        return $this->belongsTo(Tutor::class, 'tutor_id', 'TutorID');
+    }
+
+    /** Convenience: confirmed tuition (if any) */
+    public function confirmedTuition()
+    {
+        return $this->hasOne(ConfirmedTuition::class, 'application_id', 'ApplicationID');
+    }
 }

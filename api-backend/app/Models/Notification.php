@@ -10,24 +10,27 @@ class Notification extends Model
     use HasFactory;
 
     protected $table = 'notifications';
-
-    // Your table uses NotificationID as PK
     protected $primaryKey = 'NotificationID';
     public $incrementing = true;
 
-    // If the table doesn't have created_at/updated_at, keep false:
-    public $timestamps = false;
+    /** created_at / updated_at EXIST */
+    public $timestamps = true;
 
     protected $fillable = [
-        'user_id',   // recipient user id (nullable for pure broadcasts if your schema allows null)
+        'user_id',
         'TimeSent',
         'Message',
         'Type',
-        'Status',    // 'Unread' | 'Read'
-        'view',      // 'everyone' | 'all_learner' | 'all_tutor' | (optional 'all_admin') | null
+        'Status',  // 'Unread' | 'Read'
+        'view',    // 'everyone' | 'all_learner' | 'all_tutor' | (maybe 'all_admin') | null
     ];
 
     protected $casts = [
         'TimeSent' => 'datetime',
     ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class, 'user_id', 'id');
+    }
 }

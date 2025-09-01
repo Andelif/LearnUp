@@ -10,8 +10,10 @@ class Admin extends Model
     use HasFactory;
 
     protected $table = 'admins';
+    protected $primaryKey = 'AdminID';
+    public $incrementing = true;
 
-    // If your admins table doesn't have created_at/updated_at, keep false:
+    /** admins table does NOT have created_at/updated_at */
     public $timestamps = false;
 
     protected $fillable = [
@@ -32,6 +34,6 @@ class Admin extends Model
 
     public function user()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo(User::class, 'user_id', 'id');
     }
 }
