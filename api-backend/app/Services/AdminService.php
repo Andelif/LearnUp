@@ -160,7 +160,7 @@ class AdminService
      * Mark application as matched + notify both parties.
      * NO insertion into confirmed_tuitions here.
      */
-    public function matchTutor(int $applicationId): array
+   public function matchTutor(int $applicationId): array
     {
         return DB::transaction(function () use ($applicationId) {
             $application = DB::table('applications')
@@ -175,18 +175,16 @@ class AdminService
                 return ['message' => 'Application already matched'];
             }
 
-            // Load related rows (for notifications only)
             $tutor = DB::table('tutors')->where('TutorID', $application->tutor_id)->first();
             $learner = $application->learner_id
                 ? DB::table('learners')->where('LearnerID', $application->learner_id)->first()
                 : null;
 
-            // Only mark the application as matched/shortlisted
+            // Only mark matched/shortlisted (no confirmed_tuitions insert here)
             DB::table('applications')
                 ->where('ApplicationID', $applicationId)
                 ->update(['matched' => 1, 'status' => 'Shortlisted']);
 
-            // Notifications
             $tuitionId = $application->tution_id;
             $nowExpr   = DB::raw('CURRENT_TIMESTAMP');
 
@@ -197,7 +195,7 @@ class AdminService
                     'Type'     => 'Application Update',
                     'Status'   => 'Unread',
                     'TimeSent' => $nowExpr,
-                    'view'     => null,
+                    'view'     => 0, // <- NOT NULL
                 ]);
             }
 
@@ -208,11 +206,12 @@ class AdminService
                     'Type'     => 'Application Update',
                     'Status'   => 'Unread',
                     'TimeSent' => $nowExpr,
-                    'view'     => null,
+                    'view'     => 0, // <- NOT NULL
                 ]);
             }
 
             return ['message' => 'Tutor successfully matched with learner'];
         });
     }
+
 }
