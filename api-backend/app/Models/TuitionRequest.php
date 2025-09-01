@@ -10,13 +10,11 @@ class TuitionRequest extends Model
     use HasFactory;
 
     protected $table = 'tuition_requests';
-
-    // Your table uses TutionID as PK
     protected $primaryKey = 'TutionID';
     public $incrementing = true;
 
-    // If the table doesn't have created_at/updated_at, keep false:
-    public $timestamps = false;
+    /** created_at / updated_at EXIST in your table */
+    public $timestamps = true;
 
     protected $fillable = [
         'LearnerID',
@@ -27,4 +25,20 @@ class TuitionRequest extends Model
         'days',
         'location',
     ];
+
+    protected $casts = [
+        'asked_salary' => 'integer',
+    ];
+
+    /** Belongs to Learner via non-standard PK */
+    public function learner()
+    {
+        return $this->belongsTo(Learner::class, 'LearnerID', 'LearnerID');
+    }
+
+    /** Applications referencing this request (applications.tution_id -> tuition_requests.TutionID) */
+    public function applications()
+    {
+        return $this->hasMany(Application::class, 'tution_id', 'TutionID');
+    }
 }
