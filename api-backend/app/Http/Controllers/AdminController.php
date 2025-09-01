@@ -171,8 +171,13 @@ class AdminController extends Controller
             return response()->json(['errors' => $validator->errors()], 400);
         }
 
-        $response = $this->adminService->matchTutor((int)$request->application_id);
-
-        return response()->json($response, isset($response['error']) ? 404 : 200);
+        try {
+            $response = $this->adminService->matchTutor((int)$request->application_id);
+            $status   = isset($response['error']) ? 404 : 200;
+            return response()->json($response, $status);
+        } catch (\Throwable $e) {
+            \Log::error('matchTutor unhandled exception', ['e' => $e]);
+            return response()->json(['error' => 'Server error while matching tutor'], 500);
+        }
     }
 }
