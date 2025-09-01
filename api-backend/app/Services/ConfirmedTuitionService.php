@@ -10,6 +10,7 @@ class ConfirmedTuitionService
 {
     public function getAllConfirmedTuitions()
     {
+        // Uses model -> correct table already set to confirmed_tuitions
         return ConfirmedTuition::orderByDesc('ConfirmedTuitionID')->get();
     }
 
@@ -69,8 +70,8 @@ class ConfirmedTuitionService
             return ['error' => 'Tutor profile not found.'];
         }
 
-        // Confirm the tutor is tied to this tuition via the confirmed row and the application
-        $owns = DB::table('ConfirmedTuitions as ct')
+        // IMPORTANT: use snake_case table name
+        $owns = DB::table('confirmed_tuitions as ct')
             ->join('applications as a', 'ct.application_id', '=', 'a.ApplicationID')
             ->where('ct.tution_id', $tutionId)
             ->where('a.tutor_id', $tutorId)
@@ -80,17 +81,16 @@ class ConfirmedTuitionService
             return ['error' => 'Tuition not found or not confirmed for this tutor.'];
         }
 
-        // Return minimal voucher info (extend as needed)
         return [
-            'tutorId' => $tutorId,
+            'tutorId'   => $tutorId,
             'tution_id' => $tutionId,
-            'message' => 'Tutor confirmed for this tuition',
+            'message'   => 'Tutor confirmed for this tuition',
         ];
     }
 
     /**
      * Current tutor marks payment as completed for a tution_id.
-     * Requires a pre-existing row in payment_vouchers (keeps your original behavior).
+     * Requires a pre-existing row in payment_vouchers.
      */
     public function markPayment(int $tutionId): array
     {
@@ -104,8 +104,8 @@ class ConfirmedTuitionService
             return ['error' => 'Tutor profile not found.'];
         }
 
-        // Verify ownership via join (ConfirmedTuitions -> applications)
-        $owns = DB::table('ConfirmedTuitions as ct')
+        // IMPORTANT: use snake_case table name
+        $owns = DB::table('confirmed_tuitions as ct')
             ->join('applications as a', 'ct.application_id', '=', 'a.ApplicationID')
             ->where('ct.tution_id', $tutionId)
             ->where('a.tutor_id', $tutorId)

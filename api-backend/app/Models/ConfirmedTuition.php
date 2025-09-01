@@ -9,21 +9,19 @@ class ConfirmedTuition extends Model
 {
     use HasFactory;
 
-    /** Your actual table is snake_case: confirmed_tuitions */
+    // Correct snake_case table for Postgres
     protected $table = 'confirmed_tuitions';
     protected $primaryKey = 'ConfirmedTuitionID';
     public $incrementing = true;
-
-    /** No created_at/updated_at in this table */
-    public $timestamps = false;
+    public $timestamps = false; // no created_at/updated_at columns
 
     protected $fillable = [
-        'application_id',   // -> applications.ApplicationID
-        'tution_id',        // -> tuition_requests.TutionID
-        'FinalizedSalary',  // numeric(10,2)
-        'FinalizedDays',    // varchar(255)
+        'application_id',   // applications.ApplicationID
+        'tution_id',        // tuition_requests.TutionID  (note: "tution" per schema)
+        'FinalizedSalary',
+        'FinalizedDays',
         'Status',           // 'Ongoing' | 'Ended'
-        'ConfirmedDate',    // timestamptz
+        'ConfirmedDate',
     ];
 
     protected $casts = [
