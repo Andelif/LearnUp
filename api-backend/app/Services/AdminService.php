@@ -173,35 +173,55 @@ class AdminService
                 return ['error' => 'Application not found'];
             }
 
-            // Mark matched
-            DB::table('applications')
-                ->where('ApplicationID', $applicationId)
-                ->update(['matched' => 1, 'status' => 'Shortlisted']);
+            // Idempotency: already matched?
+            if ((int)($application->matched ?? 0) === 1) {
+                return ['message' => 'Application already matched'];
+            }
 
-            // Resolve linked users
-            $learner = DB::table('learners')
-                ->where('LearnerID', $application->learner_id)
-                ->first();
-
+            // Resolve linked rows
             $tutor = DB::table('tutors')
                 ->where('TutorID', $application->tutor_id)
                 ->first();
 
-            // Insert into confirmed_tuitions (basic values to unlock chat)
-            DB::table('confirmed_tuitions')->insert([
-                'application_id' => $application->ApplicationID,
-                'tution_id'      => $application->tution_id,  // (spelling matches DB)
-                'FinalizedSalary'=> (float)($tutor->preferred_salary ?? 0),
-                'FinalizedDays'  => '',                       // fill later if needed
-                'Status'         => 'Ongoing',
-                'ConfirmedDate'  => DB::raw('CURRENT_TIMESTAMP'),
-            ]);
+            if (!$tutor) {
+                return ['error' => 'Tutor not found for this application'];
+            }
 
-            // Notify both parties
+            $learner = null;
+            if (!empty($application->learner_id)) {
+                $learner = DB::table('learners')
+                    ->where('LearnerID', $application->learner_id)
+                    ->first();
+            }
+
+            // Create confirmed_tuitions only if not exists for this application
+            $confirmedExists = DB::table('confirmed_tuitions')
+                ->where('application_id', $application->ApplicationID)
+                ->exists();
+
+            if (!$confirmedExists) {
+                $finalSalary = $tutor ? (float)($tutor->preferred_salary ?? 0) : 0.0;
+
+                DB::table('confirmed_tuitions')->insert([
+                    'application_id'  => $application->ApplicationID,
+                    'tution_id'       => $application->tution_id,  // (spelling matches DB)
+                    'FinalizedSalary' => $finalSalary,
+                    'FinalizedDays'   => '',
+                    'Status'          => 'Ongoing',
+                    'ConfirmedDate'   => DB::raw('CURRENT_TIMESTAMP'),
+                ]);
+            }
+
+            // Mark application as matched
+            DB::table('applications')
+                ->where('ApplicationID', $applicationId)
+                ->update(['matched' => 1, 'status' => 'Shortlisted']);
+
+            // Notifications (guard all nulls)
             $tuitionId = $application->tution_id;
             $nowExpr   = DB::raw('CURRENT_TIMESTAMP');
 
-            if ($learner && $learner->user_id) {
+            if ($learner && !empty($learner->user_id)) {
                 DB::table('notifications')->insert([
                     'user_id'  => $learner->user_id,
                     'Message'  => "A tutor has been selected for your Tuition ID: {$tuitionId}.",
@@ -212,7 +232,7 @@ class AdminService
                 ]);
             }
 
-            if ($tutor && $tutor->user_id) {
+            if ($tutor && !empty($tutor->user_id)) {
                 DB::table('notifications')->insert([
                     'user_id'  => $tutor->user_id,
                     'Message'  => "You have been selected for Tuition ID: {$tuitionId}.",

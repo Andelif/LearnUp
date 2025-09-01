@@ -10,6 +10,7 @@ const MatchLearnerAndTutor = () => {
   const [applications, setApplications] = useState([]);
   const [selectedTuitionID, setSelectedTuitionID] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [matchingId, setMatchingId] = useState(null); // disable one button while posting
 
   useEffect(() => {
     let alive = true;
@@ -19,6 +20,7 @@ const MatchLearnerAndTutor = () => {
         if (alive) setTuitionRequests(Array.isArray(data) ? data : []);
       } catch (error) {
         console.error("Error fetching tuition requests:", error);
+        toast.error("Failed to load tuition requests");
       } finally {
         if (alive) setLoading(false);
       }
@@ -41,12 +43,19 @@ const MatchLearnerAndTutor = () => {
 
   const matchTutor = async (applicationId) => {
     try {
+      setMatchingId(applicationId);
       await api.post("/api/admin/match-tutor", { application_id: applicationId });
       toast.success("Tutor matched successfully!");
-      if (selectedTuitionID) fetchApplications(selectedTuitionID);
+      if (selectedTuitionID) await fetchApplications(selectedTuitionID);
     } catch (error) {
+      const msg =
+        error?.response?.data?.error ||
+        error?.response?.data?.message ||
+        "Match failed";
       console.error("Error matching tutor:", error);
-      toast.error("Match failed");
+      toast.error(msg);
+    } finally {
+      setMatchingId(null);
     }
   };
 
@@ -129,8 +138,11 @@ const MatchLearnerAndTutor = () => {
                   <td>{app.preferred_time}</td>
                   <td>
                     {!app.matched && (
-                      <button onClick={() => matchTutor(app.application_id)}>
-                        Match
+                      <button
+                        onClick={() => matchTutor(app.application_id)}
+                        disabled={matchingId === app.application_id}
+                      >
+                        {matchingId === app.application_id ? "Matching..." : "Match"}
                       </button>
                     )}
                   </td>
