@@ -23,7 +23,9 @@ const MatchLearnerAndTutor = () => {
         if (alive) setLoading(false);
       }
     })();
-    return () => { alive = false; };
+    return () => {
+      alive = false;
+    };
   }, [api]);
 
   const fetchApplications = async (TutionID) => {
@@ -37,13 +39,14 @@ const MatchLearnerAndTutor = () => {
     }
   };
 
-  const matchTutor = async (applicationID) => {
+  const matchTutor = async (applicationId) => {
     try {
-      await api.post("/api/admin/match-tutor", { application_id: applicationID });
+      await api.post("/api/admin/match-tutor", { application_id: applicationId });
       toast.success("Tutor matched successfully!");
       if (selectedTuitionID) fetchApplications(selectedTuitionID);
     } catch (error) {
       console.error("Error matching tutor:", error);
+      toast.error("Match failed");
     }
   };
 
@@ -105,7 +108,7 @@ const MatchLearnerAndTutor = () => {
                 <th>Application ID</th>
                 <th>Tutor Name</th>
                 <th>Experience</th>
-                <th>Qualifications</th>
+                <th>Qualification</th>
                 <th>Currently Studying</th>
                 <th>Preferred Salary</th>
                 <th>Preferred Location</th>
@@ -115,8 +118,8 @@ const MatchLearnerAndTutor = () => {
             </thead>
             <tbody>
               {applications.map((app) => (
-                <tr key={app.ApplicationID}>
-                  <td>{app.ApplicationID}</td>
+                <tr key={app.application_id}>
+                  <td>{app.application_id}</td>
                   <td>{app.tutor_name}</td>
                   <td>{app.experience}</td>
                   <td>{app.qualification}</td>
@@ -126,7 +129,7 @@ const MatchLearnerAndTutor = () => {
                   <td>{app.preferred_time}</td>
                   <td>
                     {!app.matched && (
-                      <button onClick={() => matchTutor(app.ApplicationID)}>
+                      <button onClick={() => matchTutor(app.application_id)}>
                         Match
                       </button>
                     )}
