@@ -33,9 +33,14 @@ const Notification = () => {
         )
       );
     } catch (err) {
+      // 403 likely means it was a broadcast (cannot mark as read per-user)
       console.error("Error marking notification as read:", err);
     }
   };
+
+  // helper: is this a personal notification we can mark as read?
+  const canMarkRead = (n) =>
+    n.Status === "Unread" && n.user_id && user && Number(n.user_id) === Number(user.id);
 
   return (
     <div className="notification-center">
@@ -46,40 +51,44 @@ const Notification = () => {
         <p className="no-notifications">No notifications available.</p>
       ) : (
         <ul className="notification-list">
-          {notifications
-            .filter((notif) => {
-              // show to everyone / all learners / all tutors / specific user
-              return (
-                notif.view === "everyone" ||
-                (notif.view === "all_learner" && user?.role === "learner") ||
-                (notif.view === "all_tutor" && user?.role === "tutor") ||
-                notif.view == user?.id
-              );
-            })
-            .map((notif) => (
-              <li
-                key={notif.NotificationID}
-                className={`notification-item ${
-                  notif.Status === "Unread" ? "unread" : ""
-                }`}
-              >
-                <div className="notification-content">
-                  <p className="notification-type">{notif.Type}</p>
-                  <p className="notification-message">{notif.Message}</p>
-                  <p className="notification-time">
-                    {new Date(notif.TimeSent).toLocaleString()}
+          {notifications.map((notif) => (
+            <li
+              key={notif.NotificationID}
+              className={`notification-item ${notif.Status === "Unread" ? "unread" : ""}`}
+            >
+              <div className="notification-content">
+                <p className="notification-type">{notif.Type}</p>
+                <p className="notification-message">{notif.Message}</p>
+                <p className="notification-time">
+                  {notif.TimeSent ? new Date(notif.TimeSent).toLocaleString() : ""}
+                </p>
+
+                {/* Optional: show who it's for */}
+                {notif.view && (
+                  <p className="notification-badge">
+                    {notif.view === "everyone"
+                      ? "Broadcast to everyone"
+                      : notif.view === "all_learner"
+                      ? "Broadcast to learners"
+                      : notif.view === "all_tutor"
+                      ? "Broadcast to tutors"
+                      : notif.view === "all_admin"
+                      ? "Broadcast to admins"
+                      : null}
                   </p>
-                </div>
-                {notif.Status === "Unread" && (
-                  <button
-                    className="mark-read-btn"
-                    onClick={() => markAsRead(notif.NotificationID)}
-                  >
-                    Mark as Read
-                  </button>
                 )}
-              </li>
-            ))}
+              </div>
+
+              {canMarkRead(notif) && (
+                <button
+                  className="mark-read-btn"
+                  onClick={() => markAsRead(notif.NotificationID)}
+                >
+                  Mark as Read
+                </button>
+              )}
+            </li>
+          ))}
         </ul>
       )}
     </div>

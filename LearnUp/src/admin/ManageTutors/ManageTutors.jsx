@@ -19,7 +19,9 @@ const ManageTutors = () => {
         if (alive) setLoading(false);
       }
     })();
-    return () => { alive = false; };
+    return () => {
+      alive = false;
+    };
   }, [api]);
 
   const handleDelete = async (tutorId) => {
@@ -52,7 +54,7 @@ const ManageTutors = () => {
             <th>Address</th>
             <th>Salary</th>
             <th>Availability</th>
-            <th>Qualifications</th>
+            <th>Qualification</th>
             <th>Experience</th>
             <th></th>
           </tr>
@@ -64,8 +66,8 @@ const ManageTutors = () => {
               <td>{tutor.full_name}</td>
               <td>{tutor.address}</td>
               <td>{tutor.preferred_salary}</td>
-              <td>{tutor.availability}</td>
-              <td>{tutor.qualifications}</td>
+              <td>{tutor.availability ? "Yes" : "No"}</td>
+              <td>{tutor.qualification}</td>
               <td>{tutor.experience}</td>
               <td>
                 <button onClick={() => handleDelete(tutor.TutorID)}>Delete</button>

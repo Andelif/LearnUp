@@ -14,7 +14,6 @@ const Inbox = () => {
   const [finalizedSalary, setFinalizedSalary] = useState("");
   const [finalizedDays, setFinalizedDays] = useState("");
 
-  // fetch chat list
   useEffect(() => {
     (async () => {
       try {
@@ -26,7 +25,6 @@ const Inbox = () => {
     })();
   }, [api]);
 
-  // fetch messages for selected user
   useEffect(() => {
     if (!selectedUser) return;
     fetchMessages(selectedUser.user_id);
@@ -46,7 +44,7 @@ const Inbox = () => {
     if (!newMessage.trim() || !selectedUser) return;
     try {
       await api.post("/api/messages", {
-        SentTo: selectedUser.user_id,
+        SentTo: selectedUser.user_id, // this is always a users.id
         Content: newMessage,
       });
       setNewMessage("");
@@ -89,8 +87,9 @@ const Inbox = () => {
   const rejectTutor = async () => {
     if (!selectedUser) return;
     try {
+      // IMPORTANT: use TutorID (we expose it as tutor_id from /api/matched-users)
       await api.post("/api/reject-tutor", {
-        tutor_id: selectedUser.user_id,
+        tutor_id: selectedUser.tutor_id, // <-- fixed
         tution_id: selectedUser.tution_id,
       });
       alert("Tutor rejected successfully.");
@@ -111,7 +110,7 @@ const Inbox = () => {
           ) : (
             matchedUsers.map((m) => (
               <li
-                key={m.user_id}
+                key={m.ApplicationID || `${m.user_id}-${m.tution_id}`} // more unique
                 className="ChatList"
                 onClick={() => setSelectedUser(m)}
               >
@@ -134,9 +133,7 @@ const Inbox = () => {
               {messages.map((msg) => (
                 <div
                   key={msg.MessageID}
-                  className={`message ${
-                    msg.SentBy === user?.id ? "sent" : "received"
-                  }`}
+                  className={`message ${msg.SentBy === user?.id ? "sent" : "received"}`}
                 >
                   <p className="MsgContent">{msg.Content}</p>
                   <span>{new Date(msg.TimeStamp).toLocaleTimeString()}</span>
@@ -156,10 +153,7 @@ const Inbox = () => {
 
             {user?.role === "learner" && (
               <div className="action-buttons">
-                <button
-                  className="confirm-btn"
-                  onClick={() => setShowConfirmForm(true)}
-                >
+                <button className="confirm-btn" onClick={() => setShowConfirmForm(true)}>
                   Confirm Tutor
                 </button>
                 <button className="reject-btn" onClick={rejectTutor}>

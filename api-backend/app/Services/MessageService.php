@@ -21,11 +21,11 @@ class MessageService
         if (!$exists) return ['error' => 'Recipient not found', 'status' => 404];
 
         $row = Message::create([
-            'SentBy'   => $user->id,
-            'SentTo'   => $sentTo,
-            'Content'  => $content,
-            'Status'   => 'Delivered',
-            'TimeStamp'=> now(),
+            'SentBy'    => $user->id,
+            'SentTo'    => $sentTo,
+            'Content'   => $content,
+            'Status'    => 'Delivered',
+            'TimeStamp' => now(),
         ]);
 
         return ['message' => 'Message sent successfully', 'data' => $row, 'status' => 201];
@@ -36,7 +36,6 @@ class MessageService
         $user = Auth::user();
         if (!$user) return ['error' => 'Unauthorized', 'status' => 401];
 
-        // Conversation between auth user and other user
         $rows = DB::table('messages as m')
             ->leftJoin('users as u', 'u.id', '=', 'm.SentBy')
             ->where(function ($q) use ($user, $otherUserId) {
@@ -76,6 +75,7 @@ class MessageService
     /**
      * Return matched counterpart users for the current user (tutor ↔ learner).
      * Uses applications.matched = true and maps through TutorID/LearnerID.
+     * NOTE: We return both the counterpart's user_id AND their PK (tutor_id or learner_id).
      */
     public function getMatchedUsers()
     {
@@ -93,7 +93,8 @@ class MessageService
                 ->where('a.matched', true)
                 ->where('a.tutor_id', $tutorId)
                 ->get([
-                    'l.user_id',
+                    'l.user_id',                   // chat uses this
+                    'l.LearnerID as learner_id',   // PK if you ever need it
                     'l.full_name',
                     DB::raw("'learner' as role"),
                     'a.tution_id',
@@ -110,7 +111,8 @@ class MessageService
                 ->where('a.matched', true)
                 ->where('a.learner_id', $learnerId)
                 ->get([
-                    't.user_id',
+                    't.user_id',                 // chat uses this
+                    't.TutorID as tutor_id',     // PK needed for /api/reject-tutor
                     't.full_name',
                     DB::raw("'tutor' as role"),
                     'a.tution_id',
@@ -118,12 +120,12 @@ class MessageService
                 ]);
         }
 
-        return []; // admins (or other roles) get empty by default
+        return [];
     }
 
     /**
      * Learner rejects a tutor for a specific tuition (sets status = 'Cancelled').
-     * Expects tutor_id to be the **TutorID** (not the tutor user_id).
+     * Expects tutor_id to be the TutorID (PK), not the tutor user_id.
      */
     public function rejectTutor(int $tutorId, int $tutionId): array
     {
@@ -134,8 +136,8 @@ class MessageService
         if (!$learnerId) return ['error' => 'Only learners can reject tutors', 'status' => 403];
 
         $updated = DB::table('applications')
-            ->where('tutor_id', $tutorId)     // TutorID
-            ->where('learner_id', $learnerId) // LearnerID
+            ->where('tutor_id', $tutorId)       // TutorID
+            ->where('learner_id', $learnerId)   // LearnerID
             ->where('tution_id', $tutionId)
             ->update(['status' => 'Cancelled', 'matched' => false]);
 
