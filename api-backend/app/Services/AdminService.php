@@ -9,7 +9,6 @@ class AdminService
     /** List all admins (controller restricts to admin role). */
     public function getAllAdmins()
     {
-        // admins table uses AdminID
         return DB::table('admins')->orderByDesc('AdminID')->get();
     }
 
@@ -40,7 +39,6 @@ class AdminService
 
     public function getAdminById(int $id): ?object
     {
-        // AdminID is the PK
         return DB::table('admins')->where('AdminID', $id)->first();
     }
 
@@ -137,13 +135,13 @@ class AdminService
 
     /**
      * Applications for a given tuition request (joins tutor profile).
-     * NOTE: returns `application_id` (camel-safe) and `matched`.
+     * NOTE: returns camel-safe keys.
      */
     public function getApplicationsByTuitionID(int $tuitionId)
     {
         return DB::table('applications as a')
             ->join('tutors as t', 'a.tutor_id', '=', 't.TutorID')
-            ->where('a.tution_id', $tuitionId) // spelling in DB: tution_id
+            ->where('a.tution_id', $tuitionId)
             ->orderByDesc('a.ApplicationID')
             ->get([
                 'a.ApplicationID as application_id',
@@ -159,12 +157,12 @@ class AdminService
     }
 
     /**
-     * Mark application as matched + notify both parties + create confirmed_tuitions entry.
+     * Mark application as matched + notify both parties.
+     * NO insertion into confirmed_tuitions here.
      */
     public function matchTutor(int $applicationId): array
     {
         return DB::transaction(function () use ($applicationId) {
-            // Load application
             $application = DB::table('applications')
                 ->where('ApplicationID', $applicationId)
                 ->first();
@@ -173,51 +171,22 @@ class AdminService
                 return ['error' => 'Application not found'];
             }
 
-            // Idempotency: already matched?
             if ((int)($application->matched ?? 0) === 1) {
                 return ['message' => 'Application already matched'];
             }
 
-            // Resolve linked rows
-            $tutor = DB::table('tutors')
-                ->where('TutorID', $application->tutor_id)
-                ->first();
+            // Load related rows (for notifications only)
+            $tutor = DB::table('tutors')->where('TutorID', $application->tutor_id)->first();
+            $learner = $application->learner_id
+                ? DB::table('learners')->where('LearnerID', $application->learner_id)->first()
+                : null;
 
-            if (!$tutor) {
-                return ['error' => 'Tutor not found for this application'];
-            }
-
-            $learner = null;
-            if (!empty($application->learner_id)) {
-                $learner = DB::table('learners')
-                    ->where('LearnerID', $application->learner_id)
-                    ->first();
-            }
-
-            // Create confirmed_tuitions only if not exists for this application
-            $confirmedExists = DB::table('confirmed_tuitions')
-                ->where('application_id', $application->ApplicationID)
-                ->exists();
-
-            if (!$confirmedExists) {
-                $finalSalary = $tutor ? (float)($tutor->preferred_salary ?? 0) : 0.0;
-
-                DB::table('confirmed_tuitions')->insert([
-                    'application_id'  => $application->ApplicationID,
-                    'tution_id'       => $application->tution_id,  // (spelling matches DB)
-                    'FinalizedSalary' => $finalSalary,
-                    'FinalizedDays'   => '',
-                    'Status'          => 'Ongoing',
-                    'ConfirmedDate'   => DB::raw('CURRENT_TIMESTAMP'),
-                ]);
-            }
-
-            // Mark application as matched
+            // Only mark the application as matched/shortlisted
             DB::table('applications')
                 ->where('ApplicationID', $applicationId)
                 ->update(['matched' => 1, 'status' => 'Shortlisted']);
 
-            // Notifications (guard all nulls)
+            // Notifications
             $tuitionId = $application->tution_id;
             $nowExpr   = DB::raw('CURRENT_TIMESTAMP');
 
