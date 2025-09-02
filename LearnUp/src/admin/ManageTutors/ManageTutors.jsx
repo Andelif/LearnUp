@@ -46,36 +46,44 @@ const ManageTutors = () => {
   return (
     <div>
       <h2>Manage Tutors</h2>
-      <table border="1">
-        <thead>
-          <tr>
-            <th>ID</th>
-            <th>Full Name</th>
-            <th>Address</th>
-            <th>Salary</th>
-            <th>Availability</th>
-            <th>Qualification</th>
-            <th>Experience</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>
-          {tutors.map((tutor) => (
-            <tr key={tutor.TutorID}>
-              <td>{tutor.TutorID}</td>
-              <td>{tutor.full_name}</td>
-              <td>{tutor.address}</td>
-              <td>{tutor.preferred_salary}</td>
-              <td>{tutor.availability ? "Yes" : "No"}</td>
-              <td>{tutor.qualification}</td>
-              <td>{tutor.experience}</td>
-              <td>
-                <button onClick={() => handleDelete(tutor.TutorID)}>Delete</button>
-              </td>
+      <div className="table-scroll">
+        <table border="1">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Full Name</th>
+              <th>Address</th>
+              <th>Salary</th>
+              <th>Availability</th>
+              <th>Qualification</th>
+              <th>Experience</th>
+              <th></th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {tutors.map((tutor) => (
+              <tr key={tutor.TutorID}>
+                <td>{tutor.TutorID}</td>
+                <td>{tutor.full_name}</td>
+                <td>{tutor.address}</td>
+                <td>{tutor.preferred_salary}</td>
+
+                <td>
+                  <span className={`pill ${tutor.availability ? 'ok' : 'no'}`}>
+                    {tutor.availability ? 'Available' : 'Unavailable'}
+                  </span>
+                </td>
+
+                <td>{tutor.qualification}</td>
+                <td>{tutor.experience}</td>
+                <td>
+                  <button onClick={() => handleDelete(tutor.TutorID)}>Delete</button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 };

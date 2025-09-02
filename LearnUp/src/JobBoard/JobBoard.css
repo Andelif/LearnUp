@@ -31,90 +31,146 @@
   color: #8c9db7;
 }
 
-/* Job Board */
+/* =========================
+   Page layout
+   ========================= */
 .job-board {
-  flex-grow: 1;
-  padding: 20px;
-  min-height: 850px;
+  max-width: 1100px;
+  margin: 24px auto;
+  padding: 0 16px;
+  min-height: 60vh;
 }
 
-.header {
+.job-board .title {
+  text-align: center;
+  font-size: 28px;
+  color: #352557;
+  margin-bottom: 16px;
+}
+
+/* (Optional) sidebar styles – only if you add one later */
+.job-board-container {
+  display: flex;
+  background-color: #f8f9fa;
+}
+.sidebar {
+  width: 280px;
+  background-color: #273a59;
+  color: #fff;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  border-radius: 12px;
+}
+.sidebar h2 { font-size: 20px; margin-bottom: 10px; }
+.sidebar p  { font-size: 14px; line-height: 1.5; }
+.sidebar a  { font-size: 14px; line-height: 1.5; color: #8c9db7; text-decoration: none; }
+
+/* Avoid global .header collisions */
+.job-board .header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
+  margin-bottom: 16px;
 }
-
-.header h1 {
-  font-size: 24px;
-}
-
-.filter-button {
+.job-board .header h1 { font-size: 24px; margin: 0; }
+.job-board .filter-button {
   background-color: #0d6efd;
   color: white;
   border: none;
   padding: 8px 16px;
-  border-radius: 5px;
+  border-radius: 8px;
   cursor: pointer;
 }
 
-.job-list {
+/* =========================
+   Filters
+   ========================= */
+.filter-container {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 20px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+  margin-bottom: 18px;
 }
 
-.job-card {
-  background-color: white;
-  padding: 15px;
+.filter-container input {
+  padding: 12px 14px;
+  border: 1px solid #d1d5db;
   border-radius: 10px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  font-size: 16px;              /* prevent iOS zoom */
+  outline: none;
+  background: #fff;
+  transition: border-color .2s ease, box-shadow .2s ease;
+}
+.filter-container input:focus {
+  border-color: #8e2fbe;
+  box-shadow: 0 0 0 3px rgba(142, 47, 190, 0.15);
+}
+
+/* =========================
+   Job list grid
+   ========================= */
+.job-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 16px;
+}
+
+/* Card */
+.job-card {
+  background-color: #fff;
+  padding: 16px;
+  border-radius: 12px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+  transition: transform .12s ease, box-shadow .2s ease;
+}
+.job-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px rgba(0,0,0,0.10);
 }
 
 .job-card h3 {
   font-size: 18px;
   margin-bottom: 10px;
+  color: #2c3e50;
 }
-
 .job-card p {
   font-size: 14px;
-  margin: 5px 0;
+  margin: 6px 0;
+  color: #34495e;
 }
+.job-card p strong { color: #2c3e50; }
 
+/* Button */
 .details-button {
   display: inline-block;
   margin-top: 10px;
-  padding: 8px 12px;
+  padding: 10px 14px;
   background-color: #cf77b5;
   color: white;
-  border-radius: 5px;
+  border-radius: 10px;
   text-decoration: none;
   text-align: center;
+  font-weight: 800;
+  transition: background-color .2s ease, transform .06s ease;
+}
+.details-button:hover  { background-color: #b95ea4; }
+.details-button:active { transform: translateY(1px); }
+.details-button:focus-visible {
+  outline: 3px solid rgba(207, 119, 181, 0.35);
+  outline-offset: 2px;
 }
 
-.filter-container {
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-  margin-bottom: 20px;
-}
-
-.filter-container input {
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-}
+/* =========================
+   Loader (kept from your file)
+   ========================= */
 .loader-container {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  background: rgba(235, 235, 235, 0.8); 
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  background: rgba(235, 235, 235, 0.8);
   color: white;
   font-family: Arial, sans-serif;
   z-index: 9999;
@@ -129,17 +185,60 @@
     l20-2 1.6s infinite linear;
 }
 @keyframes l20-1{
-   0%    {clip-path: polygon(50% 50%,0       0,  50%   0%,  50%    0%, 50%    0%, 50%    0%, 50%    0% )}
-   12.5% {clip-path: polygon(50% 50%,0       0,  50%   0%,  100%   0%, 100%   0%, 100%   0%, 100%   0% )}
-   25%   {clip-path: polygon(50% 50%,0       0,  50%   0%,  100%   0%, 100% 100%, 100% 100%, 100% 100% )}
-   50%   {clip-path: polygon(50% 50%,0       0,  50%   0%,  100%   0%, 100% 100%, 50%  100%, 0%   100% )}
-   62.5% {clip-path: polygon(50% 50%,100%    0, 100%   0%,  100%   0%, 100% 100%, 50%  100%, 0%   100% )}
-   75%   {clip-path: polygon(50% 50%,100% 100%, 100% 100%,  100% 100%, 100% 100%, 50%  100%, 0%   100% )}
-   100%  {clip-path: polygon(50% 50%,50%  100%,  50% 100%,   50% 100%,  50% 100%, 50%  100%, 0%   100% )}
+   0%    {clip-path: polygon(50% 50%,0 0, 50% 0%, 50% 0%, 50% 0%, 50% 0%, 50% 0%)}
+   12.5% {clip-path: polygon(50% 50%,0 0, 50% 0%, 100% 0%, 100% 0%, 100% 0%, 100% 0%)}
+   25%   {clip-path: polygon(50% 50%,0 0, 50% 0%, 100% 0%, 100% 100%, 100% 100%, 100% 100%)}
+   50%   {clip-path: polygon(50% 50%,0 0, 50% 0%, 100% 0%, 100% 100%, 50% 100%, 0% 100%)}
+   62.5% {clip-path: polygon(50% 50%,100% 0, 100% 0%, 100% 0%, 100% 100%, 50% 100%, 0% 100%)}
+   75%   {clip-path: polygon(50% 50%,100% 100%, 100% 100%, 100% 100%, 100% 100%, 50% 100%, 0% 100%)}
+   100%  {clip-path: polygon(50% 50%,50% 100%, 50% 100%, 50% 100%, 50% 100%, 50% 100%, 0% 100%)}
 }
-@keyframes l20-2{ 
+@keyframes l20-2{
   0%    {transform:scaleY(1)  rotate(0deg)}
   49.99%{transform:scaleY(1)  rotate(135deg)}
   50%   {transform:scaleY(-1) rotate(0deg)}
   100%  {transform:scaleY(-1) rotate(-135deg)}
+}
+.loading-text {
+  margin-top: 10px;
+  color: #352557;
+  font-weight: 700;
+}
+
+/* =========================
+   Responsive
+   ========================= */
+
+/* Tablets */
+@media (max-width: 768px) {
+  .job-board { padding: 0 14px; }
+
+  .filter-container {
+    grid-template-columns: 1fr 1fr; /* 2 columns */
+    gap: 10px;
+  }
+}
+
+/* Phones (≤ ~430px) */
+@media (max-width: 430px) {
+  .job-board { padding: 0 12px; }
+
+  .job-board .title { font-size: 24px; }
+
+  .filter-container {
+    grid-template-columns: 1fr;     /* stack inputs */
+    gap: 8px;
+  }
+
+  .job-list { gap: 14px; }
+
+  .job-card { padding: 14px; border-radius: 12px; }
+  .job-card h3 { font-size: 16px; }
+
+  .details-button { display: block; width: 100%; }
+}
+
+/* Ultra-tall portrait phones (e.g., 1080×2520 family) */
+@media (orientation: portrait) and (max-aspect-ratio: 9/20.5) {
+  .job-board { margin-top: 20px; margin-bottom: 20px; }
 }

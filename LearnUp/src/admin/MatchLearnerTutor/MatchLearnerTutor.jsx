@@ -69,12 +69,13 @@ const MatchLearnerAndTutor = () => {
   }
 
   return (
-    <div>
-      <h2>Match Learner and Tutor</h2>
+  <div>
+    <h2>Match Learner and Tutor</h2>
 
-      {/* Tuition Requests Table */}
-      <h3>Tuition Requests</h3>
-      <table border="1">
+    
+    <h3>Tuition Requests</h3>
+    <div className="table-scroll">
+      <table>
         <thead>
           <tr>
             <th>ID</th>
@@ -106,12 +107,14 @@ const MatchLearnerAndTutor = () => {
           ))}
         </tbody>
       </table>
+    </div>
 
-      {/* Applications Table */}
-      {selectedTuitionID && (
-        <>
-          <h3>Applications for Tuition ID: {selectedTuitionID}</h3>
-          <table border="1">
+    
+    {selectedTuitionID && (
+      <>
+        <h3>Applications for Tuition ID: {selectedTuitionID}</h3>
+        <div className="table-scroll">
+          <table>
             <thead>
               <tr>
                 <th>Application ID</th>
@@ -150,10 +153,11 @@ const MatchLearnerAndTutor = () => {
               ))}
             </tbody>
           </table>
-        </>
-      )}
-    </div>
-  );
+        </div>
+      </>
+    )}
+  </div>
+);
 };
 
 export default MatchLearnerAndTutor;

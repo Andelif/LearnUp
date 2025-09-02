@@ -1,49 +1,125 @@
 .job-details-container {
-    max-width: 800px;
-    margin: 40px auto;
-    padding: 20px;
-    background: #ffffff;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  max-width: 800px;
+  margin: 32px auto;
+  padding: 24px;
+  background: #ffffff;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+  border-radius: 12px;
+  font-family: Arial, sans-serif;
+}
+
+/* Title */
+.job-details-container h2 {
+  color: #2c3e50;
+  font-size: 26px;
+  margin-bottom: 18px;
+  text-align: center;
+}
+
+/* Rows */
+.job-details-container p {
+  display: flex;                 /* label | value on wide screens */
+  align-items: baseline;
+  gap: 12px;
+  font-size: 16px;
+  color: #34495e;
+  margin: 10px 0;
+  padding: 10px 0;
+  border-bottom: 1px solid #ecf0f1;
+}
+.job-details-container p:last-of-type { border-bottom: none; }
+
+.job-details-container p strong {
+  min-width: 160px;              /* tidy alignment on desktop */
+  color: #2c3e50;
+}
+
+/* Apply button */
+.apply-btn {
+  display: block;
+  width: 100%;
+  margin-top: 18px;
+  padding: 14px;
+  background-color: #cf77b5;
+  color: #fff;
+  text-align: center;
+  font-size: 18px;
+  font-weight: 800;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background-color .2s ease, transform .06s ease;
+}
+.apply-btn:hover  { background-color: #b95ea4; }
+.apply-btn:active { transform: translateY(1px); }
+.apply-btn:focus-visible {
+  outline: 3px solid rgba(207, 119, 181, 0.35);
+  outline-offset: 2px;
+}
+
+/* Disabled state */
+.apply-btn:disabled,
+.apply-btn[disabled] {
+  background: #c8c8cf;
+  color: #f4f4f6;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+/* =========================
+   Responsive Enhancements
+   ========================= */
+
+/* Tablets */
+@media (max-width: 768px) {
+  .job-details-container {
+    margin: 20px auto;
+    padding: 18px;
     border-radius: 10px;
-    font-family: Arial, sans-serif;
-    margin-bottom: 350px;
   }
-  
-  .job-details-container h2 {
-    color: #2c3e50;
-    font-size: 24px;
-    margin-bottom: 20px;
-    text-align: center;
-  }
-  
+
+  .job-details-container h2 { font-size: 22px; }
+
+  /* Stack label above value for narrow widths */
   .job-details-container p {
-    font-size: 16px;
-    color: #34495e;
-    margin: 10px 0;
-    padding: 8px;
-    border-bottom: 1px solid #ecf0f1;
-  }
-  
-  .job-details-container p:last-child {
-    border-bottom: none;
-  }
-  
-  .apply-btn {
     display: block;
-    width: 100%;
-    padding: 12px;
-    background-color: #cf77b5;
-    color: #fff;
-    text-align: center;
-    font-size: 18px;
-    font-weight: bold;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    transition: background 0.3s;
+    padding: 8px 0;
   }
-  
-  .apply-btn:hover {
-    background: #2980b9;
+  .job-details-container p strong {
+    display: block;
+    min-width: 0;
+    margin-bottom: 4px;
   }
-  
+}
+
+/* Phones (≤ ~430px) */
+@media (max-width: 430px) {
+  .job-details-container {
+    margin: 16px auto;
+    padding: 16px;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+    border-radius: 10px;
+
+    /* room so content doesn't hide behind sticky CTA */
+    padding-bottom: calc(16px + 64px + env(safe-area-inset-bottom));
+  }
+
+  .job-details-container h2 { font-size: 20px; }
+  .job-details-container p { font-size: 15px; }
+
+  /* Sticky bottom CTA for easy reach */
+  .apply-btn {
+    position: sticky;
+    bottom: 0;
+    margin-top: 20px;
+    padding: 16px;
+    border-radius: 12px;
+    box-shadow: 0 -6px 16px rgba(0,0,0,0.08);
+    z-index: 5;
+  }
+}
+
+/* Ultra-tall portrait phones (e.g., 1080×2520 family) */
+@media (orientation: portrait) and (max-aspect-ratio: 9/20.5) {
+  .job-details-container { padding-top: 14px; padding-bottom: 20px; }
+}

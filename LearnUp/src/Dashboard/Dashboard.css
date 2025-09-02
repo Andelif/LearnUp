@@ -1,98 +1,208 @@
-/* Dashboard.css */
+/* ===== Layout wrapper ===== */
 .dashboard-container {
-    display: flex;
-    height: 100vh;
+  display: flex;
+  gap: 16px;
+  max-width: 1200px;
+  width: 92%;
+  margin: 24px auto;
+  padding: 0 4px;
+  /* no forced 100vh so footer can sit nicely */
+}
+
+/* ===== Sidebar ===== */
+.sidebar {
+  width: 240px;
+  flex-shrink: 0;
+  background: #273a59;
+  color: #fff;
+  padding: 18px;
+  border-radius: 12px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+  position: sticky;        /* stays in view on desktop scroll */
+  top: 12px;
+  align-self: flex-start;
+}
+
+.profile-section {
+  text-align: center;
+  margin-bottom: 16px;
+}
+
+.profile-pic {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 50%;
+  margin-bottom: 10px;
+  border: 2px solid rgba(255,255,255,0.25);
+}
+
+.sidebar-link,
+.btn.btn-primary {
+  display: block;
+  text-decoration: none;
+  text-align: center;
+  padding: 10px 12px;
+  margin-top: 10px;
+  border-radius: 10px;
+  font-weight: 800;
+  transition: background-color .2s ease, transform .06s ease;
+}
+
+/* nav-style links */
+.sidebar-link {
+  background: rgba(255,255,255,0.10);
+  color: #e6f0ff;
+}
+.sidebar-link:hover { background: rgba(255,255,255,0.18); }
+.sidebar-link:active { transform: translateY(1px); }
+
+/* primary action (voucher) */
+.btn.btn-primary {
+  background: #8e2fbe;
+  color: #fff;
+}
+.btn.btn-primary:hover  { background: #7c29a7; }
+.btn.btn-primary:active { transform: translateY(1px); }
+.btn.btn-primary:focus-visible {
+  outline: 3px solid rgba(142,47,190,0.35);
+  outline-offset: 2px;
+}
+
+/* ===== Main ===== */
+.dashboard-main {
+  flex: 1;
+  padding: 4px;
+}
+
+/* errors */
+.error {
+  background: #fde8e8;
+  color: #7f1d1d;
+  border: 1px solid #fecaca;
+  padding: 10px 12px;
+  border-radius: 10px;
+  margin-bottom: 12px;
+}
+
+/* ===== Stat cards ===== */
+.stats-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 14px;
+  margin-top: 12px;
+}
+
+.stat-box {
+  background: #f5f5f5;
+  padding: 16px;
+  border-radius: 12px;
+  text-align: center;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+  transition: transform .12s ease, box-shadow .2s ease;
+}
+.stat-box:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 18px rgba(0,0,0,0.08);
+}
+.stat-box h2 {
+  font-size: 28px;
+  margin: 0 0 6px;
+  color: #273a59;
+}
+.stat-box p {
+  margin: 0;
+  color: #4b5563;
+  font-weight: 600;
+}
+
+/* ===== Notice ===== */
+.notice-board {
+  background: #eef2f7;
+  padding: 16px;
+  border-radius: 12px;
+  margin-top: 18px;
+  color: #273a59;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+}
+
+/* ===== Info boxes ===== */
+.info-boxes {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 14px;
+  margin-top: 18px;
+}
+
+.info-box {
+  background: #fff;
+  padding: 12px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+  color: #111827;
+}
+
+/* (Legacy) user switch styles if you add them later */
+.user-switch-btn {
+  background: #9a53c4;
+  color: #140e0e;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 20px;
+  cursor: pointer;
+  font-weight: bold;
+}
+.switch-user {
+  width: 150px;
+  right: 1rem;
+  position: absolute;
+}
+.edit-icon:hover { cursor: pointer; }
+
+/* =========================
+   Responsive
+   ========================= */
+
+/* Tablets */
+@media (max-width: 900px) {
+  .dashboard-container {
+    gap: 12px;
+    width: 94%;
   }
-  
+  .sidebar { width: 220px; padding: 16px; }
+}
+
+/* Phones (≤ ~430px) */
+@media (max-width: 430px) {
+  .dashboard-container {
+    flex-direction: column;
+    width: 96%;
+    gap: 12px;
+    margin: 16px auto;
+  }
+
   .sidebar {
-    width: 200px;
-    background: #273a59;
-    color: white;
-    padding: 20px;
-    height: 100%;
-  }
-  .sidebar-link{
-    color: #8fb1bc;
-  }
-  .profile-section {
-    text-align: center;
+    width: 100%;
+    position: static;            /* no sticky on small screens */
+    padding: 14px;
+    border-radius: 12px;
   }
 
+  .dashboard-main { padding: 0; }
 
+  .stats-container { gap: 12px; }
+  .stat-box h2 { font-size: 24px; }
+  .stat-box p  { font-size: 14px; }
 
-  .profile-pic {
-    width: 80px;
-    border-radius: 50%;
-    margin-bottom: 10px;
-  }
- 
-  
-  .dashboard-main {
-    flex-grow: 1;
-    padding: 20px;
-  }
-  
-  .alert-box {
-    background: #ffcccc;
-    padding: 10px;
-    text-align: center;
-    border-radius: 5px;
-  }
-  
-  .stats-container {
-    display: flex;
-    gap: 15px;
-    margin-top: 5rem;
-  }
-  
-  .stat-box {
-    background: #f5f5f5;
-    padding: 15px;
-    border-radius: 5px;
-    flex: 1;
-    text-align: center;
-  }
-  
-  .notice-board {
-    background: #e0e0e0;
-    padding: 15px;
-    border-radius: 5px;
-    margin-top: 20px;
-  }
-  
-  .info-boxes {
-    display: flex;
-    gap: 15px;
-    margin-top: 20px;
-  }
-  
-  .info-box {
-    background: #fff;
-    padding: 10px;
-    border-radius: 5px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-  .user-switch-btn {
-    background: #9a53c4;
-    color: #140e0e;
-    padding: 8px 16px;
-    border: none;
-    border-radius: 20px;
-    cursor: pointer;
-    font-weight: bold;
-  }
-  
-  .switch-user {
-    width: 150px;
-    right: 1rem;
-    position: absolute;
-  }
-  
-  .edit-icon:hover{
-    cursor: pointer;
-    
-  }
+  .notice-board { padding: 14px; }
 
-  
+  .info-boxes { gap: 12px; }
+}
+
+/* Ultra-tall portrait phones (1080×2440–2520 class) */
+@media (orientation: portrait) and (max-aspect-ratio: 9/20.5) {
+  .dashboard-container { margin-top: 18px; margin-bottom: 18px; }
+}

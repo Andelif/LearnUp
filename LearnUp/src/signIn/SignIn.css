@@ -1,204 +1,274 @@
-/* General Page Styling */
-.login-container {
-    display: flex;
-    flex-direction: column;
-    
-    min-height: 100vh;
-    background-image: url('src/assets/background.jpg'); /* Local image */
-    background-size: cover; /* Cover the entire screen */
-    background-position: center; /* Center the image */
-    background-repeat: no-repeat; 
-  }
-  
+/* Consistent sizing */
+* { box-sizing: border-box; }
 
-  /* Main Content */
+/* Page background */
+.login-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+
+  /* ✅ Works on Vercel with assets in /public */
+  background: linear-gradient(rgba(0,0,0,.20), rgba(0,0,0,.20)),
+              url('/assets/background.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+/* Main content centering */
+.main-content { /* wrapper div in JSX */
+  flex: 1;
+  display: flex;
+}
+.main-content-wrapper {
+  display: flex;
+  flex-direction: column; /* stack on mobile */
+  align-items: center;
+  justify-content: center;
+  gap: 40px;
+  padding: 50px 20px;
+  max-width: 900px;
+  width: 100%;
+  margin: 0 auto;
+  min-height: inherit; /* take full height from parent */
+}
+
+/* Tablet and up: side-by-side if illustration used */
+@media (min-width: 768px) {
   .main-content-wrapper {
-    display: flex;
-    flex-direction: column; /* Stack on mobile */
+    flex-direction: row;
     align-items: center;
     justify-content: center;
-    gap: 40px;
-    padding: 50px;
-    max-width: 900px;
-    width: 100%;
-    margin: auto; /* Ensures full centering */
-    min-height: 100vh;
+    gap: 48px;
   }
-  
-  @media (min-width: 768px) {
-    .main-content-wrapper {
-        flex-direction: row; /* Side by side on larger screens */
-        align-items: center;
-        justify-content: center; /* Ensures both sections are evenly centered */
-    }
-  }
-  
-  .illustration {
-    display: none;
 }
 
+/* Illustration (hidden on mobile by default) */
+.illustration { display: none; }
 @media (min-width: 768px) {
-    .illustration {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        width: 50%;
-    }
-
-    .illustration img {
-        max-width: 100%;
-        height: auto;
-    }
-}
-
-/* Login Form - Center */
-.login-card {
-    background: white;
-    padding: 32px;
-    border-radius: 12px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    width: 100%;
-    max-width: 400px;
-    
-}
-  
-  .login-card h2 {
-    font-size: 24px;
-    font-weight: bold;
-    color: #374151;
-  }
-  
-  .login-card span {
-    color: #692a7c;
-  }
-  
-  .login-card p {
-    color: #6b7280;
-  }
-  
-  /* User Selection Buttons */
-  .user-selection {
-    display: flex;
-    gap: 16px;
-    margin-top: 16px;
-  }
-  
-  .user-btn {
-    flex: 1;
-    padding: 12px;
-    border: 2px solid transparent;
-    border-radius: 8px;
-    cursor: pointer;
-    background-color: #f9fafb;
-    transition: all 0.3s ease;
-    font-weight: 500;
-    color: #100f0f;
-  }
-  
-  .user-btn:hover {
-    background-color: #e5e7eb;
-  }
-  .or-divider{
-    text-align: center;
-  }
-  
-  .user-btn.active {
-    border-color: #560e6c;
-    background-color: #d1fae5;
-  }
-  
-  /* Input Fields */
-  .input-label {
-    display: block;
-    margin-top: 20px;
-    color: #374151;
-    font-weight: 500;
-  }
-  
-  .input-group {
-    position: relative;
-  }
-  
-  .input-field {
-    width: 100%;
-    padding: 12px;
-    padding-left: 40px;
-    border: 1px solid #d1d5db;
-    border-radius: 8px;
-    outline: none;
-    transition: border 0.3s;
-    width: 300px;
-  }
-  
-  .input-field:focus {
-    border-color: #460956;
-  }
-  
-  .input-icon {
-    position: absolute;
-    top: 50%;
-    left: 12px;
-    transform: translateY(-50%);
-    color: #9ca3af;
-  }
-  
-  /* Password Toggle */
-  .password-toggle {
-    position: absolute;
-    top: 50%;
-    right: 12px;
-    transform: translateY(-50%);
-    cursor: pointer;
-    color: #9ca3af;
-  }
-  
-  /* Forgot Password */
-  .forgot-password {
-    text-align: right;
-    color: #16a34a;
-    margin-top: 10px;
-    cursor: pointer;
-    font-size: 14px;
-  }
-  
-  .forgot-password:hover {
-    text-decoration: underline;
-  }
-  
-  /* Login Button */
-  .login-button {
-    width: 100%;
-    margin-top: 20px;
-    background-color: #8e2fbe;
-    color: white;
-    padding: 12px;
-    border-radius: 8px;
-    font-size: 16px;
-    font-weight: bold;
-    border: none;
-    cursor: pointer;
-    transition: background 0.3s;
-  }
-  
-  .login-button:hover {
-    background-color: #6c167f;
-  }
-  .signup-option {
-    text-align: center;
-    font-size: 16px;
-    color: #100f0f;
-    margin-top: 20px;
+  .illustration {
     display: flex;
     justify-content: center;
-    width: 100%;
-    padding-bottom: 45px;
-}
-.signup-link{
-    color: #460956;
-    font-weight: bold;
-    margin-left: .3rem;
+    align-items: center;
+    width: 50%;
+  }
+  .illustration img {
+    max-width: 100%;
+    height: auto;
+  }
 }
 
-.signup-link:hover{
-  cursor:pointer;
+/* Login card */
+.login-card {
+  background: #fff;
+  padding: 32px;
+  border-radius: 12px;
+  box-shadow: 0 6px 22px rgba(0, 0, 0, 0.12);
+  width: 100%;
+  max-width: 420px;
+}
+
+.login-card h2 {
+  font-size: 24px;
+  font-weight: 800;
+  color: #374151;
+  margin-bottom: 6px;
+}
+.login-card span { color: #692a7c; }
+.login-card p    { color: #6b7280; }
+
+/* Role selector */
+.user-selection {
+  display: flex;
+  gap: 12px;
+  margin-top: 16px;
+}
+.user-btn {
+  flex: 1;
+  padding: 12px;
+  border: 2px solid transparent;
+  border-radius: 10px;
+  cursor: pointer;
+  background-color: #f9fafb;
+  transition: all 0.2s ease;
+  font-weight: 600;
+  color: #100f0f;
+}
+.user-btn:hover { background-color: #eef2f7; }
+.user-btn.active {
+  border-color: #560e6c;
+  background-color: #efe8ff;
+}
+
+/* Labels + inputs */
+.input-label {
+  display: block;
+  margin-top: 18px;
+  margin-bottom: 6px;
+  color: #374151;
+  font-weight: 600;
+}
+
+.input-group { position: relative; }
+
+.input-field {
+  width: 100%;               /* ✅ responsive */
+  padding: 12px 14px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  outline: none;
+  transition: border-color 0.2s ease;
+  font-size: 16px;           /* avoid iOS zoom */
+  background: #fff;
+}
+.input-field:focus {
+  border-color: #8e2fbe;
+  box-shadow: 0 0 0 3px rgba(142,47,190,0.15);
+}
+
+/* Optional left icon support (unused in current JSX) */
+.input-icon {
+  position: absolute;
+  top: 50%;
+  left: 12px;
+  transform: translateY(-50%);
+  color: #9ca3af;
+}
+
+/* Password eye toggle */
+.password-toggle {
+  position: absolute;
+  top: 50%;
+  right: 12px;
+  transform: translateY(-50%);
+  cursor: pointer;
+  color: #9ca3af;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 36px;
+  width: 36px;
+  border-radius: 50%;
+}
+.password-toggle:hover {
+  background: #f3f4f6;
+  color: #6b7280;
+}
+
+/* Forgot password */
+.forgot-password {
+  text-align: right;
+  color: #16a34a;
+  margin-top: 10px;
+  cursor: pointer;
+  font-size: 14px;
+}
+.forgot-password:hover { text-decoration: underline; }
+
+/* Error message (from JSX) */
+.error {
+  margin-top: 10px;
+  color: #b91c1c;
+  background: #fee2e2;
+  border: 1px solid #fecaca;
+  padding: 8px 10px;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+/* Submit button */
+.login-button {
+  width: 100%;
+  margin-top: 20px;
+  background-color: #8e2fbe;
+  color: white;
+  padding: 12px;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 800;
+  border: none;
+  cursor: pointer;
+  transition: transform .06s ease, background-color .2s ease;
+}
+.login-button:hover  { background-color: #6c167f; }
+.login-button:active { transform: translateY(1px); }
+
+/* Or divider */
+.or-divider {
+  position: relative;
+  text-align: center;
+  color: #6b7280;
+}
+.or-divider span {
+  position: relative;
+  padding: 0 10px;
+  background: #fff;
+  z-index: 1;
+}
+.or-divider::before {
+  content: "";
+  position: absolute;
+  left: 0; right: 0; top: 50%;
+  height: 1px;
+  background: #e5e7eb;
+  transform: translateY(-50%);
+  z-index: 0;
+}
+
+/* Sign up line */
+.signup-option {
+  text-align: center;
+  font-size: 16px;
+  color: #100f0f;
+  margin-top: 12px;
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  padding-bottom: 28px;
+}
+.signup-link {
+  color: #460956;
+  font-weight: 800;
+  margin-left: .3rem;
+  text-decoration: none;
+}
+.signup-link:hover { text-decoration: underline; cursor: pointer; }
+
+/* =========================
+   RESPONSIVE ENHANCEMENTS
+   ========================= */
+
+/* Tablets */
+@media (max-width: 768px) {
+  .main-content-wrapper {
+    padding: 36px 16px;
+    gap: 28px;
+  }
+  .login-card {
+    padding: 28px 22px;
+    max-width: 440px;
+  }
+}
+
+/* Phones (≤ ~430px) */
+@media (max-width: 430px) {
+  .main-content-wrapper {
+    padding: 24px 12px;
+    gap: 20px;
+  }
+  .login-card {
+    padding: 22px 16px;
+    border-radius: 12px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+    max-width: 100%;
+  }
+  .login-card h2 { font-size: 22px; }
+  .user-selection { gap: 10px; }
+  .user-btn { padding: 10px; font-size: 14px; }
+}
+
+/* Ultra-tall portrait phones (e.g., 1080×2520 family) */
+@media (orientation: portrait) and (max-aspect-ratio: 9/20.5) {
+  .main-content-wrapper { padding-top: 20px; padding-bottom: 24px; }
+  .login-card { margin: 0 auto; }
 }

@@ -1,71 +1,131 @@
 .find-tutors-container {
-  max-width: 650px; 
-  width: 90%; 
-  margin: 40px auto;
-  padding: 25px;
-  background: #f9f9f9;
+  max-width: 720px;
+  width: 92%;
+  margin: 32px auto;
+  padding: 22px;
+  background: #ffffff;
   border-radius: 12px;
-  box-shadow: 0px 0px 12px rgba(0, 0, 0, 0.1);
-  min-height: 750px; 
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
 }
 
 .find-tutors-container h2 {
   text-align: center;
-  margin-bottom: 25px;
-  font-size: 1.8rem;
+  margin-bottom: 18px;
+  font-size: 1.9rem;
+  color: #352557;
+}
+
+/* Form as a responsive grid */
+.find-tutors-form {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 14px 16px;
 }
 
 .find-tutors-form label {
-  display: block;
-  margin-bottom: 12px;
-  font-size: 1rem;
+  display: flex;
+  flex-direction: column;
+  font-size: 0.98rem;
+  color: #374151;
+  font-weight: 600;
 }
 
+/* Inputs */
 .find-tutors-form input,
 .find-tutors-form textarea {
   width: 100%;
-  padding: 10px;
+  padding: 12px 14px;
   margin-top: 6px;
-  font-size: 1rem;
-  border: 1px solid #ccc;
-  border-radius: 6px;
+  font-size: 16px; /* prevent iOS zoom */
+  border: 1px solid #d1d5db;
+  border-radius: 10px;
+  background: #fff;
+  color: #111827;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
 }
 
+.find-tutors-form input:focus,
+.find-tutors-form textarea:focus {
+  border-color: #8e2fbe;
+  box-shadow: 0 0 0 3px rgba(142, 47, 190, 0.15);
+  background: #fff;
+}
+
+/* Remove number input spinners (WebKit) */
+.find-tutors-form input[type="number"]::-webkit-outer-spin-button,
+.find-tutors-form input[type="number"]::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+.find-tutors-form input[type="number"] {
+  -moz-appearance: textfield; /* Firefox */
+}
+
+/* Submit button spans full width of the grid */
 .find-tutors-form button {
+  grid-column: 1 / -1;
   width: 100%;
-  padding: 12px;
-  margin-top: 18px;
-  font-size: 1rem;
-  background-color: #007bff;
+  padding: 12px 14px;
+  margin-top: 6px;
+  font-size: 16px;
+  background-color: #8e2fbe;
   color: white;
   border: none;
-  border-radius: 6px;
+  border-radius: 10px;
   cursor: pointer;
+  font-weight: 800;
+  transition: background-color 0.2s ease, transform 0.06s ease;
+}
+.find-tutors-form button:hover  { background-color: #7c29a7; }
+.find-tutors-form button:active { transform: translateY(1px); }
+.find-tutors-form button:focus-visible {
+  outline: 3px solid rgba(142, 47, 190, 0.35);
+  outline-offset: 2px;
 }
 
-.find-tutors-form button:hover {
-  background-color: #0056b3;
-}
+/* =========================
+   Responsive
+   ========================= */
 
-/* Responsive adjustments */
-@media (max-width: 600px) {
-  .find-tutors-container {
-      width: 95%;
-      padding: 20px;
+/* Tablets and up: two columns */
+@media (min-width: 820px) {
+  .find-tutors-form {
+    grid-template-columns: 1fr 1fr;
   }
-
-  .find-tutors-container h2 {
-      font-size: 1.5rem;
-  }
-
-  .find-tutors-form input,
-  .find-tutors-form textarea {
-      font-size: 0.9rem;
-      padding: 8px;
-  }
-
+  /* Make the button row span both columns (already set), and give a little extra top gap */
   .find-tutors-form button {
-      font-size: 0.9rem;
-      padding: 10px;
+    margin-top: 8px;
   }
+}
+
+/* Tablets */
+@media (max-width: 768px) {
+  .find-tutors-container {
+    width: 94%;
+    padding: 18px;
+  }
+  .find-tutors-container h2 {
+    font-size: 1.6rem;
+    margin-bottom: 14px;
+  }
+}
+
+/* Phones (≤ ~430px) */
+@media (max-width: 430px) {
+  .find-tutors-container {
+    width: 96%;
+    margin: 20px auto;
+    padding: 16px;
+    border-radius: 12px;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+    /* Safe-area padding for gesture nav bars */
+    padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+  }
+  .find-tutors-container h2 { font-size: 1.4rem; }
+}
+
+/* Ultra-tall portrait phones (e.g., 1080×2440 to 2520) */
+@media (orientation: portrait) and (max-aspect-ratio: 9/20.5) {
+  .find-tutors-container { padding-top: 14px; padding-bottom: 18px; }
 }
