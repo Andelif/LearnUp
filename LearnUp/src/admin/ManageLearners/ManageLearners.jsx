@@ -44,7 +44,8 @@ const ManageLearners = () => {
   return (
     <div>
       <h2>Manage Learners</h2>
-      <table border="1">
+      <div className="table-scroll">
+        <table border="1">
         <thead>
           <tr>
             <th>ID</th>
@@ -70,6 +71,7 @@ const ManageLearners = () => {
           ))}
         </tbody>
       </table>
+      </div>
     </div>
   );
 };

@@ -1,40 +1,114 @@
-
+/* ===== Loader (kept as-is) ===== */
 .loader-container {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    background: rgba(235, 235, 235, 0.8); 
-    color: white;
-    font-family: Arial, sans-serif;
-    z-index: 9999;
-  }
-  .loader {
-    width: 50px;
-    aspect-ratio: 1;
-    border-radius: 50%;
-    border: 8px solid #514b82;
-    animation:
-      l20-1 0.8s infinite linear alternate,
-      l20-2 1.6s infinite linear;
-  }
-  @keyframes l20-1{
-     0%    {clip-path: polygon(50% 50%,0       0,  50%   0%,  50%    0%, 50%    0%, 50%    0%, 50%    0% )}
-     12.5% {clip-path: polygon(50% 50%,0       0,  50%   0%,  100%   0%, 100%   0%, 100%   0%, 100%   0% )}
-     25%   {clip-path: polygon(50% 50%,0       0,  50%   0%,  100%   0%, 100% 100%, 100% 100%, 100% 100% )}
-     50%   {clip-path: polygon(50% 50%,0       0,  50%   0%,  100%   0%, 100% 100%, 50%  100%, 0%   100% )}
-     62.5% {clip-path: polygon(50% 50%,100%    0, 100%   0%,  100%   0%, 100% 100%, 50%  100%, 0%   100% )}
-     75%   {clip-path: polygon(50% 50%,100% 100%, 100% 100%,  100% 100%, 100% 100%, 50%  100%, 0%   100% )}
-     100%  {clip-path: polygon(50% 50%,50%  100%,  50% 100%,   50% 100%,  50% 100%, 50%  100%, 0%   100% )}
-  }
-  @keyframes l20-2{ 
-    0%    {transform:scaleY(1)  rotate(0deg)}
-    49.99%{transform:scaleY(1)  rotate(135deg)}
-    50%   {transform:scaleY(-1) rotate(0deg)}
-    100%  {transform:scaleY(-1) rotate(-135deg)}
-  }
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  background: rgba(235, 235, 235, 0.8);
+  color: white; font-family: Arial, sans-serif;
+  z-index: 9999;
+}
+.loader {
+  width: 50px; aspect-ratio: 1; border-radius: 50%;
+  border: 8px solid #514b82;
+  animation: l20-1 0.8s infinite linear alternate,
+             l20-2 1.6s infinite linear;
+}
+@keyframes l20-1{
+  0%    {clip-path: polygon(50% 50%,0 0,50% 0%,50% 0%,50% 0%,50% 0%,50% 0%)}
+  12.5% {clip-path: polygon(50% 50%,0 0,50% 0%,100% 0%,100% 0%,100% 0%,100% 0%)}
+  25%   {clip-path: polygon(50% 50%,0 0,50% 0%,100% 0%,100% 100%,100% 100%,100% 100%)}
+  50%   {clip-path: polygon(50% 50%,0 0,50% 0%,100% 0%,100% 100%,50% 100%,0% 100%)}
+  62.5% {clip-path: polygon(50% 50%,100% 0,100% 0%,100% 0%,100% 100%,50% 100%,0% 100%)}
+  75%   {clip-path: polygon(50% 50%,100% 100%,100% 100%,100% 100%,100% 100%,50% 100%,0% 100%)}
+  100%  {clip-path: polygon(50% 50%,50% 100%,50% 100%,50% 100%,50% 100%,50% 100%,0% 100%)}
+}
+@keyframes l20-2{
+  0% {transform: scaleY(1) rotate(0deg)}
+  49.99% {transform: scaleY(1) rotate(135deg)}
+  50% {transform: scaleY(-1) rotate(0deg)}
+  100% {transform: scaleY(-1) rotate(-135deg)}
+}
+
+/* ===== Table wrapper for horizontal scroll on small screens ===== */
+.table-scroll {
+  width: 100%;
+  overflow: auto;                /* enables horizontal scroll when needed */
+  border-radius: 12px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+  background: #ffffff;
+}
+
+/* ===== Table styling ===== */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+  min-width: 720px;              /* ensures columns don’t crush on phones */
+}
+
+thead th {
+  background: #273a59;
+  color: #ffffff;
+  text-align: left;
+  padding: 12px 14px;
+  font-weight: 800;
+  position: sticky;              /* stays visible if wrapper gets a max-height later */
+  top: 0;
+  z-index: 1;
+}
+
+tbody td {
+  padding: 12px 14px;
+  border-bottom: 1px solid #eef2f7;
+  color: #111827;
+  font-size: 14px;
+}
+
+tbody tr:nth-child(even) {
+  background: #fafafa;
+}
+
+tbody tr:hover {
+  background: #f5f7fb;
+}
+
+/* ===== Actions ===== */
+td button {
+  background: #dc3545;
+  color: #fff;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 700;
+  transition: background-color .2s ease, transform .06s ease;
+}
+td button:hover { background: #c82333; }
+td button:active { transform: translateY(1px); }
+td button:focus-visible {
+  outline: 3px solid rgba(220, 53, 69, 0.35);
+  outline-offset: 2px;
+}
+
+/* ===== Page heading (optional) ===== */
+h2 {
+  margin: 12px 0 10px;
+  color: #273a59;
+  font-size: 1.6rem;
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 768px) {
+  .table-scroll { -webkit-overflow-scrolling: touch; }
+  h2 { font-size: 1.4rem; }
+  tbody td { font-size: 13px; padding: 10px 12px; }
+  td button { padding: 8px 10px; font-size: 13px; }
+}
+
+@media (max-width: 430px) {
+  .table-scroll { border-radius: 12px; }
+  thead th, tbody td { padding: 10px 12px; }
+  td button { width: 100%; }
+}

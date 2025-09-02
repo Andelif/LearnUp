@@ -47,3 +47,50 @@ html, body, #root {
   font-size: 14px;
   text-align: center;
 }
+
+/* Default styles (desktop/tablet) already in your .css */
+
+/* For tablets and below (≤ 768px wide) */
+@media (max-width: 768px) {
+  .features-grid,
+  .categories-grid,
+  .steps-wrapper {
+    grid-template-columns: 1fr; /* stack instead of side by side */
+  }
+
+  .search-bar {
+    width: 100%; /* make search bar full width */
+    font-size: 14px;
+  }
+
+  .img-container {
+    width: 100%;
+    height: auto;
+  }
+}
+
+/* For very small phones (≤ 480px wide) */
+@media (max-width: 480px) {
+  h1, h2, h3 {
+    font-size: 1.2rem; /* smaller headings */
+    text-align: center;
+  }
+
+  .feature-box,
+  .category-box,
+  .step-card {
+    padding: 10px;
+    font-size: 14px;
+  }
+
+  .join-options {
+    flex-direction: column; /* buttons stack vertically */
+    gap: 10px;
+  }
+
+  .btn-light, .btn-dark {
+    width: 100%;
+    font-size: 14px;
+    padding: 12px;
+  }
+}
