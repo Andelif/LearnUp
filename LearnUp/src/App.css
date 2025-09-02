@@ -29,13 +29,21 @@ html, body, #root {
   width: 100%;
   margin-top: auto;
 }
-.toast-container {
-  z-index: 9999 !important; /* Ensures toast stays on top */
-  position: fixed;
-  top: 20px;
-  right: 20px;
-  width: auto; /* Adjust width dynamically */
-  max-width: 250px; /* Prevents too wide toasts */
-  text-align: center;
+
+
+.Toastify {
+  position: fixed !important;   
+  z-index: 9999 !important;     
+  pointer-events: none;         
+}
+
+.Toastify__toast-container {
+  width: 280px !important;      
+  max-width: 90vw;              
+}
+
+.Toastify__toast {
+  pointer-events: auto;         
   font-size: 14px;
+  text-align: center;
 }
