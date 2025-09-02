@@ -54,7 +54,7 @@ const LandingPage = () => {
   return (
     <div className="landing-container">
       <div className="img-banner">
-        <img className="img-container" src="src/assets/banner.png" alt="Banner" />
+        <img className="img-container" src="/assets/banner.png" alt="Banner" />
         <p className="banner-p">Welcome to LearnUp, {user?.name || "Guest"}!</p>
       </div>
 
@@ -133,7 +133,7 @@ const LandingPage = () => {
         <div className="steps-wrapper">
           <div className="step-card">
             <div className="step-content">
-              <img src="src/assets/tutor01.png" alt="Create Profile" />
+              <img src="/assets/tutor01.png" alt="Create Profile" />
               <h3>Create Your Profile</h3>
               <p>Sign up and provide your details to create your tutor profile.</p>
             </div>
@@ -141,7 +141,7 @@ const LandingPage = () => {
 
           <div className="step-card">
             <div className="step-content">
-              <img src="src/assets/tutor02.png" alt="Complete Profile" />
+              <img src="/assets/tutor02.png" alt="Complete Profile" />
               <h3>Complete Your Profile</h3>
               <p>Fill in necessary details and verify credentials to stand out.</p>
             </div>
@@ -149,7 +149,7 @@ const LandingPage = () => {
 
           <div className="step-card">
             <div className="step-content">
-              <img src="src/assets/tutor03.png" alt="Apply for Tuition" />
+              <img src="/assets/tutor03.png" alt="Apply for Tuition" />
               <h3>Apply for Tuition Jobs</h3>
               <p>Search for tuition jobs that match your skills and apply.</p>
             </div>
@@ -157,7 +157,7 @@ const LandingPage = () => {
 
           <div className="step-card">
             <div className="step-content">
-              <img src="src/assets/tutor04.png" alt="Start Tutoring" />
+              <img src="/assets/tutor04.png" alt="Start Tutoring" />
               <h3>Start Tutoring</h3>
               <p>Get selected by students and start your tutoring journey.</p>
             </div>
@@ -165,22 +165,24 @@ const LandingPage = () => {
         </div>
       </section>
 
-      <section className="join-learnup">
-        <h2>Join LearnUp Today!</h2>
-        <p>
-          Take the next step in your learning journey. Whether you're a student looking
-          for the perfect tutor or an expert wanting to share knowledge, LearnUp is the
-          place for you.
-        </p>
-        <div className="join-options">
-          <button className="btn-light" onClick={() => navigate("/signup")}>
-            Join as a Student
-          </button>
-          <button className="btn-dark" onClick={() => navigate("/signup")}>
-            Join as a Tutor
-          </button>
-        </div>
-      </section>
+      {!user && (
+        <section className="join-learnup">
+          <h2>Join LearnUp Today!</h2>
+          <p>
+            Take the next step in your learning journey. Whether you're a student
+            looking for the perfect tutor or an expert wanting to share knowledge,
+            LearnUp is the place for you.
+          </p>
+          <div className="join-options">
+            <button className="btn-light" onClick={() => navigate("/signup")}>
+              Join as a Student
+            </button>
+            <button className="btn-dark" onClick={() => navigate("/signup")}>
+              Join as a Tutor
+            </button>
+          </div>
+        </section>
+)}
     </div>
   );
 };

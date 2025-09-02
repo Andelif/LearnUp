@@ -64,7 +64,7 @@ const SignIn = () => {
         <div className="main-content-wrapper">
           {/* Left Side Illustration */}
           <div className="illustration">
-            <img src="src/assets/illustration.png" alt="Illustration" />
+            <img src="/assets/illustration.png" alt="Illustration" />
           </div>
 
           {/* Right Side Login Form */}

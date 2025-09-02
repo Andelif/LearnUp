@@ -24,6 +24,16 @@ const App = () => {
           </div>
           { <Footer />}
         </div>
+
+        <ToastContainer
+          position="bottom-center" 
+          autoClose={3000} 
+          hideProgressBar={false}
+          closeOnClick
+          pauseOnHover
+          draggable
+          theme="colored" 
+        />
         
       </Router>
     </ContextProvider>
