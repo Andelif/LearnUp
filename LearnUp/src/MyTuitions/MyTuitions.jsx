@@ -3,7 +3,7 @@ import { storeContext } from "../context/contextProvider";
 import "./MyTuitions.css";
 
 const MyTuitions = () => {
-  const { api } = useContext(storeContext); // 👈 use shared axios client
+  const { api } = useContext(storeContext); 
   const [requests, setRequests] = useState([]);
   const [editingRequest, setEditingRequest] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -131,14 +131,14 @@ const MyTuitions = () => {
                     {request.class} - {request.subjects}
                   </h3>
                   <div className="button-group">
-                    <button className="edit-btn" onClick={() => handleEditClick(request)}>
-                      Edit
+                    <button className="edits-btn" onClick={() => handleEditClick(request)}>
+                      
                     </button>
                     <button
                       className="delete-btn"
                       onClick={() => handleDelete(request.TutionID)}
                     >
-                      Delete
+                      
                     </button>
                   </div>
                 </div>

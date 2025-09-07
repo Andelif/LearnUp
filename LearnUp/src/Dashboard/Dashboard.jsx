@@ -85,7 +85,7 @@ const Dashboard = () => {
         <div className="profile-sections">
           <Link to="/ProfilePage">
             <img
-              src="https://via.placeholder.com/80"
+              src="assets/profile.jpg"
               alt="Profile"
               className="profile-pic"
             />
