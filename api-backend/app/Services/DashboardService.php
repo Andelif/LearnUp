@@ -4,56 +4,56 @@ namespace App\Services;
 
 use Illuminate\Support\Facades\DB;
 
-class DashboardService{
-    public function getDashboardStats($userId, $role)
+class DashboardService
+{
+    public function getDashboardStats(int $userId, string $role): array
     {
-        if ($role === 'tutor') {
-            return $this->getTutorStats($userId);
-        } elseif ($role === 'learner') {
-            return $this->getLearnerStats($userId);
+        return match ($role) {
+            'tutor'   => $this->getTutorStats($userId),
+            'learner' => $this->getLearnerStats($userId),
+            default   => ['error' => 'Invalid role'],
+        };
+    }
+
+    private function getTutorStats(int $userId): array
+    {
+        $tutorId = DB::table('tutors')->where('user_id', $userId)->value('TutorID');
+        if (!$tutorId) {
+            return [
+                'appliedJobs'     => 0,
+                'shortlistedJobs' => 0,
+                'confirmedJobs'   => 0,
+                'cancelledJobs'   => 0,
+            ];
         }
 
-        return ['error' => 'Invalid role'];
-    }
-    private function getTutorStats($userId)
-    {
-        $appliedJobs = DB::select("SELECT COUNT(*) as count FROM applications WHERE tutor_id = 
-                                    (SELECT TutorID FROM tutors WHERE user_id = ?)", [$userId])[0]->count;
-
-        $shortlistedJobs = DB::select("SELECT COUNT(*) as count FROM applications WHERE tutor_id = 
-                                        SELECT TutorID FROM tutors WHERE user_id = ? AND status = 'Shortlisted'", [$userId])[0]->count;
-        $confirmedJobs = DB::select("SELECT COUNT(*) as count FROM applications WHERE tutor_id = 
-                                        SELECT TutorID FROM tutors WHERE user_id = ? AND status = 'Confirmed'", [$userId])[0]->count;                                
-
-        $cancelledJobs = DB::select("SELECT COUNT(*) as count FROM applications WHERE tutor_id = 
-                                        SELECT TutorID FROM tutors WHERE user_id = ? AND status = 'Cancelled'", [$userId])[0]->count;
-
         return [
-            'appliedJobs' => $appliedJobs,
-            'shortlistedJobs' => $shortlistedJobs,
-            'confirmedJobs'=>$confirmedJobs,
-            'cancelledJobs' => $cancelledJobs
+            'appliedJobs'     => DB::table('applications')->where('tutor_id', $tutorId)->count(),
+            'shortlistedJobs' => DB::table('applications')->where('tutor_id', $tutorId)->where('status', 'Shortlisted')->count(),
+            'confirmedJobs'   => DB::table('applications')->where('tutor_id', $tutorId)->where('status', 'Confirmed')->count(),
+            'cancelledJobs'   => DB::table('applications')->where('tutor_id', $tutorId)->where('status', 'Cancelled')->count(),
         ];
     }
 
-    private function getLearnerStats($userId)
+    private function getLearnerStats(int $userId): array
     {
-        $appliedRequests = DB::select("SELECT COUNT(*) as count FROM tuition_requests WHERE LearnerID = ?", [$userId])[0]->count;
-
-        $shortlistedTutors = DB::select("SELECT COUNT(*) as count FROM applications WHERE learner_id = 
-                                         SELECT LearnerID FROM learners WHERE user_id = ? AND status = 'Shortlisted'", [$userId])[0]->count;
-         $confirmedTutors = DB::select("SELECT COUNT(*) as count FROM applications WHERE learner_id = 
-                                            (SELECT LearnerID FROM learners WHERE user_id = ?) AND status = 'Confirmed'", [$userId])[0]->count;                                 
-
-        $cancelledTutors =  DB::select("SELECT COUNT(*) as count FROM applications WHERE learner_id = 
-                                         SELECT LearnerID FROM learners WHERE user_id = ? AND status = 'Cancelled'", [$userId])[0]->count;
+        $learnerId = DB::table('learners')->where('user_id', $userId)->value('LearnerID');
+        if (!$learnerId) {
+            return [
+                'appliedRequests'  => 0,
+                'shortlistedTutors'=> 0,
+                'confirmedTutors'  => 0,
+                'cancelledTutors'  => 0,
+            ];
+        }
 
         return [
-            'appliedRequests' => $appliedRequests,
-            'shortlistedTutors' => $shortlistedTutors,
-            'confirmedTutors' =>$confirmedTutors,
-            'cancelledTutors' => $cancelledTutors
+            // number of tuition requests created by the learner
+            'appliedRequests'   => DB::table('tuition_requests')->where('LearnerID', $learnerId)->count(),
+            // application statuses on those requests
+            'shortlistedTutors' => DB::table('applications')->where('learner_id', $learnerId)->where('status', 'Shortlisted')->count(),
+            'confirmedTutors'   => DB::table('applications')->where('learner_id', $learnerId)->where('status', 'Confirmed')->count(),
+            'cancelledTutors'   => DB::table('applications')->where('learner_id', $learnerId)->where('status', 'Cancelled')->count(),
         ];
     }
-
 }

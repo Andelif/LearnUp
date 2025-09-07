@@ -2,34 +2,35 @@
 
 namespace App\Models;
 
-use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Model;
-
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Notification extends Model
 {
+    use HasFactory;
+
+    protected $table = 'notifications';
     protected $primaryKey = 'NotificationID';
     public $incrementing = true;
 
-    public static function createNotification($data)
-    {
-        DB::insert("INSERT INTO notifications (user_id, TimeSent, Message, Type, Status, view) VALUES (?, ?, ?, ?, ?, ?)", [
-            $data['user_id'],
-            $data['TimeSent'],
-            $data['Message'],
-            $data['Type'],
-            $data['Status'],
-            $data['view'] 
-        ]);
-        return DB::getPdo()->lastInsertId();
-    }
+    /** created_at / updated_at EXIST */
+    public $timestamps = true;
 
-    public static function findByUserId($user_id)
+    protected $fillable = [
+        'user_id',
+        'TimeSent',
+        'Message',
+        'Type',
+        'Status',  // 'Unread' | 'Read'
+        'view',    // 'everyone' | 'all_learner' | 'all_tutor' | (maybe 'all_admin') | null
+    ];
+
+    protected $casts = [
+        'TimeSent' => 'datetime',
+    ];
+
+    public function user()
     {
-        return DB::select("SELECT * FROM notifications WHERE view = 'everyone' 
-                          OR view = 'all_learner' AND EXISTS (SELECT 1 FROM learners WHERE user_id = ?) 
-                          OR view = 'all_tutor' AND EXISTS (SELECT 1 FROM tutors WHERE user_id = ?) 
-                          OR view = ? 
-                          ORDER BY TimeSent DESC", [$user_id, $user_id, $user_id]);
+        return $this->belongsTo(User::class, 'user_id', 'id');
     }
 }

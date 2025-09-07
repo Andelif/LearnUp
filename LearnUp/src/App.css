@@ -30,99 +30,67 @@ html, body, #root {
   margin-top: auto;
 }
 
-/* Fixed Toast Container - Better positioning and z-index */
-.toast-container {
-  z-index: 10000 !important; /* Higher z-index but not too high */
-  position: fixed !important;
-  top: 80px !important; /* Move down to avoid navbar */
-  right: 20px !important;
-  width: auto !important;
-  max-width: 350px !important; /* Slightly wider for better readability */
-  text-align: center;
-  font-size: 14px;
-  pointer-events: none !important; /* Allow clicks to pass through */
+
+.Toastify {
+  position: fixed !important;   
+  z-index: 9999 !important;     
+  pointer-events: none;         
 }
 
-/* Toast notifications themselves should have pointer events */
-.Toastify__toast {
-  pointer-events: auto !important;
-  margin-bottom: 10px !important;
-  border-radius: 8px !important;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
-}
-
-/* Ensure form inputs have proper z-index */
-input, textarea, select, button {
-  position: relative;
-  z-index: 1;
-}
-
-/* Modal and overlay elements should be above toasts */
-.modal, .overlay, .popup {
-  z-index: 10001 !important;
-}
-
-/* Ensure dropdown menus are above toasts */
-.dropdown, .menu, .select-dropdown {
-  z-index: 10002 !important;
-}
-
-/* Additional form protection */
-form {
-  position: relative;
-  z-index: 1;
-}
-
-/* Ensure all form elements are clickable */
-input[type="text"],
-input[type="email"],
-input[type="password"],
-input[type="number"],
-input[type="tel"],
-input[type="url"],
-input[type="search"],
-input[type="date"],
-input[type="time"],
-input[type="datetime-local"],
-input[type="month"],
-input[type="week"],
-textarea,
-select,
-button,
-label {
-  position: relative !important;
-  z-index: 1 !important;
-  pointer-events: auto !important;
-}
-
-/* Toast-specific overrides */
 .Toastify__toast-container {
-  pointer-events: none !important;
+  width: 280px !important;      
+  max-width: 90vw;              
 }
 
 .Toastify__toast {
-  pointer-events: auto !important;
-  position: relative !important;
-  z-index: 10000 !important;
+  pointer-events: auto;         
+  font-size: 14px;
+  text-align: center;
 }
 
-/* Ensure form containers are above toasts */
-.find-tutors-form,
-.signup-form,
-.signin-form,
-.payment-form,
-.job-form,
-.profile-form {
-  position: relative;
-  z-index: 1;
-}
+/* Default styles (desktop/tablet) already in your .css */
 
-/* Mobile responsive toast positioning */
+/* For tablets and below (≤ 768px wide) */
 @media (max-width: 768px) {
-  .toast-container {
-    top: 70px !important;
-    right: 10px !important;
-    left: 10px !important;
-    max-width: calc(100vw - 20px) !important;
+  .features-grid,
+  .categories-grid,
+  .steps-wrapper {
+    grid-template-columns: 1fr; /* stack instead of side by side */
+  }
+
+  .search-bar {
+    width: 100%; /* make search bar full width */
+    font-size: 14px;
+  }
+
+  .img-container {
+    width: 100%;
+    height: auto;
+  }
+}
+
+/* For very small phones (≤ 480px wide) */
+@media (max-width: 480px) {
+  h1, h2, h3 {
+    font-size: 1.2rem; /* smaller headings */
+    text-align: center;
+  }
+
+  .feature-box,
+  .category-box,
+  .step-card {
+    padding: 10px;
+    font-size: 14px;
+  }
+
+  .join-options {
+    flex-direction: column; /* buttons stack vertically */
+    gap: 10px;
+  }
+
+  .btn-light, .btn-dark {
+    width: 100%;
+    font-size: 14px;
+    padding: 12px;
   }
 }

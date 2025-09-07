@@ -2,39 +2,38 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     *
-     * @return void
-     */
-    public function up()
+    public function up(): void
     {
-        DB::statement("CREATE TABLE learners (
-            LearnerID BIGINT AUTO_INCREMENT PRIMARY KEY,
-            user_id BIGINT unsigned NOT NULL,
-            full_name VARCHAR(255),
-            guardian_full_name VARCHAR(255) NULL,
-            contact_number VARCHAR(255) NULL,
-            guardian_contact_number VARCHAR(255) NULL,
-            gender ENUM('Male', 'Female', 'Other') NULL,
-            address TEXT NULL,
-            created_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
-            updated_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-            FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-        )");
+        Schema::create('learners', function (Blueprint $table) {
+            // Auto-increment PK: BIGSERIAL in Postgres, UNSIGNED BIGINT in MySQL
+            $table->id('LearnerID');
+
+            // FK to users table
+            $table->foreignId('user_id')
+                  ->constrained('users')
+                  ->onDelete('cascade');
+
+            $table->string('full_name')->nullable();
+            $table->string('guardian_full_name')->nullable();
+            $table->string('contact_number')->nullable();
+            $table->string('guardian_contact_number')->nullable();
+
+            // ENUM in Postgres is messy; use check constraint via Laravel enum()
+            $table->enum('gender', ['Male', 'Female', 'Other'])->nullable();
+
+            $table->text('address')->nullable();
+
+            // Use Laravel's timestamps with timezone
+            $table->timestampsTz();
+        });
     }
 
-    /**
-     * Reverse the migrations.
-     *
-     * @return void
-     */
-    public function down()
+    public function down(): void
     {
-        DB::statement("DROP TABLE IF EXISTS learners");
+        Schema::dropIfExists('learners');
     }
 };

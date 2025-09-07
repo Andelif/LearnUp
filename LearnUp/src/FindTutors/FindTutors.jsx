@@ -2,11 +2,10 @@ import React, { useState, useContext } from "react";
 import { storeContext } from "../context/contextProvider";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
 import "./FindTutors.css";
 
 const FindTutors = () => {
-  const { user, token, url } = useContext(storeContext);
+  const { api, token } = useContext(storeContext);
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
@@ -14,64 +13,78 @@ const FindTutors = () => {
     subjects: "",
     asked_salary: "",
     location: "",
-    days: "",
+    days: "",          // STRING per validator
     curriculum: "",
   });
 
-  const handleChange = (e) => {
+  const handleChange = (e) =>
     setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Submitting form with token: ", formData, token);
 
-    // Check if all fields are filled
-    if (!formData.subjects || !formData.class || !formData.location || !formData.asked_salary || !formData.curriculum || !formData.days) {
-      toast.error("Please fill all required fields!");
-      return;
+    // required field check (mirror validator)
+    const required = ["class", "subjects", "asked_salary", "curriculum", "days", "location"];
+    for (const k of required) {
+      if (!String(formData[k]).trim()) {
+        toast.error(`Please fill the ${k.replace("_", " ")} field.`);
+        return;
+      }
     }
 
-    // Ensure the token exists before sending the request
     if (!token) {
       toast.error("Unauthorized! Please log in first.");
-      navigate("/signin");
+      navigate("/signIn");
       return;
     }
 
-    try {
-      console.log("Sending request to:", `${url}/api/tuition-requests`);
-      const response = await axios.post(
-        `${url}/api/tuition-requests`,
-        {
-          ...formData,
-          learner_id: user.id,
-        },
-        {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`, // Include token
-          },
-        }
-      );
+    const payload = {
+      class: String(formData.class).trim(),
+      subjects: String(formData.subjects).trim(),
+      asked_salary: Number(formData.asked_salary) || 0,   // numeric
+      curriculum: String(formData.curriculum).trim(),
+      days: String(formData.days).trim(),                 // string
+      location: String(formData.location).trim(),
+      // NOTE: controller uses auth user; no learner_id required
+    };
 
-      console.log("Response:", response);
-      if (response.status === 201) {
-        toast.success("Tuition requirement submitted successfully!");
+    try {
+      const res = await api.post("/api/tuition-requests", payload, {
+        headers: {
+          "Content-Type": "application/json",
+          Accept: "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      if (res.status === 201 || res.status === 200) {
+        toast.success(res?.data?.message || "Tuition requirement submitted!");
         setFormData({
-          subjects: "",
           class: "",
-          location: "",
+          subjects: "",
           asked_salary: "",
+          location: "",
           days: "",
           curriculum: "",
         });
       } else {
-        toast.error(response.data.message || "Something went wrong!");
+        toast.error(res.data?.message || "Something went wrong!");
       }
-    } catch (error) {
-      console.error(error);
-      toast.error("Failed to submit. Try again later.");
+    } catch (err) {
+      const errors = err?.response?.data?.errors;
+      if (errors && typeof errors === "object") {
+        const firstKey = Object.keys(errors)[0];
+        const firstMsg = errors[firstKey]?.[0];
+        toast.error(firstMsg || "Validation failed.");
+      } else {
+        const msg =
+          err?.response?.data?.message ||
+          err?.response?.data?.error ||
+          err?.message ||
+          "Failed to submit.";
+        toast.error(msg);
+      }
+      console.error("Tuition create failed:", err?.response?.data || err);
     }
   };
 
@@ -79,12 +92,66 @@ const FindTutors = () => {
     <div className="find-tutors-container">
       <h2>Find a Tutor</h2>
       <form onSubmit={handleSubmit} className="find-tutors-form">
-        <label>Subject: <input type="text" name="subjects" value={formData.subjects} onChange={handleChange} required /></label>
-        <label>Grade: <input type="text" name="class" value={formData.class} onChange={handleChange} required /></label>
-        <label>Location: <input type="text" name="location" value={formData.location} onChange={handleChange} required /></label>
-        <label>Budget: <input type="text" name="asked_salary" value={formData.asked_salary} onChange={handleChange} required /></label>
-        <label>Days: <input type="text" name="days" value={formData.days} onChange={handleChange} required /></label>
-        <label>Curriculum: <input type="text" name="curriculum" value={formData.curriculum} onChange={handleChange} required></input></label>
+        <label>
+          Subject:
+          <input
+            type="text"
+            name="subjects"
+            value={formData.subjects}
+            onChange={handleChange}
+            required
+          />
+        </label>
+        <label>
+          Grade:
+          <input
+            type="text"
+            name="class"
+            value={formData.class}
+            onChange={handleChange}
+            required
+          />
+        </label>
+        <label>
+          Location:
+          <input
+            type="text"
+            name="location"
+            value={formData.location}
+            onChange={handleChange}
+            required
+          />
+        </label>
+        <label>
+          Budget:
+          <input
+            type="number"
+            name="asked_salary"
+            value={formData.asked_salary}
+            onChange={handleChange}
+            required
+          />
+        </label>
+        <label>
+          Days (e.g. "3" or "Sun-Tue"):
+          <input
+            type="text"          // STRING for validator
+            name="days"
+            value={formData.days}
+            onChange={handleChange}
+            required
+          />
+        </label>
+        <label>
+          Curriculum:
+          <input
+            type="text"
+            name="curriculum"
+            value={formData.curriculum}
+            onChange={handleChange}
+            required
+          />
+        </label>
         <button type="submit">Submit</button>
       </form>
     </div>

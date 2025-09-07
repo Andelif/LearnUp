@@ -6,37 +6,33 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     *
-     * @return void
-     */
-    public function up()
+    public function up(): void
     {
-    DB::statement("CREATE TABLE admins (
-    AdminID BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    user_id BIGINT UNSIGNED UNIQUE NOT NULL,
-    full_name VARCHAR(255) NOT NULL,
-    address VARCHAR(255) NULL,
-    contact_number VARCHAR(20) NULL,
-    permission_req BOOLEAN DEFAULT FALSE,
-    match_made INT DEFAULT 0,
-    task_assigned VARCHAR(255) NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    CONSTRAINT fk_admins_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
-    );");
+        Schema::create('admins', function (Blueprint $table) {
+            // PK
+            $table->id('AdminID');
+
+            // FK (unique, one admin per user)
+            $table->foreignId('user_id')
+                  ->unique()
+                  ->constrained('users')
+                  ->onDelete('cascade');
+
+            $table->string('full_name');
+            $table->string('address')->nullable();
+            $table->string('contact_number', 20)->nullable();
+
+            $table->boolean('permission_req')->default(false);
+            $table->integer('match_made')->default(0);
+            $table->string('task_assigned')->nullable();
+
+            // Laravel-managed, timezone-aware
+            $table->timestampsTz();
+        });
     }
 
-    /**
-     * Reverse the migrations.
-     *
-     * @return void
-     */
-    public function down()
+    public function down(): void
     {
-        
-        DB::statement("DROP TABLE IF EXISTS admins");
-        
+        Schema::dropIfExists('admins');
     }
 };

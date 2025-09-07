@@ -1,32 +1,27 @@
-# Use PHP with FPM
-FROM php:8.1-fpm
+FROM php:8.2-cli
 
-# Set working directory
-WORKDIR /var/www
+# System deps + Postgres PDO driver
+RUN apt-get update && apt-get install -y git unzip libpq-dev \
+    && docker-php-ext-install pdo_pgsql
 
-# Install dependencies
-RUN apt-get update && apt-get install -y \
-    libpq-dev \
-    unzip \
-    && docker-php-ext-install pdo pdo_mysql mysqli
+# Composer
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+ENV COMPOSER_ALLOW_SUPERUSER=1
 
-# Install Composer
-RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+WORKDIR /app
 
-# Copy Laravel files
+# Copy the whole app first so composer scripts (which call "artisan") can run
 COPY . .
 
-# Set permissions
-RUN chmod -R 777 storage bootstrap/cache
+# Install PHP deps (runs Laravel's post-scripts safely because artisan exists now)
+RUN composer install --no-interaction --prefer-dist --optimize-autoloader
 
-# Expose port 9000
-EXPOSE 9000
+# Ensure writable dirs
+RUN mkdir -p storage bootstrap/cache \
+    && chmod -R 775 storage bootstrap/cache || true
 
-# Add entrypoint script
-COPY entrypoint.sh /usr/local/bin/entrypoint
-RUN chmod +x /usr/local/bin/entrypoint
+# Render expects your app to bind to PORT
+ENV PORT=10000
+EXPOSE 10000
 
-# Run the entrypoint script to install Composer dependencies
-ENTRYPOINT ["entrypoint"]
-
-CMD ["php-fpm"]
+CMD ["php", "-S", "0.0.0.0:10000", "-t", "public"]

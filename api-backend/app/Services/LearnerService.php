@@ -2,45 +2,87 @@
 
 namespace App\Services;
 
+use App\Models\Learner;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Auth;
 
-class LearnerService{
+class LearnerService
+{
+    private function normalizeGender(?string $gender): ?string
+    {
+        if ($gender === null) return null;
+        $g = strtolower(trim($gender));
+        return match ($g) {
+            'male','m'   => 'Male',
+            'female','f' => 'Female',
+            'other','o'  => 'Other',
+            default      => null,
+        };
+    }
+
+    /** Admin list (controller already guards). Order by real PK. */
     public function getAllLearners()
     {
-        return DB::select("SELECT * FROM learners");
+        return Learner::orderByDesc('LearnerID')->get();
     }
 
-    public function createOrUpdateLearner($request)
+    /** Fetch a single learner profile by users.id (FK). */
+    public function getLearnerByUserId(int $userId): ?Learner
     {
-        return DB::insert("REPLACE INTO learners (user_id, full_name, guardian_full_name, contact_number, gender, address) VALUES (?, ?, ?, ?, ?, ?)", [
-            Auth::id(),
-            $request->full_name,
-            $request->guardian_full_name,
-            $request->contact_number,
-            $request->gender,
-            $request->address
-        ]);
-    }
-    public function getLearnerById($id)
-    {
-        $learner = DB::select("SELECT * FROM learners WHERE user_id = ?", [$id]);
-        return $learner ? $learner[0] : null;
+        return Learner::where('user_id', $userId)->first();
     }
 
-    public function updateLearner($request, $id)
+    /**
+     * Create or update the learner row for a given user.
+     * POST /api/learners calls this; controller has validation.
+     */
+    public function upsertForUser(int $userId, array $data): Learner
     {
-        return DB::update("UPDATE learners SET full_name = ?, guardian_full_name = ?, contact_number = ?, gender = ?, address = ? WHERE user_id = ?", [
-            $request->full_name,
-            $request->guardian_full_name,
-            $request->contact_number,
-            $request->gender,
-            $request->address,
-            $id
-        ]);
+        $payload = $this->onlyAllowed($data);
+        $payload['user_id'] = $userId;
+        if (array_key_exists('gender', $payload)) {
+            $payload['gender'] = $this->normalizeGender($payload['gender']);
+        }
+
+        $row = DB::transaction(fn () =>
+            Learner::updateOrCreate(['user_id' => $userId], $payload)
+        );
+
+        return $row->fresh();
     }
-    public function deleteLearner($id)
+
+    /**
+     * PUT /api/learners/{userId}
+     * Idempotent: create if missing, update otherwise.
+     */
+    public function updateForUser(int $userId, array $data): Learner
     {
-        return DB::delete("DELETE FROM learners WHERE user_id = ?", [$id]);
+        return $this->upsertForUser($userId, $data);
+    }
+
+    /** Delete by users.id; returns number of deleted rows. */
+    public function deleteByUserId(int $userId): int
+    {
+        return Learner::where('user_id', $userId)->delete();
+    }
+
+    /** Write only real DB columns. */
+    private function onlyAllowed(array $data): array
+    {
+        $allowed = [
+            'full_name',
+            'guardian_full_name',
+            'contact_number',
+            'guardian_contact_number',
+            'gender',
+            'address',
+        ];
+
+        $out = [];
+        foreach ($allowed as $k) {
+            if (array_key_exists($k, $data)) {
+                $out[$k] = $data[$k];
+            }
+        }
+        return $out;
     }
 }

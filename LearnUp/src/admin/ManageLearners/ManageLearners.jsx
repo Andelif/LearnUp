@@ -1,44 +1,34 @@
 import React, { useContext, useEffect, useState } from "react";
-import axios from "axios";
 import { storeContext } from "../../context/contextProvider";
 import "./ManageLearners.css";
 
 const ManageLearners = () => {
+  const { api } = useContext(storeContext);
   const [learners, setLearners] = useState([]);
-  const [loading, setLoading] = useState(true); // Track loading state
-  const { token } = useContext(storeContext);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    axios
-      .get("http://localhost:8000/api/admin/learners", {
-        headers: { Authorization: `Bearer ${token}` },
-      })
-      .then((response) => {
-        setLearners(response.data);
-        setLoading(false); // Set loading to false once data is fetched
-      })
-      .catch((error) => {
+    let alive = true;
+    (async () => {
+      try {
+        const { data } = await api.get("/api/admin/learners");
+        if (alive) setLearners(Array.isArray(data) ? data : []);
+      } catch (error) {
         console.error("Error fetching learners:", error);
-        setLoading(false); // Set loading to false even if there is an error
-      });
-  }, [token]);
+      } finally {
+        if (alive) setLoading(false);
+      }
+    })();
+    return () => { alive = false; };
+  }, [api]);
 
-  const handleDelete = (learnerId) => {
-    // Confirm deletion
-    if (window.confirm("Are you sure you want to delete this learner?")) {
-      axios
-        .delete(`http://localhost:8000/api/admin/learners/${learnerId}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        })
-        .then((response) => {
-          // If successful, remove the learner from the state
-          setLearners((prevLearners) =>
-            prevLearners.filter((learner) => learner.LearnerID !== learnerId)
-          );
-        })
-        .catch((error) => {
-          console.error("Error deleting learner:", error);
-        });
+  const handleDelete = async (learnerId) => {
+    if (!window.confirm("Are you sure you want to delete this learner?")) return;
+    try {
+      await api.delete(`/api/admin/learners/${learnerId}`);
+      setLearners((prev) => prev.filter((l) => l.LearnerID !== learnerId));
+    } catch (error) {
+      console.error("Error deleting learner:", error);
     }
   };
 
@@ -54,7 +44,8 @@ const ManageLearners = () => {
   return (
     <div>
       <h2>Manage Learners</h2>
-      <table border="1">
+      <div className="table-scroll">
+        <table border="1">
         <thead>
           <tr>
             <th>ID</th>
@@ -62,7 +53,7 @@ const ManageLearners = () => {
             <th>Guardian Name</th>
             <th>Contact Number</th>
             <th>Address</th>
-            <th>Actions</th>
+            <th></th>
           </tr>
         </thead>
         <tbody>
@@ -75,11 +66,12 @@ const ManageLearners = () => {
               <td>{learner.address}</td>
               <td>
                 <button onClick={() => handleDelete(learner.LearnerID)}>Delete</button>
-              </td> 
+              </td>
             </tr>
           ))}
         </tbody>
       </table>
+      </div>
     </div>
   );
 };

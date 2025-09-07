@@ -2,40 +2,39 @@
 
 namespace App\Models;
 
-use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Message extends Model
 {
+    use HasFactory;
+
+    protected $table = 'messages';
     protected $primaryKey = 'MessageID';
     public $incrementing = true;
+
+    /** No created_at/updated_at; table uses TimeStamp column */
     public $timestamps = false;
 
-    // Send a message
-    public static function sendMessage($data)
+    protected $fillable = [
+        'SentBy',
+        'SentTo',
+        'Content',
+        'Status',     // 'Delivered' | 'Seen'
+        'TimeStamp',
+    ];
+
+    protected $casts = [
+        'TimeStamp' => 'datetime',
+    ];
+
+    public function sender()
     {
-        DB::insert("INSERT INTO messages (SentBy, SentTo, Content) VALUES (?, ?, ?)", [
-            $data['SentBy'],
-            $data['SentTo'],
-            $data['Content']
-        ]);
-        return DB::getPdo()->lastInsertId();
+        return $this->belongsTo(User::class, 'SentBy', 'id');
     }
 
-    // Get messages between two users
-    public static function getMessagesBetween($user1, $user2)
+    public function recipient()
     {
-        return DB::select("
-            SELECT * FROM messages 
-            WHERE (SentBy = ? AND SentTo = ?) OR (SentBy = ? AND SentTo = ?)
-            ORDER BY TimeStamp ASC", [$user1, $user2, $user2, $user1]);
-    }
-
-    // Mark messages as seen
-    public static function markMessagesAsSeen($sender, $receiver)
-    {
-        DB::update("UPDATE messages SET Status = 'Seen' WHERE SentBy = ? AND SentTo = ? AND Status = 'Delivered'", [
-            $sender, $receiver
-        ]);
+        return $this->belongsTo(User::class, 'SentTo', 'id');
     }
 }

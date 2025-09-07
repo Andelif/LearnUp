@@ -59,9 +59,31 @@ const AppContent = () => {
 };
 
 const App = () => {
+  const {user}=useContext(storeContext);
+  const isAdmin= user?.role === "admin";
   return (
     <ContextProvider>
-      <AppContent />
+      <Router>
+        <div className="app-container">
+          <NavBar />
+          <div className="main-content">
+            {isAdmin && <AdminSidebar/>}
+            <AppRoutes />
+          </div>
+          { <Footer />}
+        </div>
+
+        <ToastContainer
+          position="bottom-center" 
+          autoClose={3000} 
+          hideProgressBar={false}
+          closeOnClick
+          pauseOnHover
+          draggable
+          theme="colored" 
+        />
+        
+      </Router>
     </ContextProvider>
   );
 };

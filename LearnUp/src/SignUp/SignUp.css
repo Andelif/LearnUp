@@ -1,149 +1,233 @@
-/* General Page Styling */
+/* Global reset for this page (keeps inputs consistent) */
+* { box-sizing: border-box; }
+
+/* Page Background */
 .signup-container {
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-    background-image: url('src/assets/background.jpg'); /* Local image */
-    background-size: cover; /* Cover the entire screen */
-    background-position: center; /* Center the image */
-    background-repeat: no-repeat; 
-  }
-  
-  /* Main Content */
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+
+  /* ✅ Use public assets path so it works on Vercel */
+  background: linear-gradient(rgba(0,0,0,.25), rgba(0,0,0,.25)),
+              url('/assets/background.jpg');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+/* Main Content Centering */
+.main-content-wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  gap: 40px;
+  padding: 50px 20px;
+  max-width: 900px;
+  width: 100%;
+  margin: 0 auto;
+  min-height: inherit; /* center vertically within full viewport */
+}
+
+/* Tablet and up: allow side-by-side layout if you add an illustration later */
+@media (min-width: 768px) {
   .main-content-wrapper {
-    display: flex;
-    flex-direction: column;
+    flex-direction: row;
     align-items: center;
-    justify-content: center;
-    gap: 40px;
-    padding: 50px;
-    max-width: 900px;
-    width: 100%;
+    gap: 48px;
   }
-  
-  @media (min-width: 768px) {
-    .main-content-wrapper {
-      flex-direction: row;
-      align-items: center;
-    }
-  }
-  
-  /* Illustration */
+}
+
+/* Optional illustration area (hidden by default) */
+.illustration { display: none; }
+@media (min-width: 768px) {
   .illustration {
-    display: none;
-  }
-  
-  @media (min-width: 768px) {
-    .illustration {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      width: 50%;
-    }
-  
-    .illustration img {
-      max-width: 100%;
-      height: auto;
-    }
-  }
-  
-  /* Signup Form */
-  .signup-card {
-    background: white;
-    padding: 32px;
-    border-radius: 12px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    width: 100%;
-    max-width: 400px;
-  }
-  
-  .signup-card h2 {
-    font-size: 24px;
-    font-weight: bold;
-    color: #374151;
-  }
-  
-  .signup-card span {
-    color: #711c87;
-  }
-  
-  .signup-card p {
-    color: #6b7280;
-  }
-  
-  /* User Selection */
-  .user-selection {
     display: flex;
-    gap: 16px;
-    margin-top: 16px;
+    justify-content: center;
+    align-items: center;
+    width: 50%;
   }
-  
-  .user-btn {
-    flex: 1;
-    padding: 12px;
-    border: 2px solid transparent;
-    border-radius: 8px;
-    cursor: pointer;
-    background-color: #f9fafb;
-    transition: all 0.3s ease;
-    font-weight: 500;
+  .illustration img {
+    max-width: 100%;
+    height: auto;
   }
-  
-  .user-btn:hover {
-    background-color: #e5e7eb;
+}
+
+/* Card */
+.signup-card {
+  background: #fff;
+  padding: 32px;
+  border-radius: 12px;
+  box-shadow: 0 6px 22px rgba(0, 0, 0, 0.12);
+  width: 100%;
+  max-width: 420px;
+}
+
+.signup-card h2 {
+  font-size: 24px;
+  font-weight: 800;
+  color: #374151;
+  margin-bottom: 6px;
+}
+.signup-card span { color: #711c87; }
+.signup-card p    { color: #6b7280; }
+
+/* Role Switcher */
+.user-selection {
+  display: flex;
+  gap: 12px;
+  margin-top: 16px;
+}
+.user-btn {
+  flex: 1;
+  padding: 12px;
+  border: 2px solid transparent;
+  border-radius: 10px;
+  cursor: pointer;
+  background-color: #f9fafb;
+  transition: all 0.2s ease;
+  font-weight: 600;
+}
+.user-btn:hover { background-color: #eef2f7; }
+.user-btn.active {
+  border-color: #7e2ea3;
+  background-color: #efe8ff;
+}
+
+/* Inputs */
+.input-label {
+  display: block;
+  margin-top: 18px;
+  margin-bottom: 6px;
+  color: #374151;
+  font-weight: 600;
+}
+
+.input-field {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  outline: none;
+  font-size: 16px;          /* prevent iOS zoom */
+  background: #fff;
+}
+.input-field:focus {
+  border-color: #8e2fbe;
+  box-shadow: 0 0 0 3px rgba(142, 47, 190, 0.15);
+}
+
+/* Password field with eye icon */
+.input-group {
+  position: relative;       /* ✅ needed for absolute icon */
+}
+.password-toggle {
+  position: absolute;
+  top: 50%;
+  right: 12px;
+  transform: translateY(-50%);
+  cursor: pointer;
+  color: #9ca3af;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 36px;
+  width: 36px;
+  border-radius: 50%;
+}
+.password-toggle:hover {
+  background: #f3f4f6;
+  color: #6b7280;
+}
+
+/* Messages (you already render .error and .success in JSX) */
+.error {
+  margin-top: 10px;
+  color: #b91c1c;
+  background: #fee2e2;
+  border: 1px solid #fecaca;
+  padding: 8px 10px;
+  border-radius: 8px;
+  font-size: 14px;
+}
+.success {
+  margin-top: 10px;
+  color: #065f46;
+  background: #d1fae5;
+  border: 1px solid #a7f3d0;
+  padding: 8px 10px;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+/* Submit + login link */
+.signup-button {
+  width: 100%;
+  margin-top: 20px;
+  background-color: #8e2fbe;
+  color: white;
+  padding: 12px;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 800;
+  border: none;
+  cursor: pointer;
+  transition: transform .06s ease, background-color .2s ease;
+}
+.signup-button:hover   { background-color: #7c29a7; }
+.signup-button:active  { transform: translateY(1px); }
+
+.login-option {
+  text-align: center;
+  margin-top: 14px;
+  color: #374151;
+}
+.login-option a {
+  color: #8e2fbe;
+  font-weight: 800;
+  text-decoration: none;
+}
+.login-option a:hover { text-decoration: underline; }
+
+/* =========================
+   RESPONSIVE ENHANCEMENTS
+   ========================= */
+
+/* Tablets */
+@media (max-width: 768px) {
+  .main-content-wrapper {
+    padding: 36px 16px;
+    gap: 28px;
   }
-  
-  .user-btn.active {
-    border-color: #7e2ea3;
-    background-color: #d1fae5;
+  .signup-card {
+    padding: 28px 22px;
+    max-width: 440px;
   }
-  
-  /* Input Fields */
-  .input-label {
-    display: block;
-    margin-top: 20px;
-    color: #374151;
-    font-weight: 500;
+}
+
+/* Phones (≤ ~430px) */
+@media (max-width: 430px) {
+  .main-content-wrapper {
+    padding: 24px 12px;
+    gap: 20px;
   }
-  
-  .input-field {
-    width: 100%;
-    padding: 12px;
-    border: 1px solid #d1d5db;
-    border-radius: 8px;
-    outline: none;
+  .signup-card {
+    padding: 22px 16px;
+    border-radius: 12px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+    max-width: 100%;
   }
-  
-  .password-toggle {
-    position: absolute;
-    top: 50%;
-    right: 12px;
-    transform: translateY(-50%);
-    cursor: pointer;
-    color: #9ca3af;
-  }
-  
-  /* Signup Button */
-  .signup-button {
-    width: 100%;
-    margin-top: 20px;
-    background-color: #8e2fbe;
-    color: white;
-    padding: 12px;
-    border-radius: 8px;
-    font-size: 16px;
-    font-weight: bold;
-    border: none;
-    cursor: pointer;
-  }
-  
-  .login-option {
-    text-align: center;
-    margin-top: 16px;
-  }
-  
-  .login-option a {
-    color: #8e2fbe;
-    font-weight: bold;
-  }
-  
+  .signup-card h2 { font-size: 22px; }
+  .user-selection { gap: 10px; }
+  .user-btn { padding: 10px; font-size: 14px; }
+  .input-label { margin-top: 16px; }
+  .input-field { padding: 12px 14px; font-size: 16px; }
+  .signup-button { padding: 12px; font-size: 16px; }
+}
+
+/* Ultra-tall portrait phones (e.g., 1080×2520 family) */
+@media (orientation: portrait) and (max-aspect-ratio: 9/20.5) {
+  .main-content-wrapper { padding-top: 20px; padding-bottom: 24px; }
+  .signup-card { margin: 0 auto; }
+}

@@ -1,7 +1,6 @@
-import React, { useState, useContext, useEffect } from "react";
+import React, { useState, useContext } from "react";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
 import { storeContext } from "../context/contextProvider";
 import "./SignUp.css";
 
@@ -19,47 +18,49 @@ const SignUp = () => {
   const [rePasswordVisible, setRePasswordVisible] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+
   const navigate = useNavigate();
-  const url = useContext(storeContext);
 
-  // Ensure base URL is correct
-  const [apiBaseUrl, setApiBaseUrl] = useState("");
+  // use shared axios instance from context
+  const { api } = useContext(storeContext);
 
-  useEffect(() => {
-    setApiBaseUrl(import.meta.env.VITE_API_BASE_URL || "http://localhost:8000");
-  }, []);
-
-  const handleSignIn = () => {
-    navigate("/signIn");
-  };
+  const handleSignIn = () => navigate("/signIn");
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
     setSuccess("");
-    console.log("Submitting form data:", formData);
+
+    // (optional client check)
+    if (formData.password !== formData.password_confirmation) {
+      setError("Passwords do not match.");
+      return;
+    }
 
     try {
-      const response = await axios.post(`${apiBaseUrl}/api/register`, formData, {
-        headers: {
-          "Content-Type": "application/json",
-        },
-        withCredentials: true,
+      // token-based register → backend returns { message, user, token }
+      const res = await api.post("/api/register", formData, {
+        headers: { "Content-Type": "application/json" },
       });
 
+      const { token, user } = res.data;
+      localStorage.setItem("token", token);
+      
       setSuccess("Registration successful! Redirecting...");
       setTimeout(() => navigate("/signIn"), 2000);
     } catch (err) {
-      if (err.response?.data?.errors) {
-        const errorMessages = Object.values(err.response.data.errors).flat().join(" ");
-        setError(errorMessages);
-      } else {
-        setError("Registration failed. Please try again.");
-      }
+      const data = err.response?.data;
+      const msg =
+        (data?.errors && Object.values(data.errors).flat().join(" ")) ||
+        data?.error ||
+        data?.details ||
+        data?.message ||
+        "Registration failed. Please try again.";
+      setError(msg);
     }
   };
 
@@ -74,14 +75,16 @@ const SignUp = () => {
 
           <div className="user-selection">
             <button
+              type="button"
               className={`user-btn ${formData.role === "learner" ? "active" : ""}`}
-              onClick={() => setFormData({ ...formData, role: "learner" })}
+              onClick={() => setFormData((p) => ({ ...p, role: "learner" }))}
             >
               Learner
             </button>
             <button
+              type="button"
               className={`user-btn ${formData.role === "tutor" ? "active" : ""}`}
-              onClick={() => setFormData({ ...formData, role: "tutor" })}
+              onClick={() => setFormData((p) => ({ ...p, role: "tutor" }))}
             >
               Tutor
             </button>
@@ -145,7 +148,12 @@ const SignUp = () => {
                   onChange={handleChange}
                   required
                 />
-                <span className="password-toggle" onClick={() => setPasswordVisible(!passwordVisible)}>
+                <span
+                  className="password-toggle"
+                  onClick={() => setPasswordVisible((v) => !v)}
+                  role="button"
+                  tabIndex={0}
+                >
                   {passwordVisible ? <FaEyeSlash /> : <FaEye />}
                 </span>
               </div>
@@ -161,7 +169,12 @@ const SignUp = () => {
                   onChange={handleChange}
                   required
                 />
-                <span className="password-toggle" onClick={() => setRePasswordVisible(!rePasswordVisible)}>
+                <span
+                  className="password-toggle"
+                  onClick={() => setRePasswordVisible((v) => !v)}
+                  role="button"
+                  tabIndex={0}
+                >
                   {rePasswordVisible ? <FaEyeSlash /> : <FaEye />}
                 </span>
               </div>
@@ -172,7 +185,8 @@ const SignUp = () => {
               <button className="signup-button" type="submit">Sign Up</button>
 
               <p className="login-option">
-                Already have an account? <a href="#" onClick={handleSignIn}>Sign in</a>
+                Already have an account?{" "}
+                <a href="#" onClick={handleSignIn}>Sign in</a>
               </p>
             </form>
           </div>

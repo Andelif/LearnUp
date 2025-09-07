@@ -1,93 +1,130 @@
-
+/* ===== Page layout ===== */
 .container {
-    padding: 20px;
-  }
-  
-  h2 {
-    text-align: center;
-    margin-bottom: 20px;
-  }
-  
-  h3 {
-    margin-top: 30px;
-    margin-bottom: 10px;
-  }
-  
-  table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-bottom: 20px;
-  }
-  
-  th, td {
-    border: 1px solid #ddd;
-    padding: 8px;
-    text-align: left;
-  }
-  
-  th {
-    background-color: #3498db;
-  }
-  
-  tr:nth-child(even) {
-    background-color: #f9f9f9;
-  }
-  
-  tr:hover {
-    background-color: #f1f1f1;
-  }
-  
-  button {
-    background-color: #4CAF50;
-    color: white;
-    padding: 10px 20px;
-    border: none;
-    cursor: pointer;
-    border-radius: 4px;
-  }
-  
-  button:hover {
-    background-color: #45a049;
-  }
-  
+  padding: 20px;
+}
+
+h2 {
+  text-align: center;
+  margin-bottom: 20px;
+  color: #273a59;
+}
+
+h3 {
+  margin-top: 30px;
+  margin-bottom: 10px;
+  color: #273a59;
+}
+
+/* ===== Scroll wrapper so tables don't squish on phones ===== */
+.table-scroll {
+  width: 100%;
+  overflow: auto;
+  border-radius: 12px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+  background: #ffffff;
+  margin-bottom: 20px;
+}
+
+/* ===== Table styling ===== */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+  min-width: 960px; /* ensures columns remain readable on phones */
+}
+
+th, td {
+  padding: 12px 14px;
+  text-align: left;
+  border-bottom: 1px solid #eef2f7;
+}
+
+thead th {
+  background-color: #273a59;
+  color: #ffffff;
+  font-weight: 800;
+  position: sticky; /* sticky header inside scroll wrapper */
+  top: 0;
+  z-index: 1;
+}
+
+tbody tr:nth-child(even) {
+  background-color: #fafafa;
+}
+
+tbody tr:hover {
+  background-color: #f5f7fb;
+}
+
+/* ===== Buttons (Applications / Match) ===== */
+button {
+  background-color: #4CAF50;
+  color: #ffffff;
+  padding: 10px 16px;
+  border: none;
+  cursor: pointer;
+  border-radius: 8px;
+  font-weight: 700;
+  transition: background-color .2s ease, transform .06s ease;
+}
+
+button:hover {
+  background-color: #45a049;
+}
+
+button:active {
+  transform: translateY(1px);
+}
+
+button:disabled {
+  background-color: #a4d5a7;
+  cursor: not-allowed;
+}
+
+/* ===== Loader (kept as-is) ===== */
 .loader-container {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  background: rgba(235, 235, 235, 0.8); 
-  color: white;
-  font-family: Arial, sans-serif;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  background: rgba(235, 235, 235, 0.8);
+  color: white; font-family: Arial, sans-serif;
   z-index: 9999;
 }
 .loader {
-  width: 50px;
-  aspect-ratio: 1;
-  border-radius: 50%;
+  width: 50px; aspect-ratio: 1; border-radius: 50%;
   border: 8px solid #514b82;
   animation:
     l20-1 0.8s infinite linear alternate,
     l20-2 1.6s infinite linear;
 }
 @keyframes l20-1{
-   0%    {clip-path: polygon(50% 50%,0       0,  50%   0%,  50%    0%, 50%    0%, 50%    0%, 50%    0% )}
-   12.5% {clip-path: polygon(50% 50%,0       0,  50%   0%,  100%   0%, 100%   0%, 100%   0%, 100%   0% )}
-   25%   {clip-path: polygon(50% 50%,0       0,  50%   0%,  100%   0%, 100% 100%, 100% 100%, 100% 100% )}
-   50%   {clip-path: polygon(50% 50%,0       0,  50%   0%,  100%   0%, 100% 100%, 50%  100%, 0%   100% )}
-   62.5% {clip-path: polygon(50% 50%,100%    0, 100%   0%,  100%   0%, 100% 100%, 50%  100%, 0%   100% )}
-   75%   {clip-path: polygon(50% 50%,100% 100%, 100% 100%,  100% 100%, 100% 100%, 50%  100%, 0%   100% )}
-   100%  {clip-path: polygon(50% 50%,50%  100%,  50% 100%,   50% 100%,  50% 100%, 50%  100%, 0%   100% )}
+  0%    {clip-path: polygon(50% 50%,0 0,50% 0%,50% 0%,50% 0%,50% 0%,50% 0%)}
+  12.5% {clip-path: polygon(50% 50%,0 0,50% 0%,100% 0%,100% 0%,100% 0%,100% 0%)}
+  25%   {clip-path: polygon(50% 50%,0 0,50% 0%,100% 0%,100% 100%,100% 100%,100% 100%)}
+  50%   {clip-path: polygon(50% 50%,0 0,50% 0%,100% 0%,100% 100%,50% 100%,0% 100%)}
+  62.5% {clip-path: polygon(50% 50%,100% 0,100% 0%,100% 0%,100% 100%,50% 100%,0% 100%)}
+  75%   {clip-path: polygon(50% 50%,100% 100%,100% 100%,100% 100%,100% 100%,50% 100%,0% 100%)}
+  100%  {clip-path: polygon(50% 50%,50% 100%,50% 100%,50% 100%,50% 100%,50% 100%,0% 100%)}
 }
-@keyframes l20-2{ 
-  0%    {transform:scaleY(1)  rotate(0deg)}
-  49.99%{transform:scaleY(1)  rotate(135deg)}
-  50%   {transform:scaleY(-1) rotate(0deg)}
-  100%  {transform:scaleY(-1) rotate(-135deg)}
+@keyframes l20-2{
+  0% {transform: scaleY(1) rotate(0deg)}
+  49.99% {transform: scaleY(1) rotate(135deg)}
+  50% {transform: scaleY(-1) rotate(0deg)}
+  100% {transform: scaleY(-1) rotate(-135deg)}
 }
 
-  
+/* ===== Responsive tweaks ===== */
+@media (max-width: 768px) {
+  .table-scroll { -webkit-overflow-scrolling: touch; }
+  th, td { padding: 10px 12px; }
+  button { padding: 10px 14px; }
+}
+
+@media (max-width: 430px) {
+  h2 { font-size: 1.4rem; }
+  h3 { font-size: 1.1rem; }
+  th, td { padding: 10px; }
+  button { width: 100%; }
+}

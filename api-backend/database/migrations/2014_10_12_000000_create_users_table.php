@@ -2,38 +2,42 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
-use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
     /**
      * Run the migrations.
-     *
-     * @return void
      */
-    public function up()
+    public function up(): void
     {
-        DB::statement("CREATE TABLE users (
-            id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-            name VARCHAR(255) NOT NULL,
-            email VARCHAR(255) UNIQUE NOT NULL,
-            email_verified_at TIMESTAMP NULL DEFAULT NULL,
-            password VARCHAR(255) NOT NULL,
-            remember_token VARCHAR(100) NULL DEFAULT NULL,
-            role ENUM('learner', 'tutor', 'admin') DEFAULT 'learner',
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-        )
-       ");
+        Schema::create('users', function (Blueprint $table) {
+            // Creates a big integer auto-increment PK.
+            // MySQL => UNSIGNED BIGINT; Postgres => BIGSERIAL. Portable.
+            $table->id();
+
+            $table->string('name');
+            $table->string('email')->unique();
+
+            // Use timezone-aware timestamps on Postgres
+            $table->timestampTz('email_verified_at')->nullable();
+
+            $table->string('password');
+            $table->rememberToken();
+
+            // Enum becomes a CHECK constraint on Postgres via Schema builder
+            $table->enum('role', ['learner', 'tutor', 'admin'])->default('learner');
+
+            // Let Laravel manage timestamps in app code (no ON UPDATE clause needed)
+            $table->timestampsTz();
+        });
     }
 
     /**
      * Reverse the migrations.
-     *
-     * @return void
      */
-    public function down()
+    public function down(): void
     {
-        DB::statement("DROP TABLE IF EXISTS users");
+        Schema::dropIfExists('users');
     }
 };

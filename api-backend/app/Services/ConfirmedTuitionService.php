@@ -1,135 +1,133 @@
 <?php
+
 namespace App\Services;
 
-use Illuminate\Support\Facades\DB;
+use App\Models\ConfirmedTuition;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class ConfirmedTuitionService
 {
     public function getAllConfirmedTuitions()
     {
-        return DB::select("SELECT * FROM ConfirmedTuitions");
+        // Uses model -> correct table already set to confirmed_tuitions
+        return ConfirmedTuition::orderByDesc('ConfirmedTuitionID')->get();
     }
 
-    public function getConfirmedTuitionById($id)
+    public function getConfirmedTuitionById(int $id)
     {
-        return DB::select("SELECT * FROM ConfirmedTuitions WHERE ConfirmedTuitionID = ?", [$id]);
+        return ConfirmedTuition::find($id);
     }
 
-    public function storeConfirmedTuition($request)
+    /**
+     * Create a confirmed tuition:
+     * - ensure unique (application_id + tution_id)
+     * - set application.status = 'Confirmed'
+     */
+    public function storeConfirmedTuition(array $data): array
     {
-        // Validate request
-        $request->validate([
-            'application_id' => 'required|exists:applications,ApplicationID',
-            'tution_id' => 'required|exists:tuition_requests,TutionID',
-            'FinalizedSalary' => 'required|numeric',
-            'FinalizedDays' => 'required|string',
-            'Status' => 'required|in:Ongoing,Ended'
-        ]);
-
-        // Check if the same tutor has already been confirmed for the SAME tuition job
-        $existing = DB::table('ConfirmedTuitions')
-            ->where('application_id', $request->application_id)
-            ->where('tution_id', $request->tution_id)
+        // Uniqueness check on the pair
+        $exists = ConfirmedTuition::where('application_id', $data['application_id'])
+            ->where('tution_id', $data['tution_id'])
             ->exists();
 
-        if ($existing) {
+        if ($exists) {
             return ['error' => 'This tutor has already been confirmed for this tuition job'];
         }
 
-        // Update application status to "Confirmed"
-        DB::table('applications')->where('ApplicationID', $request->application_id)->update(['status' => 'Confirmed']);
+        $row = DB::transaction(function () use ($data) {
+            // Update the application status
+            DB::table('applications')
+                ->where('ApplicationID', $data['application_id'])
+                ->update(['status' => 'Confirmed']);
 
-        // Insert new confirmed tuition
-        DB::table('ConfirmedTuitions')->insert([
-            'application_id' => $request->application_id,
-            'tution_id' => $request->tution_id,
-            'FinalizedSalary' => $request->FinalizedSalary,
-            'FinalizedDays' => $request->FinalizedDays,
-            'Status' => $request->Status
-        ]);
+            // Create confirmed row
+            return ConfirmedTuition::create([
+                'application_id'  => $data['application_id'],
+                'tution_id'       => $data['tution_id'],   // (spelling per your schema)
+                'FinalizedSalary' => $data['FinalizedSalary'],
+                'FinalizedDays'   => $data['FinalizedDays'],
+                'Status'          => $data['Status'],
+            ]);
+        });
 
-        return ['message' => 'Confirmed Tuition created successfully'];
+        return ['message' => 'Confirmed Tuition created successfully', 'data' => $row];
     }
 
-    public function getPaymentVoucher($tutionId)
+    /**
+     * For the current tutor, check they are confirmed on this tuition
+     * and return a simple voucher payload (you can extend later).
+     */
+    public function getPaymentVoucher(int $tutionId): array
     {
         $user = Auth::user();
-        if ($user->role !== 'tutor') {
+        if (!$user || $user->role !== 'tutor') {
             return ['error' => 'Unauthorized: Only tutors can view this voucher.'];
         }
 
-        // Retrieve tutor_id from Tutors table using user_id
-        $tutor = DB::selectOne("SELECT TutorID FROM tutors WHERE user_id = ?", [$user->id]);
-        if (!$tutor) {
+        $tutorId = DB::table('tutors')->where('user_id', $user->id)->value('TutorID');
+        if (!$tutorId) {
             return ['error' => 'Tutor profile not found.'];
         }
 
-        // Check if the user is the confirmed tutor for this tuition
-        $confirmed = DB::selectOne("SELECT application_id FROM ConfirmedTuitions WHERE tution_id = ?", [$tutionId]);
+        // IMPORTANT: use snake_case table name
+        $owns = DB::table('confirmed_tuitions as ct')
+            ->join('applications as a', 'ct.application_id', '=', 'a.ApplicationID')
+            ->where('ct.tution_id', $tutionId)
+            ->where('a.tutor_id', $tutorId)
+            ->exists();
 
-        if (!$confirmed) {
-            return ['error' => 'Tuition not found or not confirmed.'];
+        if (!$owns) {
+            return ['error' => 'Tuition not found or not confirmed for this tutor.'];
         }
 
-        $applicationId = $confirmed->application_id;
-        $learnerId = DB::selectOne("SELECT learner_id FROM applications WHERE ApplicationID = ?", [$applicationId]);
-
-        // Fetch the tutor_id using application_id
-        $tutor = DB::selectOne("SELECT tutor_id FROM applications WHERE ApplicationID = ?", [$applicationId]);
-
-        if (!$tutor) {
-            return ['error' => 'Tutor not found for this application.'];
-        }
-        $salary= DB ::selectOne("SELECT FinalizedSalary from ConfirmedTuitions where tution_id = ?", [$tutionId]);
-
-        // Return the tutorId and other information
         return [
-            'tutorId' => $tutor->tutor_id,
-            'tutionId' => $tutionId,
-            'applicationId' => $applicationId,
-            'salary' => $salary->FinalizedSalary,
-            'learnerId' => $learnerId->learner_id,
-            'message' => 'Tutor confirmed for this tuition'
+            'tutorId'   => $tutorId,
+            'tution_id' => $tutionId,
+            'message'   => 'Tutor confirmed for this tuition',
         ];
     }
 
-    public function markPayment($tutionId)
+    /**
+     * Current tutor marks payment as completed for a tution_id.
+     * Requires a pre-existing row in payment_vouchers.
+     */
+    public function markPayment(int $tutionId): array
     {
-        // Check if the user is a tutor
         $user = Auth::user();
-        if ($user->role !== 'Tutor') {
+        if (!$user || $user->role !== 'tutor') {
             return ['error' => 'Unauthorized: Only tutors can mark payment.'];
         }
 
-        // Retrieve tutor_id from Tutors table using user_id
-        $tutor = DB::selectOne("SELECT TutorID FROM Tutors WHERE user_id = ?", [$user->id]);
-        if (!$tutor) {
+        $tutorId = DB::table('tutors')->where('user_id', $user->id)->value('TutorID');
+        if (!$tutorId) {
             return ['error' => 'Tutor profile not found.'];
         }
 
-        // Check if this tutor is associated with the confirmed tuition
-        $confirmed = DB::selectOne("SELECT COUNT(*) AS confirmed FROM ConfirmedTuitions WHERE tutor_id = ? AND tution_id = ?", [$tutor->TutorID, $tutionId]);
+        // IMPORTANT: use snake_case table name
+        $owns = DB::table('confirmed_tuitions as ct')
+            ->join('applications as a', 'ct.application_id', '=', 'a.ApplicationID')
+            ->where('ct.tution_id', $tutionId)
+            ->where('a.tutor_id', $tutorId)
+            ->exists();
 
-        if ($confirmed->confirmed == 0) {
+        if (!$owns) {
             return ['error' => 'You are not confirmed for this tuition.'];
         }
 
-        // Mark the payment status as 'Completed'
-        $update = DB::table('payment_vouchers')
+        $updated = DB::table('payment_vouchers')
             ->where('tution_id', $tutionId)
             ->update(['status' => 'Completed']);
 
-        if ($update) {
+        if ($updated > 0) {
             return ['message' => 'Payment marked successfully.'];
-        } else {
-            return ['error' => 'Failed to mark payment.'];
         }
+        return ['error' => 'Failed to mark payment (no voucher row found or already completed).'];
     }
 
-    public function deleteConfirmedTuition($id)
+    public function deleteConfirmedTuition(int $id): array
     {
-        DB::delete("DELETE FROM ConfirmedTuitions WHERE ConfirmedTuitionID = ?", [$id]);
-        return ['message' => 'Confirmed Tuition deleted successfully'];
+        $deleted = ConfirmedTuition::where('ConfirmedTuitionID', $id)->delete();
+        return ['message' => $deleted ? 'Confirmed Tuition deleted successfully' : 'Nothing to delete'];
     }
 }

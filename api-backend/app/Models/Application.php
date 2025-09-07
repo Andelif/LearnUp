@@ -2,35 +2,51 @@
 
 namespace App\Models;
 
-use Illuminate\Support\Facades\DB;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Application extends Model
 {
+    use HasFactory;
+
+    protected $table = 'applications';
     protected $primaryKey = 'ApplicationID';
     public $incrementing = true;
 
-    // Create a new application
-    public static function createApplication($data)
+    /** created_at / updated_at EXIST */
+    public $timestamps = true;
+
+    protected $fillable = [
+        'tution_id',     // FK -> tuition_requests.TutionID  (note: tution*)
+        'learner_id',    // FK -> learners.LearnerID
+        'tutor_id',      // FK -> tutors.TutorID
+        'matched',
+        'status',
+        'payment_status',
+    ];
+
+    protected $casts = [
+        'matched' => 'boolean',
+    ];
+
+    public function tuitionRequest()
     {
-        DB::insert("INSERT INTO applications (tution_id, learner_id, tutor_id, matched) VALUES (?, ?, ?, ?)", [
-            $data['tution_id'],
-            $data['learner_id'],
-            $data['tutor_id'],
-            false
-        ]);
-        return DB::getPdo()->lastInsertId();
+        return $this->belongsTo(TuitionRequest::class, 'tution_id', 'TutionID');
     }
 
-    // Fetch application by ID
-    public static function findById($application_id)
+    public function learner()
     {
-        return DB::select("SELECT * FROM applications WHERE ApplicationID = ?", [$application_id])[0] ?? null;
+        return $this->belongsTo(Learner::class, 'learner_id', 'LearnerID');
     }
 
-    // Get all applications for a tutor
-    public static function getApplicationsByTutor($tutor_id)
+    public function tutor()
     {
-        return DB::select("SELECT * FROM applications WHERE tutor_id = ?", [$tutor_id]);
+        return $this->belongsTo(Tutor::class, 'tutor_id', 'TutorID');
+    }
+
+    /** Convenience: confirmed tuition (if any) */
+    public function confirmedTuition()
+    {
+        return $this->hasOne(ConfirmedTuition::class, 'application_id', 'ApplicationID');
     }
 }

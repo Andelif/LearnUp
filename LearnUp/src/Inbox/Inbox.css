@@ -1,27 +1,33 @@
-/* ==== Container ==== */
+/* =========================
+   Layout
+   ========================= */
 .inbox-container {
   display: flex;
-  height: 85vh;
-  border: 1px solid #ddd;
-  border-radius: 10px;
+  gap: 0;
+  height: 80vh;
+  max-width: 1100px;
+  margin: 30px auto;
+  border-radius: 12px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.08);
   overflow: hidden;
   font-family: 'Segoe UI', sans-serif;
   background-color: #f9f9f9;
 }
 
-/* ==== Sidebar ==== */
+/* Sidebar (matched users) */
 .inbox-sidebar {
   width: 30%;
-  min-width: 250px;
-  background-color: #fff;
-  border-right: 1px solid #ddd;
-  padding: 20px;
+  min-width: 260px;
+  background: #f5f5f7;
+  padding: 16px;
+  border-right: 2px solid #e5e7eb;
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 .inbox-sidebar h3 {
-  margin-bottom: 15px;
-  font-size: 20px;
+  margin-bottom: 12px;
+  text-align: center;
   color: #333;
 }
 
@@ -29,256 +35,309 @@
   list-style: none;
   padding: 0;
   margin: 0;
+  display: grid;
+  gap: 10px;
 }
 
-.ChatList {
-  padding: 10px 15px;
-  margin-bottom: 10px;
-  background-color: #f2f2f2;
-  border-radius: 6px;
+.inbox-sidebar .ChatList {
+  padding: 10px 12px;
+  border-radius: 10px;
+  background: #fff;
   cursor: pointer;
-  transition: background 0.2s;
+  border: 1px solid #e5e7eb;
+  transition: background 0.2s ease, border-color 0.2s ease, transform .06s ease;
+}
+.inbox-sidebar .ChatList:hover,
+.inbox-sidebar .ChatList:focus-visible {
+  background: #f3f4f6;
+  border-color: #d1d5db;
+}
+.inbox-sidebar .ChatList:active { transform: translateY(1px); }
+/* If you ever add .active in JSX, it will highlight: */
+.inbox-sidebar .ChatList.active {
+  border-color: #8e2fbe;
+  box-shadow: 0 0 0 3px rgba(142,47,190,0.15) inset;
 }
 
-.ChatList:hover {
-  background-color: #e0e0e0;
-}
-
-/* ==== Chat Area ==== */
+/* Chat pane */
 .inbox-chat {
+  width: 70%;
   flex: 1;
   display: flex;
   flex-direction: column;
   padding: 20px;
   background-color: #fefefe;
   position: relative;
+  background: #fff;
 }
 
-/* ==== Header ==== */
+/* Header */
 .inbox-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 15px;
+  padding: 14px 16px;
+  background: #9a529b;
+  color: #fff;
+  font-size: 18px;
 }
-
-.inbox-header h3 {
-  margin: 0;
-  font-size: 20px;
-  color: #444;
-}
-
 .inbox-header button {
   background: none;
   border: none;
-  font-size: 18px;
+  font-size: 20px;
+  color: #fff;
   cursor: pointer;
-  color: #777;
+  border-radius: 8px;
+  padding: 4px 8px;
+  transition: background 0.2s ease;
 }
+.inbox-header button:hover { background: rgba(255,255,255,0.12); }
 
-.inbox-header button:hover {
-  color: #333;
-}
-
-/* ==== Messages ==== */
+/* Messages */
 .inbox-messages {
   flex: 1;
+  padding: 14px;
   overflow-y: auto;
-  padding-right: 10px;
-  margin-bottom: 15px;
+  background: #f8fafc;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  -webkit-overflow-scrolling: touch;
 }
 
 .message {
-  max-width: 70%;
-  padding: 10px;
-  margin: 8px 0;
-  border-radius: 10px;
-  position: relative;
-  word-wrap: break-word;
+  padding: 10px 12px;
+  border-radius: 14px;
+  max-width: 72%;
+  word-break: break-word;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
 }
 
 .message.sent {
-  background-color: #d1e7ff;
+  background: #8e2fbe;     /* brand-ish purple */
+  color: #fff;
   align-self: flex-end;
-  margin-left: auto;
-  border-bottom-right-radius: 0;
 }
-
 .message.received {
-  background-color: #e9ecef;
+  background: #e2e8f0;     /* slate-200 */
+  color: #0f172a;          /* slate-900 */
   align-self: flex-start;
-  border-bottom-left-radius: 0;
 }
 
+.message .MsgContent {
+  margin: 0;
+  color: inherit; /* inherit from bubble */
+}
 .message span {
   display: block;
-  font-size: 11px;
-  color: #555;
-  margin-top: 5px;
+  margin-top: 6px;
+  opacity: 0.8;
+  color: inherit; /* match bubble */
   text-align: right;
 }
 
-.MsgContent {
-  font-size: 14px;
-}
-
-/* ==== Input Bar ==== */
+/* Composer (sticky) */
 .inbox-input {
   display: flex;
   gap: 10px;
-  margin-top: 10px;
-}
+  padding: 10px;
+  background: #fff;
+  border-top: 2px solid #e5e7eb;
 
+  position: sticky;
+  bottom: 0;
+  z-index: 2;
+}
 .inbox-input input {
   flex: 1;
-  padding: 10px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  font-size: 14px;
+  padding: 12px 14px;
+  border: 1px solid #d1d5db;
+  border-radius: 10px;
+  font-size: 16px; /* prevent iOS zoom */
+  outline: none;
+  background: #fff;
+  transition: border-color .2s ease, box-shadow .2s ease;
 }
-
+.inbox-input input:focus {
+  border-color: #8e2fbe;
+  box-shadow: 0 0 0 3px rgba(142,47,190,0.15);
+}
 .inbox-input button {
-  background-color: #007bff;
-  color: white;
+  padding: 12px 16px;
   border: none;
-  border-radius: 8px;
-  padding: 10px 16px;
+  background: #007bff;
+  color: #fff;
+  border-radius: 10px;
   cursor: pointer;
-  transition: background-color 0.2s;
+  font-weight: 800;
+  transition: background .2s ease, transform .06s ease;
 }
+.inbox-input button:hover  { background: #0056b3; }
+.inbox-input button:active { transform: translateY(1px); }
 
-.inbox-input button:hover {
-  background-color: #0056b3;
-}
-
-/* ==== Action Buttons ==== */
+/* Learner-only actions */
 .action-buttons {
   display: flex;
   gap: 10px;
-  margin-top: 20px;
+  justify-content: center;
+  padding: 12px;
+  border-top: 1px dashed #e5e7eb;
 }
-
 .confirm-btn,
 .reject-btn {
-  flex: 1;
-  padding: 10px;
-  font-size: 14px;
+  padding: 10px 14px;
   border: none;
-  border-radius: 8px;
+  border-radius: 10px;
   cursor: pointer;
-  color: white;
+  font-weight: 800;
+  color: #fff;
+  transition: background .2s ease, transform .06s ease;
 }
+.confirm-btn { background: #10b981; }  /* emerald */
+.confirm-btn:hover { background: #0ea371; }
+.reject-btn { background: #ef4444; }   /* red */
+.reject-btn:hover { background: #dc2626; }
+.confirm-btn:active,
+.reject-btn:active { transform: translateY(1px); }
 
-.confirm-btn {
-  background-color: #28a745;
-}
-
-.confirm-btn:hover {
-  background-color: #218838;
-}
-
-.reject-btn {
-  background-color: #dc3545;
-}
-
-.reject-btn:hover {
-  background-color: #c82333;
-}
-
-/* ==== Confirm Form ==== */
+/* =========================
+   Confirm Tutor Modal
+   ========================= */
 .confirm-form {
   position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background: white;
-  border-radius: 12px;
-  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.2);
-  padding: 30px;
-  z-index: 1000;
-  width: 320px;
-  max-width: 90%;
+  inset: 0;
+  z-index: 50;
+  display: grid;
+  place-items: center;
+  background: rgba(15, 23, 42, 0.45); /* backdrop */
+}
+
+.confirm-form form {
+  width: min(520px, 92vw);
+  background: #fff;
+  border-radius: 14px;
+  padding: 18px;
+  box-shadow: 0 18px 48px rgba(0,0,0,0.18);
+  display: grid;
+  gap: 12px;
 }
 
 .confirm-form h3 {
-  margin-bottom: 15px;
-  font-size: 18px;
-  color: #333;
+  margin: 0 0 6px;
+  font-size: 20px;
+  color: #0f172a;
+  text-align: center;
 }
 
 .confirm-form label {
-  display: block;
-  margin-bottom: 10px;
-  font-size: 14px;
+  display: grid;
+  gap: 6px;
+  font-weight: 600;
+  color: #374151;
+  font-size: 0.98rem;
 }
 
-.confirm-form input {
-  width: 100%;
-  padding: 8px 10px;
-  margin-top: 5px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  font-size: 14px;
+.confirm-form input[type="number"],
+.confirm-form input[type="text"] {
+  padding: 12px 14px;
+  border: 1px solid #d1d5db;
+  border-radius: 10px;
+  font-size: 16px;  /* avoid iOS zoom */
+  outline: none;
+  transition: border-color .2s ease, box-shadow .2s ease, background .2s ease;
+  background: #fff;
 }
-
-.confirm-form button {
-  margin-top: 15px;
-  margin-right: 10px;
-  padding: 8px 14px;
-  font-size: 14px;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
+.confirm-form input:focus {
+  border-color: #8e2fbe;
+  box-shadow: 0 0 0 3px rgba(142,47,190,0.15);
 }
 
 .confirm-form button[type="submit"] {
-  background-color: #28a745;
-  color: white;
-}
-
-.confirm-form button[type="submit"]:hover {
-  background-color: #218838;
-}
-
-.confirm-form button[type="button"] {
-  background-color: #6c757d;
-  color: white;
-}
-
-.confirm-form button[type="button"]:hover {
-  background-color: #5a6268;
-}
-
-/* ==== Scrollbar Styling ==== */
-.inbox-messages::-webkit-scrollbar,
-.inbox-sidebar::-webkit-scrollbar {
-  width: 6px;
-}
-
-.inbox-messages::-webkit-scrollbar-thumb,
-.inbox-sidebar::-webkit-scrollbar-thumb {
-  background-color: #ccc;
+  background: #10b981;
+  color: #fff;
+  border: none;
+  padding: 12px 14px;
   border-radius: 10px;
+  cursor: pointer;
+  font-weight: 800;
+  transition: background .2s ease, transform .06s ease;
 }
-
-.inbox-messages::-webkit-scrollbar-track,
-.inbox-sidebar::-webkit-scrollbar-track {
-  background: transparent;
+.confirm-form button[type="button"] {
+  background: #6b7280;
+  color: #fff;
+  border: none;
+  padding: 12px 14px;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 800;
+  transition: background .2s ease, transform .06s ease;
 }
+.confirm-form button:hover { filter: brightness(0.95); }
+.confirm-form button:active { transform: translateY(1px); }
 
-/* ==== Responsive ==== */
+/* =========================
+   Responsive
+   ========================= */
+
+/* Tablets */
 @media (max-width: 768px) {
   .inbox-container {
     flex-direction: column;
+    height: 85vh;
+    border-radius: 12px;
   }
 
   .inbox-sidebar {
     width: 100%;
+    min-width: 0;
     border-right: none;
-    border-bottom: 1px solid #ddd;
+    border-bottom: 2px solid #e5e7eb;
+    padding: 12px;
   }
 
   .inbox-chat {
-    padding: 15px;
+    width: 100%;
+    box-shadow: none;
+    background: #fff;
   }
+
+  .inbox-header {
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+    padding: 12px;
+  }
+
+  .inbox-messages { padding: 12px; gap: 8px; }
+
+  .message { max-width: 80%; font-size: 14px; }
+  .message span { font-size: 11px; }
+}
+
+/* Phones (≤ ~430px) */
+@media (max-width: 430px) {
+  .inbox-container { margin: 16px auto; height: 80vh; }
+
+  .inbox-sidebar { padding: 10px; }
+  .inbox-sidebar ul { gap: 8px; }
+
+  .inbox-header { font-size: 16px; padding: 10px; }
+
+  .inbox-messages { padding: 10px; gap: 8px; }
+  .message { max-width: 90%; padding: 10px 12px; border-radius: 14px; }
+
+  .inbox-input {
+    padding: 10px;
+    gap: 8px;
+    border-top-width: 1px;
+  }
+  .inbox-input input { padding: 10px 12px; font-size: 16px; }
+  .inbox-input button { padding: 10px 12px; border-radius: 10px; }
+
+  .action-buttons { padding: 10px; gap: 8px; }
+  .confirm-btn, .reject-btn { flex: 1; }
+}
+
+/* Ultra-tall portrait (e.g., 1080×2520 family) */
+@media (orientation: portrait) and (max-aspect-ratio: 9/20.5) {
+  .inbox-messages { padding-bottom: 12px; }
 }

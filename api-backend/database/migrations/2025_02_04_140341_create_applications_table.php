@@ -6,36 +6,42 @@ use Illuminate\Support\Facades\Schema;
 
 return new class extends Migration
 {
-    /**
-     * Run the migrations.
-     *
-     * @return void
-     */
-    public function up()
+    public function up(): void
     {
-        DB::statement("CREATE TABLE applications (
-            ApplicationID BIGINT AUTO_INCREMENT PRIMARY KEY,
-            tution_id BIGINT NOT NULL, -- Foreign key to tuition_requests table
-            learner_id BIGINT NOT NULL, -- Foreign key to learners table
-            tutor_id BIGINT NOT NULL, -- Foreign key to tutors table
-            matched BOOLEAN NOT NULL DEFAULT FALSE,
-            status ENUM('Applied', 'Shortlisted', 'Confirmed', 'Cancelled') NULL,
-            payment_status ENUM('Pending', 'Completed') NOT NULL DEFAULT 'Pending',
-            created_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP,
-            updated_at TIMESTAMP NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-            FOREIGN KEY (tution_id) REFERENCES tuition_requests(TutionID) ON DELETE CASCADE,
-            FOREIGN KEY (learner_id) REFERENCES learners(LearnerID) ON DELETE CASCADE,
-            FOREIGN KEY (tutor_id) REFERENCES tutors(TutorID) ON DELETE CASCADE
-        ) ENGINE=InnoDB;
-    ");
+        Schema::create('applications', function (Blueprint $table) {
+            // PK
+            $table->id('ApplicationID');
+
+            // FKs (note the custom PK names on related tables)
+            $table->foreignId('tution_id')     // keeping your current column name
+                  ->constrained('tuition_requests', 'TutionID')
+                  ->onDelete('cascade');
+
+            $table->foreignId('learner_id')
+                  ->constrained('learners', 'LearnerID')
+                  ->onDelete('cascade');
+
+            $table->foreignId('tutor_id')
+                  ->constrained('tutors', 'TutorID')
+                  ->onDelete('cascade');
+
+            $table->boolean('matched')->default(false);
+
+            // Enums → CHECK constraints on Postgres via Schema builder
+            $table->enum('status', ['Applied', 'Shortlisted', 'Confirmed', 'Cancelled'])->nullable();
+            $table->enum('payment_status', ['Pending', 'Completed'])->default('Pending');
+
+            // TZ-aware timestamps
+            $table->timestampsTz();
+
+            // (Optional) helpful indexes
+            // $table->index(['tution_id']);
+            // $table->index(['learner_id']);
+            // $table->index(['tutor_id']);
+        });
     }
 
-    /**
-     * Reverse the migrations.
-     *
-     * @return void
-     */
-    public function down()
+    public function down(): void
     {
         Schema::dropIfExists('applications');
     }
