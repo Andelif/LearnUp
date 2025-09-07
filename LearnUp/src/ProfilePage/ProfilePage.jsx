@@ -212,7 +212,7 @@ const ProfilePage = () => {
     <div className="profile-page">
       <div className="profile-section">
         <img
-          src="https://via.placeholder.com/100x100.png?text=Profile+Pic"
+          src="assets/profile.jpg"
           alt="Profile"
           className="profile-pic"
         />

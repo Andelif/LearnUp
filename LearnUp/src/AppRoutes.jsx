@@ -39,10 +39,11 @@ const AppRoutes = () => {
     <Route path="/notification-center" element={<Notification/>} /> 
     <Route path="/ProfilePage" element={<ProfilePage />} />
     <Route path="/myTuitions" element={<MyTuitions />} />
+    <Route path="/voucher/:tutionId" element={<PaymentVoucher />} />
     
     <Route path="/admin/*" element={<AdminRoutes />} />
     <Route path="/inbox" element={<Inbox />} />
-    <Route path="/voucher/:tutionId" element={<PaymentVoucher />} />
+    
     
    </Routes>
   )

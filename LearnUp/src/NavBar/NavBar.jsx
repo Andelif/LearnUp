@@ -88,7 +88,7 @@ const NavBar = () => {
             </Link>
           </div>
 
-          <div className="profile-section" onClick={() => setShowDropdown(v => !v)}>
+          <div className="profile-sections" onClick={() => setShowDropdown(v => !v)}>
             <span className="profile-icon">👤</span>
             <br />
             <span className="user-name">{user.name}</span>
@@ -100,8 +100,8 @@ const NavBar = () => {
                 to="/ProfilePage"
                 className="dropdown-item"
                 onClick={() => { setShowDropdown(false); closeMenu(); }}
-              >
-                Profile
+              ><b>
+                Profile</b>
               </Link>
               <button className="dropdown-item" onClick={handleLogout}>
                 Logout

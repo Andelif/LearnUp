@@ -51,15 +51,15 @@ html, body, #root {
 /* Default styles (desktop/tablet) already in your .css */
 
 /* For tablets and below (≤ 768px wide) */
-@media (max-width: 768px) {
+/* @media (max-width: 768px) {
   .features-grid,
   .categories-grid,
   .steps-wrapper {
-    grid-template-columns: 1fr; /* stack instead of side by side */
+    grid-template-columns: 1fr; 
   }
 
   .search-bar {
-    width: 100%; /* make search bar full width */
+    width: 100%; 
     font-size: 14px;
   }
 
@@ -67,12 +67,12 @@ html, body, #root {
     width: 100%;
     height: auto;
   }
-}
+} */
 
 /* For very small phones (≤ 480px wide) */
-@media (max-width: 480px) {
+/* @media (max-width: 480px) {
   h1, h2, h3 {
-    font-size: 1.2rem; /* smaller headings */
+    font-size: 1.2rem; 
     text-align: center;
   }
 
@@ -84,7 +84,7 @@ html, body, #root {
   }
 
   .join-options {
-    flex-direction: column; /* buttons stack vertically */
+    flex-direction: column; 
     gap: 10px;
   }
 
@@ -93,4 +93,4 @@ html, body, #root {
     font-size: 14px;
     padding: 12px;
   }
-}
+} */

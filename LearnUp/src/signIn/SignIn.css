@@ -1,11 +1,20 @@
 /* Consistent sizing */
-* { box-sizing: border-box; }
+* { 
+  box-sizing: border-box; 
+  margin: 0;
+  padding: 0;
+}
+
+html, body, #root {
+  height: 100%;
+}
 
 /* Page background */
 .login-container {
   display: flex;
   flex-direction: column;
   min-height: 100vh;
+  width: 100%;
 
   /* ✅ Works on Vercel with assets in /public */
   background: linear-gradient(rgba(0,0,0,.20), rgba(0,0,0,.20)),
@@ -16,13 +25,15 @@
 }
 
 /* Main content centering */
-.main-content { /* wrapper div in JSX */
+.main-content {
   flex: 1;
   display: flex;
+  width: 100%;
 }
+
 .main-content-wrapper {
   display: flex;
-  flex-direction: column; /* stack on mobile */
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   gap: 40px;
@@ -30,7 +41,7 @@
   max-width: 900px;
   width: 100%;
   margin: 0 auto;
-  min-height: inherit; /* take full height from parent */
+  min-height: inherit;
 }
 
 /* Tablet and up: side-by-side if illustration used */
@@ -44,7 +55,10 @@
 }
 
 /* Illustration (hidden on mobile by default) */
-.illustration { display: none; }
+.illustration { 
+  display: none; 
+}
+
 @media (min-width: 768px) {
   .illustration {
     display: flex;
@@ -74,15 +88,24 @@
   color: #374151;
   margin-bottom: 6px;
 }
-.login-card span { color: #692a7c; }
-.login-card p    { color: #6b7280; }
+
+.login-card span { 
+  color: #692a7c; 
+}
+
+.login-card p { 
+  color: #6b7280; 
+  margin-bottom: 16px;
+}
 
 /* Role selector */
 .user-selection {
   display: flex;
   gap: 12px;
   margin-top: 16px;
+  margin-bottom: 8px;
 }
+
 .user-btn {
   flex: 1;
   padding: 12px;
@@ -94,7 +117,11 @@
   font-weight: 600;
   color: #100f0f;
 }
-.user-btn:hover { background-color: #eef2f7; }
+
+.user-btn:hover { 
+  background-color: #eef2f7; 
+}
+
 .user-btn.active {
   border-color: #560e6c;
   background-color: #efe8ff;
@@ -109,30 +136,24 @@
   font-weight: 600;
 }
 
-.input-group { position: relative; }
+.input-group { 
+  position: relative; 
+}
 
 .input-field {
-  width: 100%;               /* ✅ responsive */
+  width: 100%;
   padding: 12px 14px;
   border: 1px solid #d1d5db;
   border-radius: 8px;
   outline: none;
   transition: border-color 0.2s ease;
-  font-size: 16px;           /* avoid iOS zoom */
+  font-size: 16px;
   background: #fff;
 }
+
 .input-field:focus {
   border-color: #8e2fbe;
   box-shadow: 0 0 0 3px rgba(142,47,190,0.15);
-}
-
-/* Optional left icon support (unused in current JSX) */
-.input-icon {
-  position: absolute;
-  top: 50%;
-  left: 12px;
-  transform: translateY(-50%);
-  color: #9ca3af;
 }
 
 /* Password eye toggle */
@@ -150,6 +171,7 @@
   width: 36px;
   border-radius: 50%;
 }
+
 .password-toggle:hover {
   background: #f3f4f6;
   color: #6b7280;
@@ -163,9 +185,12 @@
   cursor: pointer;
   font-size: 14px;
 }
-.forgot-password:hover { text-decoration: underline; }
 
-/* Error message (from JSX) */
+.forgot-password:hover { 
+  text-decoration: underline; 
+}
+
+/* Error message */
 .error {
   margin-top: 10px;
   color: #b91c1c;
@@ -190,25 +215,36 @@
   cursor: pointer;
   transition: transform .06s ease, background-color .2s ease;
 }
-.login-button:hover  { background-color: #6c167f; }
-.login-button:active { transform: translateY(1px); }
+
+.login-button:hover  { 
+  background-color: #6c167f; 
+}
+
+.login-button:active { 
+  transform: translateY(1px); 
+}
 
 /* Or divider */
 .or-divider {
   position: relative;
   text-align: center;
   color: #6b7280;
+  margin: 20px 0;
 }
+
 .or-divider span {
   position: relative;
   padding: 0 10px;
   background: #fff;
   z-index: 1;
 }
+
 .or-divider::before {
   content: "";
   position: absolute;
-  left: 0; right: 0; top: 50%;
+  left: 0; 
+  right: 0; 
+  top: 50%;
   height: 1px;
   background: #e5e7eb;
   transform: translateY(-50%);
@@ -224,15 +260,19 @@
   display: flex;
   justify-content: center;
   width: 100%;
-  padding-bottom: 28px;
 }
+
 .signup-link {
   color: #460956;
   font-weight: 800;
   margin-left: .3rem;
   text-decoration: none;
+  cursor: pointer;
 }
-.signup-link:hover { text-decoration: underline; cursor: pointer; }
+
+.signup-link:hover { 
+  text-decoration: underline; 
+}
 
 /* =========================
    RESPONSIVE ENHANCEMENTS
@@ -244,6 +284,7 @@
     padding: 36px 16px;
     gap: 28px;
   }
+  
   .login-card {
     padding: 28px 22px;
     max-width: 440px;
@@ -256,19 +297,46 @@
     padding: 24px 12px;
     gap: 20px;
   }
+  
   .login-card {
     padding: 22px 16px;
     border-radius: 12px;
     box-shadow: 0 4px 16px rgba(0,0,0,0.12);
     max-width: 100%;
   }
-  .login-card h2 { font-size: 22px; }
-  .user-selection { gap: 10px; }
-  .user-btn { padding: 10px; font-size: 14px; }
+  
+  .login-card h2 { 
+    font-size: 22px; 
+  }
+  
+  .user-selection { 
+    gap: 10px; 
+  }
+  
+  .user-btn { 
+    padding: 10px; 
+    font-size: 14px; 
+  }
+  
+  .signup-option {
+    flex-direction: column;
+    gap: 5px;
+  }
 }
 
-/* Ultra-tall portrait phones (e.g., 1080×2520 family) */
-@media (orientation: portrait) and (max-aspect-ratio: 9/20.5) {
-  .main-content-wrapper { padding-top: 20px; padding-bottom: 24px; }
-  .login-card { margin: 0 auto; }
+/* Ultra-tall portrait phones */
+@media (orientation: portrait) and (max-aspect-ratio: 9/20) {
+  .main-content-wrapper { 
+    padding-top: 20px; 
+    padding-bottom: 24px; 
+  }
+  
+  .login-card { 
+    margin: 0 auto; 
+  }
+  
+  .login-container {
+    min-height: 100vh;
+    height: auto;
+  }
 }

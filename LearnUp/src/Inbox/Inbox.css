@@ -10,7 +10,8 @@
   border-radius: 12px;
   box-shadow: 0 6px 18px rgba(0,0,0,0.08);
   overflow: hidden;
-  background: #fff;
+  font-family: 'Segoe UI', sans-serif;
+  background-color: #f9f9f9;
 }
 
 /* Sidebar (matched users) */
@@ -64,6 +65,8 @@
   flex: 1;
   display: flex;
   flex-direction: column;
+  padding: 20px;
+  background-color: #fefefe;
   position: relative;
   background: #fff;
 }
@@ -79,7 +82,7 @@
   font-size: 18px;
 }
 .inbox-header button {
-  background: transparent;
+  background: none;
   border: none;
   font-size: 20px;
   color: #fff;
@@ -126,7 +129,6 @@
   color: inherit; /* inherit from bubble */
 }
 .message span {
-  font-size: 12px;
   display: block;
   margin-top: 6px;
   opacity: 0.8;
