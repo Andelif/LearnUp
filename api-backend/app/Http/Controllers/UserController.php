@@ -48,6 +48,7 @@ class UserController extends Controller
                     'name' => $request->name,
                     'email' => $request->email,
                     'role' => $request->role,
+                    'created_at' => $userModel->created_at,
                 ],
                 'token' => $token
             ], 201);
@@ -127,6 +128,7 @@ class UserController extends Controller
             'name' => $user->name,
             'email' => $user->email,
             'role' => $user->role,
+            'created_at' => $user->created_at,
         ],
         'token' => $token,
         'redirect' => ($user->role === 'admin') ? '/admin/dashboard' : '/dashboard'
@@ -142,6 +144,7 @@ class UserController extends Controller
             'name' => $user->name,
             'email' => $user->email,
             'role' => $user->role,
+            'created_at' => $user->created_at,
         ]);
     }
     

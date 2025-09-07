@@ -64,6 +64,7 @@ const ManageTutors = () => {
             <th>Availability</th>
             <th>Qualifications</th>
             <th>Experience</th>
+            <th>Actions</th>
           </tr>
         </thead>
         <tbody>

@@ -73,6 +73,7 @@ class ConfirmedTuitionService
         }
 
         $applicationId = $confirmed->application_id;
+        $learnerId = DB::selectOne("SELECT learner_id FROM applications WHERE ApplicationID = ?", [$applicationId]);
 
         // Fetch the tutor_id using application_id
         $tutor = DB::selectOne("SELECT tutor_id FROM applications WHERE ApplicationID = ?", [$applicationId]);
@@ -80,10 +81,15 @@ class ConfirmedTuitionService
         if (!$tutor) {
             return ['error' => 'Tutor not found for this application.'];
         }
+        $salary= DB ::selectOne("SELECT FinalizedSalary from ConfirmedTuitions where tution_id = ?", [$tutionId]);
 
         // Return the tutorId and other information
         return [
             'tutorId' => $tutor->tutor_id,
+            'tutionId' => $tutionId,
+            'applicationId' => $applicationId,
+            'salary' => $salary->FinalizedSalary,
+            'learnerId' => $learnerId->learner_id,
             'message' => 'Tutor confirmed for this tuition'
         ];
     }

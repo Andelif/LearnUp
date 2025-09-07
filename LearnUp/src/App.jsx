@@ -1,5 +1,5 @@
 import './App.css';
-import { BrowserRouter as Router } from "react-router-dom";
+import { BrowserRouter as Router, useLocation } from "react-router-dom";
 import React, { useContext } from 'react';
 import AppRoutes from './AppRoutes';
 import NavBar from './NavBar/NavBar';
@@ -10,20 +10,31 @@ import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import AdminSidebar from './admin/AdminSidebar/AdminSidebar';
 
-const AppContent = () => {
+const AppContentInner = () => {
   const { user } = useContext(storeContext);
+  const location = useLocation();
   const isAdmin = user?.role === "admin";
+  const isHomePage = location.pathname === "/";
+  
+  // Don't show sidebar for admin on home page
+  const shouldShowSidebar = isAdmin && !isHomePage;
 
   return (
-    <Router>
-      <div className="app-container">
-        <NavBar />
-        <div className="main-content">
-          {isAdmin && <AdminSidebar />}
-          <AppRoutes />
-        </div>
-        {!isAdmin && <Footer />}
+    <div className="app-container">
+      <NavBar />
+      <div className="main-content">
+        {shouldShowSidebar && <AdminSidebar />}
+        <AppRoutes />
       </div>
+      {!isAdmin && <Footer />}
+    </div>
+  );
+};
+
+const AppContent = () => {
+  return (
+    <Router>
+      <AppContentInner />
       <ToastContainer
         position="top-right"
         autoClose={3000}
@@ -32,6 +43,16 @@ const AppContent = () => {
         pauseOnHover
         draggable
         theme="colored"
+        limit={3}
+        newestOnTop={true}
+        rtl={false}
+        pauseOnFocusLoss={false}
+        style={{
+          zIndex: 10000,
+          position: 'fixed',
+          top: '100px',
+          right: '20px'
+        }}
       />
     </Router>
   );

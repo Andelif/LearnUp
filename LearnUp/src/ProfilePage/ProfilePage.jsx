@@ -1,7 +1,6 @@
 import { useState, useEffect, useContext } from "react";
 import { storeContext } from "../context/contextProvider";
 import axios from "axios";
-import { FaEdit } from "react-icons/fa";
 import './ProfilePage.css';
 
 const ProfilePage = () => {
@@ -13,6 +12,9 @@ const ProfilePage = () => {
   const apiBaseUrl = import.meta.env.VITE_API_BASE_URL || "http://localhost:8000";
 
   const fieldNames = {
+    id: "User ID",
+    tutor_id: "Tutor ID",
+    userId: "User ID",
     name: "Full Name",
     email: "Email Address",
     contact_number: "Contact Number",
@@ -22,6 +24,8 @@ const ProfilePage = () => {
     salary: "Preferred Salary",
     availability: "Availability",
   };
+
+  const nonEditableFields = ["id", "tutor_id", "userId"]; // Fields that cannot be edited
 
   useEffect(() => {
     if (user) {
@@ -44,16 +48,22 @@ const ProfilePage = () => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData((prevData) => ({ ...prevData, [name]: value }));
+    if (!nonEditableFields.includes(name)) {
+      setFormData((prevData) => ({ ...prevData, [name]: value }));
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
     setSuccess("");
-    
+
+    // Ensure IDs are not sent/modified
+    const updateData = { ...formData };
+    nonEditableFields.forEach((field) => delete updateData[field]);
+
     try {
-      await axios.put(`${apiBaseUrl}/api/${user.role}s/${user.id}`, formData, {
+      await axios.put(`${apiBaseUrl}/api/${user.role}s/${user.id}`, updateData, {
         headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
         withCredentials: true,
       });
@@ -67,7 +77,7 @@ const ProfilePage = () => {
   return (
     <div className="profile-page">
       <div className="profile-section">
-        <img src="https://via.placeholder.com/100x100.png?text=Profile+Pic" alt="Profile" className="profile-pic" />
+        <img src="src/assets/images.jpg" alt="Profile" className="profile-pic" />
         <h3>{user?.name}</h3>
         <p>{user?.email}</p>
       </div>
@@ -77,7 +87,6 @@ const ProfilePage = () => {
 
       {!isEditing ? (
         <div className="profile-info">
-          {/* Displaying user info */}
           {Object.keys(formData).map((key) => (
             <div key={key} className="info-item">
               <strong>{fieldNames[key] || key.replace(/([A-Z])/g, " $1").trim()}:</strong>
@@ -98,6 +107,7 @@ const ProfilePage = () => {
                   name={key}
                   value={formData[key] || ""}
                   onChange={handleInputChange}
+                  readOnly={nonEditableFields.includes(key)}
                 />
               </div>
             ))}

@@ -37,7 +37,7 @@ const Dashboard = () => {
       });
       console.log(response.data);
       if (response.data && response.data[0].tution_id) {
-        setTuitionId(response.data[0].tution_id); // Store tuition ID in state
+        setTuitionId(response.data[0].tution_id);
         console.log(tuitionId);
       } else {
         console.error("Tuition ID not found in response");
@@ -93,9 +93,9 @@ const Dashboard = () => {
   return (
     <div className="dashboard-container">
       <aside className="sidebar">
-        <div className="profile-section">
+        <div className="profile-sections">
           <Link to="/ProfilePage">
-            <img src="https://via.placeholder.com/80" alt="Profile" className="profile-pic" />
+            <img src="src/assets/images.jpg" alt="Profile" className="profile-pic" />
           </Link>
           <h3>{user?.name}</h3>
           <p>{user?.email}</p>
@@ -104,7 +104,7 @@ const Dashboard = () => {
         {user?.role === "learner" && <Link to='/myTuitions' className="sidebar-link">My Tuitions</Link>}
 
         {user?.role === 'tutor' && tuitionId && (
-          <Link to={`/voucher/${tuitionId}`} className="btn btn-primary">
+          <Link to={`/voucher/${tuitionId}`} className="sidebar-link">
             View Payment Voucher
           </Link>
         )}
@@ -146,7 +146,16 @@ const Dashboard = () => {
 
         <div className="info-boxes">
           <div className="info-box">
-            <FaCalendarAlt /> <p>Member Since: Aug 21, 2022</p>
+            <FaCalendarAlt /> <p> Member Since:{" "} {user?.created_at ? (() => {
+          const [datePart] = user.created_at.split(" "); // "2025-03-08"
+          const [year, month, day] = datePart.split("-");
+          const dateObj = new Date(year, month - 1, day); // month - 1 because JS months are 0-indexed
+          return dateObj.toLocaleDateString("en-US", {
+            year: "numeric",
+            month: "short",
+            day: "numeric",
+          });
+        })(): "N/A"}</p>
           </div>
           <div className="info-box">
             <FaEnvelope /> <p>03 Confirmation Letters</p>

@@ -29,13 +29,100 @@ html, body, #root {
   width: 100%;
   margin-top: auto;
 }
+
+/* Fixed Toast Container - Better positioning and z-index */
 .toast-container {
-  z-index: 9999 !important; /* Ensures toast stays on top */
-  position: fixed;
-  top: 20px;
-  right: 20px;
-  width: auto; /* Adjust width dynamically */
-  max-width: 250px; /* Prevents too wide toasts */
+  z-index: 10000 !important; /* Higher z-index but not too high */
+  position: fixed !important;
+  top: 80px !important; /* Move down to avoid navbar */
+  right: 20px !important;
+  width: auto !important;
+  max-width: 350px !important; /* Slightly wider for better readability */
   text-align: center;
   font-size: 14px;
+  pointer-events: none !important; /* Allow clicks to pass through */
+}
+
+/* Toast notifications themselves should have pointer events */
+.Toastify__toast {
+  pointer-events: auto !important;
+  margin-bottom: 10px !important;
+  border-radius: 8px !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+}
+
+/* Ensure form inputs have proper z-index */
+input, textarea, select, button {
+  position: relative;
+  z-index: 1;
+}
+
+/* Modal and overlay elements should be above toasts */
+.modal, .overlay, .popup {
+  z-index: 10001 !important;
+}
+
+/* Ensure dropdown menus are above toasts */
+.dropdown, .menu, .select-dropdown {
+  z-index: 10002 !important;
+}
+
+/* Additional form protection */
+form {
+  position: relative;
+  z-index: 1;
+}
+
+/* Ensure all form elements are clickable */
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="number"],
+input[type="tel"],
+input[type="url"],
+input[type="search"],
+input[type="date"],
+input[type="time"],
+input[type="datetime-local"],
+input[type="month"],
+input[type="week"],
+textarea,
+select,
+button,
+label {
+  position: relative !important;
+  z-index: 1 !important;
+  pointer-events: auto !important;
+}
+
+/* Toast-specific overrides */
+.Toastify__toast-container {
+  pointer-events: none !important;
+}
+
+.Toastify__toast {
+  pointer-events: auto !important;
+  position: relative !important;
+  z-index: 10000 !important;
+}
+
+/* Ensure form containers are above toasts */
+.find-tutors-form,
+.signup-form,
+.signin-form,
+.payment-form,
+.job-form,
+.profile-form {
+  position: relative;
+  z-index: 1;
+}
+
+/* Mobile responsive toast positioning */
+@media (max-width: 768px) {
+  .toast-container {
+    top: 70px !important;
+    right: 10px !important;
+    left: 10px !important;
+    max-width: calc(100vw - 20px) !important;
+  }
 }

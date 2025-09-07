@@ -50,9 +50,9 @@ const NavBar = () => {
               </Link>
             )}
           </div>
-          <div className="profile-section" onClick={() => setShowDropdown(!showDropdown)}>
+          <div className="profile-sections" onClick={() => setShowDropdown(!showDropdown)}>
             
-              <span className="profile-icon">👤</span>
+              <span className="profile-icons">👤</span>
               <br />
               <span className="user-name">{user.name}</span> {/* ✅ Show username */}
             

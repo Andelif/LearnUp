@@ -1,0 +1,158 @@
+/* ===== Container Styling ===== */
+.payment-voucher-container {
+    max-width: 600px;
+    margin: 40px auto;
+    padding: 30px 20px;
+    background-color: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    position: relative;
+    z-index: 1;
+  }
+  
+  /* ===== Header ===== */
+  .payment-voucher-container h2 {
+    font-size: 24px;
+    margin-bottom: 20px;
+    color: #333;
+    border-bottom: 2px solid #f0f0f0;
+    padding-bottom: 10px;
+  }
+  
+  /* ===== Info Paragraphs ===== */
+  .payment-voucher-container p {
+    margin: 12px 0;
+    font-size: 16px;
+    color: #444;
+  }
+  
+  .payment-voucher-container strong {
+    color: #000;
+  }
+  
+  /* ===== Button Styling ===== */
+  .payment-voucher-container button {
+    margin-top: 20px;
+    padding: 10px 20px;
+    font-size: 15px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.3s ease-in-out;
+    position: relative;
+    z-index: 2;
+  }
+  
+  .payment-voucher-container button:hover {
+    background-color: #0056b3;
+  }
+  
+  /* ===== Loading/Error Messages ===== */
+  .payment-voucher-message {
+    max-width: 600px;
+    margin: 100px auto;
+    text-align: center;
+    font-size: 18px;
+    color: #555;
+  }
+  
+  /* ===== Toast Container Overrides ===== */
+  /* Ensure toast container doesn't interfere with payment voucher */
+  .Toastify__toast-container {
+    position: fixed !important;
+    z-index: 10000 !important;
+    top: 80px !important;
+    right: 20px !important;
+    width: auto !important;
+    max-width: 350px !important;
+    pointer-events: none !important;
+  }
+  
+  .Toastify__toast {
+    pointer-events: auto !important;
+    margin-bottom: 10px !important;
+    border-radius: 8px !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+    position: relative !important;
+    z-index: 10001 !important;
+  }
+  
+  /* Specific toast type styling */
+  .Toastify__toast--success {
+    background-color: #28a745 !important;
+    color: white !important;
+  }
+  
+  .Toastify__toast--error {
+    background-color: #dc3545 !important;
+    color: white !important;
+  }
+  
+  .Toastify__toast--info {
+    background-color: #17a2b8 !important;
+    color: white !important;
+  }
+  
+  .Toastify__toast--warning {
+    background-color: #ffc107 !important;
+    color: #212529 !important;
+  }
+  
+  /* Toast close button */
+  .Toastify__close-button {
+    color: inherit !important;
+    opacity: 0.7 !important;
+  }
+  
+  .Toastify__close-button:hover {
+    opacity: 1 !important;
+  }
+  
+  /* Toast progress bar */
+  .Toastify__progress-bar {
+    background-color: rgba(255, 255, 255, 0.3) !important;
+  }
+  
+  /* Custom toast styling for payment voucher page */
+  .custom-toast {
+    position: fixed !important;
+    bottom: 1rem;
+    right: 1rem;
+    width: auto;
+    z-index: 10000;
+  }
+  
+  .custom-toast-body {
+    font-size: 14px;
+  }
+  
+  /* ===== Responsive ===== */
+  @media (max-width: 500px) {
+    .payment-voucher-container {
+      padding: 20px 15px;
+    }
+  
+    .payment-voucher-container h2 {
+      font-size: 20px;
+    }
+  
+    .payment-voucher-container p {
+      font-size: 15px;
+    }
+  
+    .payment-voucher-container button {
+      width: 100%;
+    }
+    
+    /* Mobile toast positioning */
+    .Toastify__toast-container {
+      top: 70px !important;
+      right: 10px !important;
+      left: 10px !important;
+      max-width: calc(100vw - 20px) !important;
+    }
+  }
+  

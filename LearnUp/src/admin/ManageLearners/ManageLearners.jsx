@@ -62,6 +62,7 @@ const ManageLearners = () => {
             <th>Guardian Name</th>
             <th>Contact Number</th>
             <th>Address</th>
+            <th>Actions</th>
           </tr>
         </thead>
         <tbody>
