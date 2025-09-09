@@ -13,6 +13,7 @@ use App\Http\Controllers\AdminController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ConfirmedTuitionController;
 use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\PasswordResetController;
 
 
 
@@ -102,6 +103,13 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/payment/initiate', [PaymentController::class, 'initiatePayment']);
 
     Route::put('/confirmed-tuitions/{id}', [ConfirmedTuitionController::class, 'update']);
+
+
+    // Password Reset Routes
+    Route::post('/password/forgot', [PasswordResetController::class, 'send']);   // Send OTP to email
+    Route::post('/password/verify', [PasswordResetController::class, 'verify']); // Verify OTP
+    Route::post('/password/reset', [PasswordResetController::class, 'reset']);   // Reset password
+    
     
     Route::get('/migrate', function () {
         Artisan::call('migrate', ['--force' => true]);
