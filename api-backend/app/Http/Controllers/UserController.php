@@ -31,7 +31,7 @@ class UserController extends Controller
             'password'             => 'required|string|min:6|confirmed',
             'role'                 => 'required|string|in:learner,tutor,admin',
             'gender'               => 'nullable|string|in:male,female,other,Male,Female,Other',
-            'contact_number'       => 'nullable|string|max:20',
+            'contact_number'       => 'nullable|string|digits:11',
             
             'qualification'        => 'nullable|string|max:255',
             'experience'           => 'nullable|integer|min:0',
