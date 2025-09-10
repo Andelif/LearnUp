@@ -15,17 +15,19 @@ use App\Http\Controllers\ConfirmedTuitionController;
 use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\PasswordResetController;
 
-
-
-
+// Public routes
 Route::post('/register', [UserController::class, 'register']);
 Route::post('/login', [UserController::class, 'login']);
 Route::get('/tuition-requests/all', [TuitionRequestController::class, 'index']);
 Route::get('/tuition-requests/{id}', [TuitionRequestController::class, 'show']);
 Route::get('/tuition-requests/filter', [TuitionRequestController::class, 'filterTuitionRequests']);
 
-// Authentication Routes
+// ✅ Password Reset should be public (no auth)
+Route::post('/password/forgot', [PasswordResetController::class, 'send']);   // Send OTP
+Route::post('/password/verify', [PasswordResetController::class, 'verify']); // Verify OTP
+Route::post('/password/reset',  [PasswordResetController::class, 'reset']);  // Reset password
 
+// Authenticated routes
 Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/user', [UserController::class, 'getUser']);
     Route::post('/logout', [UserController::class, 'logout']);
@@ -39,8 +41,6 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::put('/learners/{id}', [LearnerController::class, 'update']);
 
     Route::post('/tuition-requests', [TuitionRequestController::class, 'store']); 
-    
-
     Route::put('/tuition-requests/{id}', [TuitionRequestController::class, 'update']);
     Route::delete('/tuition-requests/{id}', [TuitionRequestController::class, 'destroy']);
     Route::get('/tuition-requests', [TuitionRequestController::class, 'getAllRequests']);
@@ -49,32 +49,21 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/tutor/{userId}/stats', [ApplicationController::class, 'getTutorStats']);
     Route::get('/applications/check/{tuition_id}', [ApplicationController::class, 'checkApplication']); 
     Route::get('/learner/{userId}/stats', [ApplicationController::class, 'getLearnerStats']);
-    //Route::resource('messages', MessageController::class);
-    Route::resource('notifications', NotificationController::class);
 
-    // Notification Routes
+    Route::resource('notifications', NotificationController::class);
     Route::get('/notifications', [NotificationController::class, 'index']);  
     Route::post('/notifications', [NotificationController::class, 'store']); 
     Route::put('/notifications/{id}/read', [NotificationController::class, 'markAsRead']); 
     Route::delete('/notifications/{id}', [NotificationController::class, 'destroy']);
-    
-    
 
-    //Message Routes
-    Route::post('/messages', [MessageController::class, 'sendMessage']); 
-    Route::get('/messages/{userId}', [MessageController::class, 'getMessages']); 
-    Route::put('/messages/seen/{senderId}', [MessageController::class, 'markAsSeen']); 
-
-
-    //Message Routes
+    // Messages
     Route::post('/messages', [MessageController::class, 'sendMessage']); 
     Route::get('/messages/{userId}', [MessageController::class, 'getMessages']); 
     Route::put('/messages/seen/{senderId}', [MessageController::class, 'markAsSeen']); 
     Route::get('/matched-users', [MessageController::class, 'getMatchedUsers']); 
     Route::post('/reject-tutor', [MessageController::class, 'rejectTutor']);
 
-
-    //Admin Functionalities
+    // Admin
     Route::get('/admin/learners', [AdminController::class, 'getLearners']);
     Route::delete('/admin/learners/{id}', [AdminController::class, 'deleteLearner']);
     Route::get('/admin/tutors', [AdminController::class, 'getTutors']);
@@ -84,36 +73,24 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/admin/applications/{tuition_id}', [AdminController::class, 'getApplicationsByTuitionID']);
     Route::post('/admin/match-tutor', [AdminController::class, 'matchTutor']);
 
-
-    //Dashboard Route
+    // Dashboard
     Route::get('/dashboard/{userId}/{role}', [DashboardController::class, 'getDashboardStats']);
 
-
-    //Confirmed Tution
+    // Confirmed Tuition
     Route::resource('confirmed-tuitions', ConfirmedTuitionController::class);
-
     Route::get('/confirmed-tuitions', [ConfirmedTuitionController::class, 'index']);  
     Route::post('/confirmed-tuitions', [ConfirmedTuitionController::class, 'store']);
     Route::get('/confirmed-tuition/invoice/{tutionId}', [ConfirmedTuitionController::class, 'getPaymentVoucher']);
     Route::post('/payment-marked/{tutionId}', [ConfirmedTuitionsController::class, 'markPayment']);
     Route::delete('/confirmed-tuitions/{id}', [ConfirmedTuitionController::class, 'destroy']);
-   
-    
-    //Payment Routes
-    Route::post('/payment/initiate', [PaymentController::class, 'initiatePayment']);
-
     Route::put('/confirmed-tuitions/{id}', [ConfirmedTuitionController::class, 'update']);
 
+    // Payments
+    Route::post('/payment/initiate', [PaymentController::class, 'initiatePayment']);
 
-    // Password Reset Routes
-    Route::post('/password/forgot', [PasswordResetController::class, 'send']);   // Send OTP to email
-    Route::post('/password/verify', [PasswordResetController::class, 'verify']); // Verify OTP
-    Route::post('/password/reset', [PasswordResetController::class, 'reset']);   // Reset password
-    
-    
+    // Utilities
     Route::get('/migrate', function () {
         Artisan::call('migrate', ['--force' => true]);
         return response()->json(['message' => '✅ Migrations run successfully!']);
     });
-
 });

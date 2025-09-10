@@ -132,7 +132,7 @@ const SignIn = () => {
               >
                 Forgot Password?
               </div>
-              <div className="forgot-password">Forgot Password?</div>
+              
 
               {error && <p className="error">{error}</p>}
 
