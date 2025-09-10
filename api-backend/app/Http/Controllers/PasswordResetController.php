@@ -52,17 +52,23 @@ class PasswordResetController extends Controller
             ['token' => $hash, 'created_at' => Carbon::now()]
         );
 
-        // Send the code (quietly succeeds even if user email doesn’t exist)
+        // Try sending the mail
         try {
-            \Illuminate\Support\Facades\Mail::to($email)->send(new PasswordResetCode($code));
+            \Mail::to($email)->send(new PasswordResetCode($code));
         } catch (\Throwable $e) {
-            // Swallow mail errors to avoid user enumeration; you can log if needed
+            // ✅ Log the error so you can see what failed in Render / logs
+            \Log::error('Password reset mail failed', [
+                'email' => $email,
+                'error' => $e->getMessage(),
+            ]);
         }
 
+        // Always respond generically to the user
         return response()->json([
             'message' => 'If the email exists, a verification code has been sent.'
         ], 200);
     }
+
 
 
     /**
