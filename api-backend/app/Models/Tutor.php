@@ -10,13 +10,9 @@ class Tutor extends Model
     use HasFactory;
 
     protected $table = 'tutors';
-
-
     protected $primaryKey = 'TutorID';
     public $incrementing = true;
     protected $keyType = 'int';
-
-
     public $timestamps = false;
 
     protected $fillable = [
@@ -32,6 +28,7 @@ class Tutor extends Model
         'preferred_location',
         'preferred_time',
         'availability',
+        'profile_picture',   
     ];
 
     protected $casts = [

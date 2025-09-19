@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Learner;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class LearnerService
 {
@@ -39,8 +40,17 @@ class LearnerService
     {
         $payload = $this->onlyAllowed($data);
         $payload['user_id'] = $userId;
+
         if (array_key_exists('gender', $payload)) {
             $payload['gender'] = $this->normalizeGender($payload['gender']);
+        }
+
+        // Handle profile picture replacement
+        if (array_key_exists('profile_picture', $payload) && $payload['profile_picture'] !== null) {
+            $existing = Learner::where('user_id', $userId)->first();
+            if ($existing && $existing->profile_picture && $existing->profile_picture !== $payload['profile_picture']) {
+                $this->deleteFileFromStorage($existing->profile_picture);
+            }
         }
 
         $row = DB::transaction(fn () =>
@@ -52,7 +62,6 @@ class LearnerService
 
     /**
      * PUT /api/learners/{userId}
-     * Idempotent: create if missing, update otherwise.
      */
     public function updateForUser(int $userId, array $data): Learner
     {
@@ -62,6 +71,10 @@ class LearnerService
     /** Delete by users.id; returns number of deleted rows. */
     public function deleteByUserId(int $userId): int
     {
+        $existing = Learner::where('user_id', $userId)->first();
+        if ($existing && $existing->profile_picture) {
+            $this->deleteFileFromStorage($existing->profile_picture);
+        }
         return Learner::where('user_id', $userId)->delete();
     }
 
@@ -75,6 +88,7 @@ class LearnerService
             'guardian_contact_number',
             'gender',
             'address',
+            'profile_picture',
         ];
 
         $out = [];
@@ -84,5 +98,14 @@ class LearnerService
             }
         }
         return $out;
+    }
+
+    /** Delete file safely from storage path (expects "/storage/..."). */
+    private function deleteFileFromStorage(string $publicPath): void
+    {
+        $relativePath = str_replace('/storage/', '', $publicPath);
+        if (Storage::disk('public')->exists($relativePath)) {
+            Storage::disk('public')->delete($relativePath);
+        }
     }
 }

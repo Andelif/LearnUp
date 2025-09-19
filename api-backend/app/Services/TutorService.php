@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Tutor;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class TutorService
 {
@@ -24,7 +25,7 @@ class TutorService
         if ($v === null) return null;
         if ($v === true || $v === 1 || $v === '1' || $v === 'true')  return true;
         if ($v === false || $v === 0 || $v === '0' || $v === 'false') return false;
-        return null; // unknown text → don’t overwrite
+        return null;
     }
 
     /** Admin list (controller already guards). Order by real PK. */
@@ -54,11 +55,18 @@ class TutorService
         if (array_key_exists('preferred_salary', $payload) && $payload['preferred_salary'] !== null) {
             $payload['preferred_salary'] = (int) $payload['preferred_salary'];
         }
-        // experience column is varchar(255) in your DB, so keep it as string if provided
         if (array_key_exists('availability', $payload)) {
             $norm = $this->normalizeAvailability($payload['availability']);
             if ($norm !== null) $payload['availability'] = $norm;
-            else unset($payload['availability']); // avoid writing invalid text to bool column
+            else unset($payload['availability']);
+        }
+
+        // Handle profile picture replacement
+        if (array_key_exists('profile_picture', $payload) && $payload['profile_picture'] !== null) {
+            $existing = Tutor::where('user_id', $userId)->first();
+            if ($existing && $existing->profile_picture && $existing->profile_picture !== $payload['profile_picture']) {
+                $this->deleteFileFromStorage($existing->profile_picture);
+            }
         }
 
         $row = DB::transaction(fn () =>
@@ -71,6 +79,10 @@ class TutorService
     /** Delete by users.id; returns number of deleted rows. */
     public function deleteByUserId(int $userId): int
     {
+        $existing = Tutor::where('user_id', $userId)->first();
+        if ($existing && $existing->profile_picture) {
+            $this->deleteFileFromStorage($existing->profile_picture);
+        }
         return Tutor::where('user_id', $userId)->delete();
     }
 
@@ -84,11 +96,12 @@ class TutorService
             'gender',
             'preferred_salary',
             'qualification',
-            'experience',              // varchar(255)
+            'experience',
             'currently_studying_in',
             'preferred_location',
             'preferred_time',
-            'availability',            // bool
+            'availability',
+            'profile_picture',
         ];
 
         $out = [];
@@ -98,5 +111,14 @@ class TutorService
             }
         }
         return $out;
+    }
+
+    /** Delete file safely from storage path (expects "/storage/..."). */
+    private function deleteFileFromStorage(string $publicPath): void
+    {
+        $relativePath = str_replace('/storage/', '', $publicPath);
+        if (Storage::disk('public')->exists($relativePath)) {
+            Storage::disk('public')->delete($relativePath);
+        }
     }
 }

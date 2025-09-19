@@ -134,11 +134,38 @@
   letter-spacing: 0.3px;
 }
 
+.delete-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #4F46E5;
+  color: white;
+  border: none;
+  padding: 14px 32px;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin: 30px auto 0;
+  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25);
+  letter-spacing: 0.3px;
+}
+
+
 .edit-btn:hover {
   background: #4338CA;
   transform: translateY(-2px);
   box-shadow: 0 6px 16px rgba(79, 70, 229, 0.3);
 }
+
+.delete-btn:hover {
+  background: #ffffff;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(79, 70, 229, 0.3);
+  
+}
+
 
 .edit-form-container {
   background: white;
