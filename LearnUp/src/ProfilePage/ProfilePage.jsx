@@ -1,6 +1,6 @@
 import { useState, useEffect, useContext } from "react";
 import { storeContext } from "../context/contextProvider";
-import { FaEdit } from "react-icons/fa";
+import { FaEdit, FaTrash } from "react-icons/fa";
 import "./ProfilePage.css";
 
 const IMMUTABLE_KEYS = [
@@ -30,6 +30,7 @@ const pickEditable = (role, data) => {
     "contact_number",
     "address",
     "availability",
+    "profile_picture",
   ];
 
   const learnerOnly = [
@@ -39,6 +40,7 @@ const pickEditable = (role, data) => {
     "guardian_contact_number",
     "gender",
     "address",
+    "profile_picture",
   ];
 
   const allow = role === "tutor" ? tutorOnly : learnerOnly;
@@ -52,6 +54,7 @@ const DEFAULT_LEARNER_FIELDS = {
   guardian_contact_number: "",
   gender: "",
   address: "",
+  profile_picture: null,
 };
 
 const DEFAULT_TUTOR_FIELDS = {
@@ -65,8 +68,11 @@ const DEFAULT_TUTOR_FIELDS = {
   currently_studying_in: "",
   preferred_location: "",
   preferred_time: "",
-  availability: true, // your DB column is boolean
+  availability: true,
+  profile_picture: null,
 };
+
+const DEFAULT_PROFILE_PIC = "/assets/profile.jpg";
 
 const ProfilePage = () => {
   const { api, user, token } = useContext(storeContext);
@@ -92,11 +98,12 @@ const ProfilePage = () => {
     setIsEditing(false);
 
     try {
-      // IMPORTANT: always hit with users.id (not TutorID/LearnerID)
-      const { data } = await api.get(`/api/${user.role}s/${user.id}`, authHeader);
+      const { data } = await api.get(
+        `/api/${user.role}s/${user.id}`,
+        authHeader
+      );
       setFormData(data || {});
     } catch (e) {
-      // If not found, prep a "create" form with defaults
       if (e?.response?.status === 404) {
         const base =
           user.role === "tutor"
@@ -116,11 +123,18 @@ const ProfilePage = () => {
   };
 
   const handleInputChange = (e) => {
-    const { name, value, type, checked } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: type === "checkbox" ? checked : value,
-    }));
+    const { name, value, type, checked, files } = e.target;
+    if (type === "file") {
+      setFormData((prev) => ({
+        ...prev,
+        [name]: files[0],
+      }));
+    } else {
+      setFormData((prev) => ({
+        ...prev,
+        [name]: type === "checkbox" ? checked : value,
+      }));
+    }
   };
 
   const normalizeForSubmit = (role, editable) => {
@@ -130,7 +144,6 @@ const ProfilePage = () => {
       const n = Number(out.preferred_salary);
       if (!Number.isNaN(n)) out.preferred_salary = n;
     }
-    // availability is boolean in DB; support text "true"/"false" just in case
     if (out.availability !== undefined) {
       if (typeof out.availability === "string") {
         const s = out.availability.toLowerCase().trim();
@@ -150,49 +163,72 @@ const ProfilePage = () => {
       let editable = pickEditable(user.role, formData);
       editable = normalizeForSubmit(user.role, editable);
 
-      if (isNewProfile) {
-        // learner POST validator requires full_name
-        if (user.role === "learner" && !editable.full_name) {
-          setError("Full name is required.");
-          return;
-        }
-        const payload = { ...editable, user_id: user.id };
-        const res = await api.post(`/api/${user.role}s`, payload, {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
+      let payload;
+      let headers;
+
+      if (editable.profile_picture instanceof File) {
+        payload = new FormData();
+        Object.keys(editable).forEach((k) => {
+          if (editable[k] !== null && editable[k] !== undefined) {
+            payload.append(k, editable[k]);
+          }
         });
-        setSuccess(res?.data?.message || "Profile created successfully!");
+        headers = {
+          Authorization: `Bearer ${token}`,
+          Accept: "application/json",
+          "Content-Type": "multipart/form-data",
+        };
       } else {
-        // ALWAYS users.id for both roles
-        const res = await api.put(`/api/${user.role}s/${user.id}`, editable, {
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        setSuccess(res?.data?.message || "Profile updated successfully!");
+        payload = editable;
+        headers = {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+        };
       }
 
+      let res;
+      if (isNewProfile) {
+        res = await api.post(`/api/${user.role}s`, payload, { headers });
+      } else {
+        res = await api.put(`/api/${user.role}s/${user.id}`, payload, {
+          headers,
+        });
+      }
+
+      setSuccess(res?.data?.message || "Profile saved!");
       setTimeout(() => setIsEditing(false), 800);
       fetchUserData();
     } catch (err) {
-      const msg =
+      setError(
         err?.response?.data?.message ||
-        err?.response?.data?.error ||
-        err?.message ||
-        "Error saving profile.";
-      setError(msg);
+          err?.response?.data?.error ||
+          err?.message ||
+          "Error saving profile."
+      );
     }
   };
 
-  // Fields to render as inputs
+  const handleDelete = async () => {
+    try {
+      await api.delete(`/api/${user.role}s/${user.id}`, authHeader);
+      setFormData({});
+      setIsNewProfile(true);
+      setIsEditing(true);
+      setSuccess("Profile deleted successfully.");
+    } catch (err) {
+      setError(
+        err?.response?.data?.message ||
+          err?.response?.data?.error ||
+          err?.message ||
+          "Error deleting profile."
+      );
+    }
+  };
+
   const keysForDisplay = Object.keys(formData).filter(
     (k) => !IMMUTABLE_KEYS.includes(k)
   );
 
-  // On brand-new create, ensure default fields present
   const ensureDefaults =
     isNewProfile && keysForDisplay.length === 0
       ? user.role === "tutor"
@@ -203,16 +239,24 @@ const ProfilePage = () => {
   const displayPairs = ensureDefaults.map((key) => ({
     key,
     label: key.replace(/_/g, " ").replace(/([A-Z])/g, " $1").trim(),
-    value: formData[key] ?? (user.role === "tutor"
-      ? DEFAULT_TUTOR_FIELDS[key]
-      : DEFAULT_LEARNER_FIELDS[key]),
+    value:
+      formData[key] ??
+      (user.role === "tutor"
+        ? DEFAULT_TUTOR_FIELDS[key]
+        : DEFAULT_LEARNER_FIELDS[key]),
   }));
 
   return (
     <div className="profile-page">
       <div className="profile-section">
         <img
-          src="assets/profile.jpg"
+          src={
+            formData.profile_picture
+              ? formData.profile_picture instanceof File
+                ? URL.createObjectURL(formData.profile_picture)
+                : formData.profile_picture
+              : DEFAULT_PROFILE_PIC
+          }
           alt="Profile"
           className="profile-pic"
         />
@@ -235,17 +279,24 @@ const ProfilePage = () => {
               </div>
             ))
           )}
-          <button className="edit-btn" onClick={() => setIsEditing(true)}>
-            <FaEdit style={{ marginRight: 6 }} />
-            {isNewProfile ? "Create" : "Edit"}
-          </button>
+          <div className="button-group">
+            <button className="edit-btn" onClick={() => setIsEditing(true)}>
+              <FaEdit style={{ marginRight: 6 }} />
+              {isNewProfile ? "Create" : "Edit"}
+            </button>
+            {!isNewProfile && (
+              <button className="delete-btn" onClick={handleDelete}>
+                <FaTrash style={{ marginRight: 6 }} />
+                Delete
+              </button>
+            )}
+          </div>
         </div>
       ) : (
         <div className="edit-form-container">
           <h2>{isNewProfile ? "Create Profile" : "Edit Profile"}</h2>
           <form onSubmit={handleSubmit}>
             {displayPairs.map(({ key, label }) => {
-              // boolean checkbox for tutor availability
               if (user.role === "tutor" && key === "availability") {
                 return (
                   <div key={key} className="form-group">
@@ -254,6 +305,19 @@ const ProfilePage = () => {
                       type="checkbox"
                       name={key}
                       checked={!!formData[key]}
+                      onChange={handleInputChange}
+                    />
+                  </div>
+                );
+              }
+              if (key === "profile_picture") {
+                return (
+                  <div key={key} className="form-group">
+                    <label>{label}:</label>
+                    <input
+                      type="file"
+                      name={key}
+                      accept="image/*"
                       onChange={handleInputChange}
                     />
                   </div>

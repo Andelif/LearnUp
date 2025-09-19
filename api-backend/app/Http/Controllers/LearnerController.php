@@ -58,13 +58,21 @@ class LearnerController extends Controller
             'guardian_contact_number' => 'nullable|string|max:20',
             'gender'                  => 'nullable|string|in:male,female,other,Male,Female,Other',
             'address'                 => 'nullable|string|max:255',
+            'profile_picture'         => 'sometimes|nullable|image|mimes:jpg,jpeg,png,gif|max:2048',
         ]);
 
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 400);
         }
 
-        $row = $this->learnerService->upsertForUser($user->id, $validator->validated());
+        $validated = $validator->validated();
+
+        if ($request->hasFile('profile_picture')) {
+            $path = $request->file('profile_picture')->store('profile_pictures', 'public');
+            $validated['profile_picture'] = "/storage/" . $path;
+        }
+
+        $row = $this->learnerService->upsertForUser($user->id, $validated);
 
         return response()->json([
             'message' => 'Learner profile saved',
@@ -100,7 +108,6 @@ class LearnerController extends Controller
         $user = Auth::user();
         if (!$user) return response()->json(['message' => 'Unauthorized'], 401);
 
-
         $validator = Validator::make($request->all(), [
             'full_name'               => 'sometimes|required|string|max:255',
             'guardian_full_name'      => 'sometimes|nullable|string|max:255',
@@ -108,13 +115,21 @@ class LearnerController extends Controller
             'guardian_contact_number' => 'sometimes|nullable|string|max:20',
             'gender'                  => 'sometimes|nullable|string|in:male,female,other,Male,Female,Other',
             'address'                 => 'sometimes|nullable|string|max:255',
+            'profile_picture'         => 'sometimes|nullable|image|mimes:jpg,jpeg,png,gif|max:2048',
         ]);
 
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 400);
         }
 
-        $row = $this->learnerService->updateForUser((int)$userId, $validator->validated());
+        $validated = $validator->validated();
+
+        if ($request->hasFile('profile_picture')) {
+            $path = $request->file('profile_picture')->store('profile_pictures', 'public');
+            $validated['profile_picture'] = "/storage/" . $path;
+        }
+
+        $row = $this->learnerService->updateForUser((int)$userId, $validated);
 
         return response()->json([
             'message' => 'Learner profile updated successfully',
@@ -122,7 +137,6 @@ class LearnerController extends Controller
         ], 200);
     }
 
-    
     public function destroy($userId)
     {
         $user = Auth::user();

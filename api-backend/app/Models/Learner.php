@@ -10,7 +10,7 @@ class Learner extends Model
     protected $primaryKey = 'LearnerID';
     public $incrementing = true;
     protected $keyType = 'int';
-    public $timestamps = true; // uses created_at, updated_at
+    public $timestamps = true;
 
     protected $fillable = [
         'user_id',
@@ -20,5 +20,6 @@ class Learner extends Model
         'guardian_contact_number',
         'gender',
         'address',
+        'profile_picture',   
     ];
 }

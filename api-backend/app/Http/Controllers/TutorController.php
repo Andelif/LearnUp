@@ -43,26 +43,32 @@ class TutorController extends Controller
         }
 
         $validator = Validator::make($request->all(), [
-            'full_name'              => 'required|string|max:255',
-            'address'                => 'nullable|string|max:255',
-            'contact_number'         => 'nullable|string|max:20',
-            'gender'                 => 'nullable|string|in:male,female,other,Male,Female,Other',
-            'preferred_salary'       => 'nullable|integer|min:0',
-            'qualification'          => 'nullable|string|max:255',
-            // DB column is varchar(255) → treat as string
-            'experience'             => 'nullable|string|max:255',
-            'currently_studying_in'  => 'nullable|string|max:255',
-            'preferred_location'     => 'nullable|string|max:255',
-            'preferred_time'         => 'nullable|string|max:255',
-            // DB column is boolean → validate as boolean
-            'availability'           => 'nullable|boolean',
+            'full_name'             => 'required|string|max:255',
+            'address'               => 'nullable|string|max:255',
+            'contact_number'        => 'nullable|string|max:20',
+            'gender'                => 'nullable|string|in:male,female,other,Male,Female,Other',
+            'preferred_salary'      => 'nullable|integer|min:0',
+            'qualification'         => 'nullable|string|max:255',
+            'experience'            => 'nullable|string|max:255',
+            'currently_studying_in' => 'nullable|string|max:255',
+            'preferred_location'    => 'nullable|string|max:255',
+            'preferred_time'        => 'nullable|string|max:255',
+            'availability'          => 'nullable|boolean',
+            'profile_picture'       => 'sometimes|nullable|image|mimes:jpg,jpeg,png,gif|max:2048',
         ]);
 
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 400);
         }
 
-        $row = $this->tutorService->upsertForUser($user->id, $validator->validated());
+        $validated = $validator->validated();
+
+        if ($request->hasFile('profile_picture')) {
+            $path = $request->file('profile_picture')->store('profile_pictures', 'public');
+            $validated['profile_picture'] = "/storage/" . $path;
+        }
+
+        $row = $this->tutorService->upsertForUser($user->id, $validated);
 
         return response()->json([
             'message' => 'Tutor profile saved',
@@ -93,26 +99,32 @@ class TutorController extends Controller
         if (!$user) return response()->json(['message' => 'Unauthorized'], 401);
 
         $validator = Validator::make($request->all(), [
-            'full_name'              => 'sometimes|required|string|max:255',
-            'address'                => 'sometimes|nullable|string|max:255',
-            'contact_number'         => 'sometimes|nullable|string|max:20',
-            'gender'                 => 'sometimes|nullable|string|in:male,female,other,Male,Female,Other',
-            'preferred_salary'       => 'sometimes|nullable|integer|min:0',
-            'qualification'          => 'sometimes|nullable|string|max:255',
-            // keep as string, not integer
-            'experience'             => 'sometimes|nullable|string|max:255',
-            'currently_studying_in'  => 'sometimes|nullable|string|max:255',
-            'preferred_location'     => 'sometimes|nullable|string|max:255',
-            'preferred_time'         => 'sometimes|nullable|string|max:255',
-            // boolean, not string
-            'availability'           => 'sometimes|nullable|boolean',
+            'full_name'             => 'sometimes|required|string|max:255',
+            'address'               => 'sometimes|nullable|string|max:255',
+            'contact_number'        => 'sometimes|nullable|string|max:20',
+            'gender'                => 'sometimes|nullable|string|in:male,female,other,Male,Female,Other',
+            'preferred_salary'      => 'sometimes|nullable|integer|min:0',
+            'qualification'         => 'sometimes|nullable|string|max:255',
+            'experience'            => 'sometimes|nullable|string|max:255',
+            'currently_studying_in' => 'sometimes|nullable|string|max:255',
+            'preferred_location'    => 'sometimes|nullable|string|max:255',
+            'preferred_time'        => 'sometimes|nullable|string|max:255',
+            'availability'          => 'sometimes|nullable|boolean',
+            'profile_picture'       => 'sometimes|nullable|image|mimes:jpg,jpeg,png,gif|max:2048',
         ]);
 
         if ($validator->fails()) {
             return response()->json(['errors' => $validator->errors()], 400);
         }
 
-        $row = $this->tutorService->upsertForUser((int)$userId, $validator->validated());
+        $validated = $validator->validated();
+
+        if ($request->hasFile('profile_picture')) {
+            $path = $request->file('profile_picture')->store('profile_pictures', 'public');
+            $validated['profile_picture'] = "/storage/" . $path;
+        }
+
+        $row = $this->tutorService->upsertForUser((int)$userId, $validated);
 
         return response()->json([
             'message' => 'Tutor profile updated successfully',
