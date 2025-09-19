@@ -34,7 +34,7 @@ class TutorController extends Controller
         return response()->json($me, 200);
     }
 
-    /** POST /api/tutors  (create or update current tutor profile) */
+    /** POST /api/tutors */
     public function store(Request $request)
     {
         $user = Auth::user();
@@ -43,18 +43,18 @@ class TutorController extends Controller
         }
 
         $validator = Validator::make($request->all(), [
-            'full_name'             => 'required|string|max:255',
-            'address'               => 'nullable|string|max:255',
-            'contact_number'        => 'nullable|string|max:20',
-            'gender'                => 'nullable|string|in:male,female,other,Male,Female,Other',
-            'preferred_salary'      => 'nullable|integer|min:0',
-            'qualification'         => 'nullable|string|max:255',
-            'experience'            => 'nullable|string|max:255',
-            'currently_studying_in' => 'nullable|string|max:255',
-            'preferred_location'    => 'nullable|string|max:255',
-            'preferred_time'        => 'nullable|string|max:255',
-            'availability'          => 'nullable|boolean',
-            'profile_picture'       => 'sometimes|nullable|image|mimes:jpg,jpeg,png,gif|max:2048',
+            'full_name'              => 'required|string|max:255',
+            'address'                => 'nullable|string|max:255',
+            'contact_number'         => 'nullable|string|max:20',
+            'gender'                 => 'nullable|string|in:male,female,other,Male,Female,Other',
+            'preferred_salary'       => 'nullable|integer|min:0',
+            'qualification'          => 'nullable|string|max:255',
+            'experience'             => 'nullable|string|max:255',
+            'currently_studying_in'  => 'nullable|string|max:255',
+            'preferred_location'     => 'nullable|string|max:255',
+            'preferred_time'         => 'nullable|string|max:255',
+            'availability'           => 'nullable|boolean',
+            'profile_picture'        => 'sometimes|nullable|image|mimes:jpg,jpeg,png,gif|max:2048',
         ]);
 
         if ($validator->fails()) {
@@ -99,18 +99,18 @@ class TutorController extends Controller
         if (!$user) return response()->json(['message' => 'Unauthorized'], 401);
 
         $validator = Validator::make($request->all(), [
-            'full_name'             => 'sometimes|required|string|max:255',
-            'address'               => 'sometimes|nullable|string|max:255',
-            'contact_number'        => 'sometimes|nullable|string|max:20',
-            'gender'                => 'sometimes|nullable|string|in:male,female,other,Male,Female,Other',
-            'preferred_salary'      => 'sometimes|nullable|integer|min:0',
-            'qualification'         => 'sometimes|nullable|string|max:255',
-            'experience'            => 'sometimes|nullable|string|max:255',
-            'currently_studying_in' => 'sometimes|nullable|string|max:255',
-            'preferred_location'    => 'sometimes|nullable|string|max:255',
-            'preferred_time'        => 'sometimes|nullable|string|max:255',
-            'availability'          => 'sometimes|nullable|boolean',
-            'profile_picture'       => 'sometimes|nullable|image|mimes:jpg,jpeg,png,gif|max:2048',
+            'full_name'              => 'sometimes|required|string|max:255',
+            'address'                => 'sometimes|nullable|string|max:255',
+            'contact_number'         => 'sometimes|nullable|string|max:20',
+            'gender'                 => 'sometimes|nullable|string|in:male,female,other,Male,Female,Other',
+            'preferred_salary'       => 'sometimes|nullable|integer|min:0',
+            'qualification'          => 'sometimes|nullable|string|max:255',
+            'experience'             => 'sometimes|nullable|string|max:255',
+            'currently_studying_in'  => 'sometimes|nullable|string|max:255',
+            'preferred_location'     => 'sometimes|nullable|string|max:255',
+            'preferred_time'         => 'sometimes|nullable|string|max:255',
+            'availability'           => 'sometimes|nullable|boolean',
+            'profile_picture'        => 'sometimes|nullable|image|mimes:jpg,jpeg,png,gif|max:2048',
         ]);
 
         if ($validator->fails()) {

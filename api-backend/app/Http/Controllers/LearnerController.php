@@ -18,8 +18,6 @@ class LearnerController extends Controller
 
     /**
      * GET /api/learners
-     * - If the user is a learner: return their own learner profile.
-     * - If the user is an admin: return list of all learners.
      */
     public function index()
     {
@@ -42,7 +40,6 @@ class LearnerController extends Controller
 
     /**
      * POST /api/learners
-     * Create or update current learner’s profile
      */
     public function store(Request $request)
     {
@@ -82,7 +79,6 @@ class LearnerController extends Controller
 
     /**
      * GET /api/learners/{userId}
-     * Only the owner (or admin) can view.
      */
     public function show($userId)
     {
@@ -101,7 +97,6 @@ class LearnerController extends Controller
 
     /**
      * PUT /api/learners/{userId}
-     * Only the owner (or admin) can update.
      */
     public function update(Request $request, $userId)
     {
@@ -137,6 +132,9 @@ class LearnerController extends Controller
         ], 200);
     }
 
+    /**
+     * DELETE /api/learners/{userId}
+     */
     public function destroy($userId)
     {
         $user = Auth::user();
