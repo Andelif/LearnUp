@@ -6,6 +6,7 @@ use App\Services\TutorService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Log;
 
 class TutorController extends Controller
 {
@@ -16,11 +17,12 @@ class TutorController extends Controller
         $this->tutorService = $tutorService;
     }
 
-    /** GET /api/tutors  */
     public function index()
     {
         $user = Auth::user();
-        if (!$user) return response()->json(['message' => 'Unauthorized'], 401);
+        if (!$user) {
+            return response()->json(['message' => 'Unauthorized'], 401);
+        }
 
         if ($user->role === 'admin') {
             return response()->json($this->tutorService->getAllTutors(), 200);
@@ -34,7 +36,6 @@ class TutorController extends Controller
         return response()->json($me, 200);
     }
 
-    /** POST /api/tutors */
     public function store(Request $request)
     {
         $user = Auth::user();
@@ -58,25 +59,37 @@ class TutorController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 400);
+            Log::warning("Tutor profile validation failed", ['errors' => $validator->errors()]);
+            return response()->json([
+                'message' => 'Validation failed',
+                'errors'  => $validator->errors()
+            ], 400);
         }
 
         $validated = $validator->validated();
 
-        if ($request->hasFile('profile_picture')) {
-            $path = $request->file('profile_picture')->store('profile_pictures', 'public');
-            $validated['profile_picture'] = "/storage/" . $path;
+        try {
+            if ($request->hasFile('profile_picture')) {
+                $path = $request->file('profile_picture')->store('profile_pictures', 'public');
+                $validated['profile_picture'] = "/storage/" . $path;
+                Log::info("Tutor profile picture uploaded", ['path' => $validated['profile_picture']]);
+            }
+
+            $row = $this->tutorService->upsertForUser($user->id, $validated);
+
+            return response()->json([
+                'message' => 'Tutor profile saved successfully',
+                'data'    => $row,
+            ], 201);
+        } catch (\Exception $e) {
+            Log::error("Error saving tutor profile", ['error' => $e->getMessage()]);
+            return response()->json([
+                'message' => 'Server error while saving tutor profile',
+                'error'   => $e->getMessage(),
+            ], 500);
         }
-
-        $row = $this->tutorService->upsertForUser($user->id, $validated);
-
-        return response()->json([
-            'message' => 'Tutor profile saved',
-            'data'    => $row,
-        ], 201);
     }
 
-    /** GET /api/tutors/{userId} */
     public function show($userId)
     {
         $user = Auth::user();
@@ -92,7 +105,6 @@ class TutorController extends Controller
         return response()->json($row, 200);
     }
 
-    /** PUT /api/tutors/{userId} */
     public function update(Request $request, $userId)
     {
         $user = Auth::user();
@@ -114,25 +126,37 @@ class TutorController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 400);
+            Log::warning("Tutor profile update validation failed", ['errors' => $validator->errors()]);
+            return response()->json([
+                'message' => 'Validation failed',
+                'errors'  => $validator->errors()
+            ], 400);
         }
 
         $validated = $validator->validated();
 
-        if ($request->hasFile('profile_picture')) {
-            $path = $request->file('profile_picture')->store('profile_pictures', 'public');
-            $validated['profile_picture'] = "/storage/" . $path;
+        try {
+            if ($request->hasFile('profile_picture')) {
+                $path = $request->file('profile_picture')->store('profile_pictures', 'public');
+                $validated['profile_picture'] = "/storage/" . $path;
+                Log::info("Tutor profile picture updated", ['path' => $validated['profile_picture']]);
+            }
+
+            $row = $this->tutorService->upsertForUser((int)$userId, $validated);
+
+            return response()->json([
+                'message' => 'Tutor profile updated successfully',
+                'data'    => $row,
+            ], 200);
+        } catch (\Exception $e) {
+            Log::error("Error updating tutor profile", ['error' => $e->getMessage()]);
+            return response()->json([
+                'message' => 'Server error while updating tutor profile',
+                'error'   => $e->getMessage(),
+            ], 500);
         }
-
-        $row = $this->tutorService->upsertForUser((int)$userId, $validated);
-
-        return response()->json([
-            'message' => 'Tutor profile updated successfully',
-            'data'    => $row,
-        ], 200);
     }
 
-    /** DELETE /api/tutors/{userId} */
     public function destroy($userId)
     {
         $user = Auth::user();
@@ -142,10 +166,15 @@ class TutorController extends Controller
             return response()->json(['message' => 'Forbidden'], 403);
         }
 
-        $deleted = $this->tutorService->deleteByUserId((int)$userId);
-
-        return response()->json([
-            'message' => $deleted ? 'Tutor profile deleted successfully' : 'Nothing to delete',
-        ], 200);
+        try {
+            $deleted = $this->tutorService->deleteByUserId((int)$userId);
+            return response()->json(['message' => $deleted ? 'Tutor profile deleted successfully' : 'Nothing to delete'], 200);
+        } catch (\Exception $e) {
+            Log::error("Error deleting tutor profile", ['error' => $e->getMessage()]);
+            return response()->json([
+                'message' => 'Server error while deleting tutor profile',
+                'error'   => $e->getMessage(),
+            ], 500);
+        }
     }
 }
