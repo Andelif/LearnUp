@@ -54,7 +54,7 @@ const DEFAULT_LEARNER_FIELDS = {
   guardian_contact_number: "",
   gender: "",
   address: "",
-  profile_picture: null,
+  profile_picture: "",
 };
 
 const DEFAULT_TUTOR_FIELDS = {
@@ -69,7 +69,7 @@ const DEFAULT_TUTOR_FIELDS = {
   preferred_location: "",
   preferred_time: "",
   availability: true,
-  profile_picture: null,
+  profile_picture: "",
 };
 
 const ProfilePage = () => {
