@@ -6,6 +6,7 @@ use App\Services\LearnerService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Log;
 
 class LearnerController extends Controller
 {
@@ -16,9 +17,6 @@ class LearnerController extends Controller
         $this->learnerService = $learnerService;
     }
 
-    /**
-     * GET /api/learners
-     */
     public function index()
     {
         $user = Auth::user();
@@ -38,9 +36,6 @@ class LearnerController extends Controller
         return response()->json($me, 200);
     }
 
-    /**
-     * POST /api/learners
-     */
     public function store(Request $request)
     {
         $user = Auth::user();
@@ -59,27 +54,39 @@ class LearnerController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 400);
+            Log::warning("Learner profile validation failed", ['errors' => $validator->errors()]);
+            return response()->json([
+                'message' => 'Validation failed',
+                'errors'  => $validator->errors()
+            ], 400);
         }
 
         $validated = $validator->validated();
 
-        if ($request->hasFile('profile_picture')) {
-            $path = $request->file('profile_picture')->store('profile_pictures', 'public');
-            $validated['profile_picture'] = "/storage/" . $path;
+        try {
+            if ($request->hasFile('profile_picture')) {
+                $path = $request->file('profile_picture')->store('profile_pictures', 'public');
+                $validated['profile_picture'] = "/storage/" . $path;
+                Log::info("Learner profile picture uploaded", ['path' => $validated['profile_picture']]);
+            } else {
+                Log::info("Learner profile picture not uploaded");
+            }
+
+            $row = $this->learnerService->upsertForUser($user->id, $validated);
+
+            return response()->json([
+                'message' => 'Learner profile saved successfully',
+                'data'    => $row,
+            ], 201);
+        } catch (\Exception $e) {
+            Log::error("Error saving learner profile", ['error' => $e->getMessage()]);
+            return response()->json([
+                'message' => 'Server error while saving learner profile',
+                'error'   => $e->getMessage(),
+            ], 500);
         }
-
-        $row = $this->learnerService->upsertForUser($user->id, $validated);
-
-        return response()->json([
-            'message' => 'Learner profile saved',
-            'data'    => $row,
-        ], 201);
     }
 
-    /**
-     * GET /api/learners/{userId}
-     */
     public function show($userId)
     {
         $user = Auth::user();
@@ -95,9 +102,6 @@ class LearnerController extends Controller
         return response()->json($row, 200);
     }
 
-    /**
-     * PUT /api/learners/{userId}
-     */
     public function update(Request $request, $userId)
     {
         $user = Auth::user();
@@ -114,27 +118,37 @@ class LearnerController extends Controller
         ]);
 
         if ($validator->fails()) {
-            return response()->json(['errors' => $validator->errors()], 400);
+            Log::warning("Learner profile update validation failed", ['errors' => $validator->errors()]);
+            return response()->json([
+                'message' => 'Validation failed',
+                'errors'  => $validator->errors()
+            ], 400);
         }
 
         $validated = $validator->validated();
 
-        if ($request->hasFile('profile_picture')) {
-            $path = $request->file('profile_picture')->store('profile_pictures', 'public');
-            $validated['profile_picture'] = "/storage/" . $path;
+        try {
+            if ($request->hasFile('profile_picture')) {
+                $path = $request->file('profile_picture')->store('profile_pictures', 'public');
+                $validated['profile_picture'] = "/storage/" . $path;
+                Log::info("Learner profile picture updated", ['path' => $validated['profile_picture']]);
+            }
+
+            $row = $this->learnerService->updateForUser((int)$userId, $validated);
+
+            return response()->json([
+                'message' => 'Learner profile updated successfully',
+                'data'    => $row,
+            ], 200);
+        } catch (\Exception $e) {
+            Log::error("Error updating learner profile", ['error' => $e->getMessage()]);
+            return response()->json([
+                'message' => 'Server error while updating learner profile',
+                'error'   => $e->getMessage(),
+            ], 500);
         }
-
-        $row = $this->learnerService->updateForUser((int)$userId, $validated);
-
-        return response()->json([
-            'message' => 'Learner profile updated successfully',
-            'data'    => $row,
-        ], 200);
     }
 
-    /**
-     * DELETE /api/learners/{userId}
-     */
     public function destroy($userId)
     {
         $user = Auth::user();
@@ -144,7 +158,15 @@ class LearnerController extends Controller
             return response()->json(['message' => 'Forbidden'], 403);
         }
 
-        $deleted = $this->learnerService->deleteByUserId((int)$userId);
-        return response()->json(['message' => $deleted ? 'Learner profile deleted' : 'Nothing to delete'], 200);
+        try {
+            $deleted = $this->learnerService->deleteByUserId((int)$userId);
+            return response()->json(['message' => $deleted ? 'Learner profile deleted' : 'Nothing to delete'], 200);
+        } catch (\Exception $e) {
+            Log::error("Error deleting learner profile", ['error' => $e->getMessage()]);
+            return response()->json([
+                'message' => 'Server error while deleting learner profile',
+                'error'   => $e->getMessage(),
+            ], 500);
+        }
     }
 }

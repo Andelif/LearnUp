@@ -1,6 +1,6 @@
 import { useState, useEffect, useContext } from "react";
 import { storeContext } from "../context/contextProvider";
-import { FaEdit, FaTrash } from "react-icons/fa";
+import { FaEdit } from "react-icons/fa";
 import "./ProfilePage.css";
 
 const IMMUTABLE_KEYS = [
@@ -16,7 +16,7 @@ const IMMUTABLE_KEYS = [
   "email_verified_at",
 ];
 
-/** Whitelist fields that match your backend validators / columns */
+/** Whitelist fields */
 const pickEditable = (role, data) => {
   const tutorOnly = [
     "full_name",
@@ -72,14 +72,13 @@ const DEFAULT_TUTOR_FIELDS = {
   profile_picture: null,
 };
 
-const DEFAULT_PROFILE_PIC = "/assets/profile.jpg";
-
 const ProfilePage = () => {
   const { api, user, token } = useContext(storeContext);
   const [formData, setFormData] = useState({});
   const [isEditing, setIsEditing] = useState(false);
   const [isNewProfile, setIsNewProfile] = useState(false);
   const [error, setError] = useState("");
+  const [validationErrors, setValidationErrors] = useState([]);
   const [success, setSuccess] = useState("");
 
   const authHeader = {
@@ -93,6 +92,7 @@ const ProfilePage = () => {
 
   const fetchUserData = async () => {
     setError("");
+    setValidationErrors([]);
     setSuccess("");
     setIsNewProfile(false);
     setIsEditing(false);
@@ -157,6 +157,7 @@ const ProfilePage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+    setValidationErrors([]);
     setSuccess("");
 
     try {
@@ -196,31 +197,25 @@ const ProfilePage = () => {
       }
 
       setSuccess(res?.data?.message || "Profile saved!");
-      setTimeout(() => setIsEditing(false), 800);
+      setTimeout(() => setIsEditing(false), 1000);
       fetchUserData();
     } catch (err) {
+      const res = err?.response?.data;
+      if (res?.errors) {
+        // Laravel validation errors
+        const errorsList = [];
+        Object.keys(res.errors).forEach((field) => {
+          res.errors[field].forEach((msg) => {
+            errorsList.push(`${field}: ${msg}`);
+          });
+        });
+        setValidationErrors(errorsList);
+      }
       setError(
-        err?.response?.data?.message ||
-          err?.response?.data?.error ||
+        res?.message ||
+          res?.error ||
           err?.message ||
           "Error saving profile."
-      );
-    }
-  };
-
-  const handleDelete = async () => {
-    try {
-      await api.delete(`/api/${user.role}s/${user.id}`, authHeader);
-      setFormData({});
-      setIsNewProfile(true);
-      setIsEditing(true);
-      setSuccess("Profile deleted successfully.");
-    } catch (err) {
-      setError(
-        err?.response?.data?.message ||
-          err?.response?.data?.error ||
-          err?.message ||
-          "Error deleting profile."
       );
     }
   };
@@ -255,7 +250,7 @@ const ProfilePage = () => {
               ? formData.profile_picture instanceof File
                 ? URL.createObjectURL(formData.profile_picture)
                 : formData.profile_picture
-              : DEFAULT_PROFILE_PIC
+              : "/assets/profile.jpg"
           }
           alt="Profile"
           className="profile-pic"
@@ -264,7 +259,15 @@ const ProfilePage = () => {
         <p style={{ textAlign: "center" }}>{user?.email}</p>
       </div>
 
+      {/* Error + Success messages */}
       {error && <p className="error-message">{error}</p>}
+      {validationErrors.length > 0 && (
+        <ul className="error-list">
+          {validationErrors.map((err, idx) => (
+            <li key={idx}>{err}</li>
+          ))}
+        </ul>
+      )}
       {success && <p className="success-message">{success}</p>}
 
       {!isEditing ? (
@@ -279,18 +282,10 @@ const ProfilePage = () => {
               </div>
             ))
           )}
-          <div className="button-group">
-            <button className="edit-btn" onClick={() => setIsEditing(true)}>
-              <FaEdit style={{ marginRight: 6 }} />
-              {isNewProfile ? "Create" : "Edit"}
-            </button>
-            {!isNewProfile && (
-              <button className="delete-btn" onClick={handleDelete}>
-                <FaTrash style={{ marginRight: 6 }} />
-                Delete
-              </button>
-            )}
-          </div>
+          <button className="edit-btn" onClick={() => setIsEditing(true)}>
+            <FaEdit style={{ marginRight: 6 }} />
+            {isNewProfile ? "Create" : "Edit"}
+          </button>
         </div>
       ) : (
         <div className="edit-form-container">
