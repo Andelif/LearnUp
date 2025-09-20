@@ -16,7 +16,6 @@ const IMMUTABLE_KEYS = [
   "email_verified_at",
 ];
 
-/** Whitelist fields */
 const pickEditable = (role, data) => {
   const tutorOnly = [
     "full_name",
@@ -54,7 +53,7 @@ const DEFAULT_LEARNER_FIELDS = {
   guardian_contact_number: "",
   gender: "",
   address: "",
-  profile_picture: "",
+  profile_picture: null,
 };
 
 const DEFAULT_TUTOR_FIELDS = {
@@ -69,7 +68,7 @@ const DEFAULT_TUTOR_FIELDS = {
   preferred_location: "",
   preferred_time: "",
   availability: true,
-  profile_picture: "",
+  profile_picture: null,
 };
 
 const ProfilePage = () => {
@@ -91,6 +90,7 @@ const ProfilePage = () => {
   }, [user?.id, user?.role, token]);
 
   const fetchUserData = async () => {
+    console.log("Fetching profile for:", user);
     setError("");
     setValidationErrors([]);
     setSuccess("");
@@ -102,8 +102,10 @@ const ProfilePage = () => {
         `/api/${user.role}s/${user.id}`,
         authHeader
       );
+      console.log("Fetch success:", data);
       setFormData(data || {});
     } catch (e) {
+      console.error("Fetch error:", e?.response?.data || e.message);
       if (e?.response?.status === 404) {
         const base =
           user.role === "tutor"
@@ -125,6 +127,7 @@ const ProfilePage = () => {
   const handleInputChange = (e) => {
     const { name, value, type, checked, files } = e.target;
     if (type === "file") {
+      console.log("File selected:", files[0]);
       setFormData((prev) => ({
         ...prev,
         [name]: files[0],
@@ -164,6 +167,8 @@ const ProfilePage = () => {
       let editable = pickEditable(user.role, formData);
       editable = normalizeForSubmit(user.role, editable);
 
+      console.log("Submitting editable data:", editable);
+
       let payload;
       let headers;
 
@@ -179,30 +184,35 @@ const ProfilePage = () => {
           Accept: "application/json",
           "Content-Type": "multipart/form-data",
         };
+        console.log("Payload is FormData with keys:", [...payload.keys()]);
       } else {
         payload = editable;
         headers = {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         };
+        console.log("Payload is JSON:", payload);
       }
 
       let res;
       if (isNewProfile) {
+        console.log("POSTing new profile...");
         res = await api.post(`/api/${user.role}s`, payload, { headers });
       } else {
+        console.log("PUTting existing profile...");
         res = await api.put(`/api/${user.role}s/${user.id}`, payload, {
           headers,
         });
       }
 
+      console.log("Save success response:", res?.data);
       setSuccess(res?.data?.message || "Profile saved!");
       setTimeout(() => setIsEditing(false), 1000);
       fetchUserData();
     } catch (err) {
+      console.error("Save error:", err?.response?.data || err.message);
       const res = err?.response?.data;
       if (res?.errors) {
-        // Laravel validation errors
         const errorsList = [];
         Object.keys(res.errors).forEach((field) => {
           res.errors[field].forEach((msg) => {
@@ -259,7 +269,6 @@ const ProfilePage = () => {
         <p style={{ textAlign: "center" }}>{user?.email}</p>
       </div>
 
-      {/* Error + Success messages */}
       {error && <p className="error-message">{error}</p>}
       {validationErrors.length > 0 && (
         <ul className="error-list">
