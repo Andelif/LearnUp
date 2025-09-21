@@ -6,7 +6,6 @@ use App\Services\LearnerService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\Facades\Log;
 
 class LearnerController extends Controller
 {
@@ -17,33 +16,34 @@ class LearnerController extends Controller
         $this->learnerService = $learnerService;
     }
 
+    /**
+     * GET /api/learners
+     */
     public function index()
     {
         $user = Auth::user();
-        Log::info("LearnerController@index", ['user' => $user]);
-
-        if (!$user) return response()->json(['message' => 'Unauthorized'], 401);
+        if (!$user) {
+            return response()->json(['message' => 'Unauthorized'], 401);
+        }
 
         if ($user->role === 'admin') {
-            Log::info("Admin fetching all learners");
             return response()->json($this->learnerService->getAllLearners(), 200);
         }
 
         if ($user->role !== 'learner') {
-            Log::warning("Forbidden learner index access", ['role' => $user->role]);
             return response()->json(['message' => 'Forbidden: not a learner'], 403);
         }
 
         $me = $this->learnerService->getLearnerByUserId($user->id);
-        Log::info("Learner profile fetched", ['id' => $user->id, 'profile' => $me]);
         return response()->json($me, 200);
     }
 
+    /**
+     * POST /api/learners
+     */
     public function store(Request $request)
     {
         $user = Auth::user();
-        Log::info("LearnerController@store", ['user' => $user, 'input' => $request->all()]);
-
         if (!$user || $user->role !== 'learner') {
             return response()->json(['message' => 'Forbidden: not a learner'], 403);
         }
@@ -59,33 +59,30 @@ class LearnerController extends Controller
         ]);
 
         if ($validator->fails()) {
-            Log::warning("Learner store validation failed", ['errors' => $validator->errors()]);
-            return response()->json(['message' => 'Validation failed', 'errors' => $validator->errors()], 400);
+            return response()->json(['errors' => $validator->errors()], 400);
         }
 
         $validated = $validator->validated();
 
-        Log::info("File check", [
-            'hasFile' => $request->hasFile('profile_picture'),
-            'files'   => $request->allFiles(),
-        ]);
-
         if ($request->hasFile('profile_picture')) {
             $path = $request->file('profile_picture')->store('profile_pictures', 'public');
             $validated['profile_picture'] = "/storage/" . $path;
-            Log::info("Learner profile picture uploaded", ['path' => $validated['profile_picture']]);
         }
 
         $row = $this->learnerService->upsertForUser($user->id, $validated);
 
-        return response()->json(['message' => 'Learner profile saved successfully', 'data' => $row], 201);
+        return response()->json([
+            'message' => 'Learner profile saved',
+            'data'    => $row,
+        ], 201);
     }
 
+    /**
+     * GET /api/learners/{userId}
+     */
     public function show($userId)
     {
         $user = Auth::user();
-        Log::info("LearnerController@show", ['auth_user' => $user, 'target_user' => $userId]);
-
         if (!$user) return response()->json(['message' => 'Unauthorized'], 401);
 
         if ($user->role !== 'admin' && $user->id != (int)$userId) {
@@ -98,11 +95,12 @@ class LearnerController extends Controller
         return response()->json($row, 200);
     }
 
+    /**
+     * PUT /api/learners/{userId}
+     */
     public function update(Request $request, $userId)
     {
         $user = Auth::user();
-        Log::info("LearnerController@update", ['auth_user' => $user, 'target_user' => $userId, 'input' => $request->all()]);
-
         if (!$user) return response()->json(['message' => 'Unauthorized'], 401);
 
         $validator = Validator::make($request->all(), [
@@ -116,33 +114,30 @@ class LearnerController extends Controller
         ]);
 
         if ($validator->fails()) {
-            Log::warning("Learner update validation failed", ['errors' => $validator->errors()]);
-            return response()->json(['message' => 'Validation failed', 'errors' => $validator->errors()], 400);
+            return response()->json(['errors' => $validator->errors()], 400);
         }
 
         $validated = $validator->validated();
 
-        Log::info("File check", [
-            'hasFile' => $request->hasFile('profile_picture'),
-            'files'   => $request->allFiles(),
-        ]);
-
         if ($request->hasFile('profile_picture')) {
             $path = $request->file('profile_picture')->store('profile_pictures', 'public');
             $validated['profile_picture'] = "/storage/" . $path;
-            Log::info("Learner profile picture updated", ['path' => $validated['profile_picture']]);
         }
 
         $row = $this->learnerService->updateForUser((int)$userId, $validated);
 
-        return response()->json(['message' => 'Learner profile updated successfully', 'data' => $row], 200);
+        return response()->json([
+            'message' => 'Learner profile updated successfully',
+            'data'    => $row,
+        ], 200);
     }
 
+    /**
+     * DELETE /api/learners/{userId}
+     */
     public function destroy($userId)
     {
         $user = Auth::user();
-        Log::info("LearnerController@destroy", ['auth_user' => $user, 'target_user' => $userId]);
-
         if (!$user) return response()->json(['message' => 'Unauthorized'], 401);
 
         if ($user->role !== 'admin' && $user->id != (int)$userId) {
