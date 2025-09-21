@@ -1,6 +1,6 @@
 import { useState, useEffect, useContext } from "react";
 import { storeContext } from "../context/contextProvider";
-import { FaEdit } from "react-icons/fa";
+import { FaEdit, FaTrash } from "react-icons/fa";
 import "./ProfilePage.css";
 
 const IMMUTABLE_KEYS = [
@@ -16,6 +16,7 @@ const IMMUTABLE_KEYS = [
   "email_verified_at",
 ];
 
+/** Whitelist fields that match your backend validators / columns */
 const pickEditable = (role, data) => {
   const tutorOnly = [
     "full_name",
@@ -71,13 +72,14 @@ const DEFAULT_TUTOR_FIELDS = {
   profile_picture: null,
 };
 
+const DEFAULT_PROFILE_PIC = "/assets/profile.jpg";
+
 const ProfilePage = () => {
   const { api, user, token } = useContext(storeContext);
   const [formData, setFormData] = useState({});
   const [isEditing, setIsEditing] = useState(false);
   const [isNewProfile, setIsNewProfile] = useState(false);
   const [error, setError] = useState("");
-  const [validationErrors, setValidationErrors] = useState([]);
   const [success, setSuccess] = useState("");
 
   const authHeader = {
@@ -90,9 +92,7 @@ const ProfilePage = () => {
   }, [user?.id, user?.role, token]);
 
   const fetchUserData = async () => {
-    console.log("Fetching profile for:", user);
     setError("");
-    setValidationErrors([]);
     setSuccess("");
     setIsNewProfile(false);
     setIsEditing(false);
@@ -102,10 +102,8 @@ const ProfilePage = () => {
         `/api/${user.role}s/${user.id}`,
         authHeader
       );
-      console.log("Fetch success:", data);
       setFormData(data || {});
     } catch (e) {
-      console.error("Fetch error:", e?.response?.data || e.message);
       if (e?.response?.status === 404) {
         const base =
           user.role === "tutor"
@@ -127,7 +125,6 @@ const ProfilePage = () => {
   const handleInputChange = (e) => {
     const { name, value, type, checked, files } = e.target;
     if (type === "file") {
-      console.log("File selected:", files[0]);
       setFormData((prev) => ({
         ...prev,
         [name]: files[0],
@@ -160,14 +157,11 @@ const ProfilePage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
-    setValidationErrors([]);
     setSuccess("");
 
     try {
       let editable = pickEditable(user.role, formData);
       editable = normalizeForSubmit(user.role, editable);
-
-      console.log("Submitting editable data:", editable);
 
       let payload;
       let headers;
@@ -184,48 +178,49 @@ const ProfilePage = () => {
           Accept: "application/json",
           "Content-Type": "multipart/form-data",
         };
-        console.log("Payload is FormData with keys:", [...payload.keys()]);
       } else {
         payload = editable;
         headers = {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         };
-        console.log("Payload is JSON:", payload);
       }
 
       let res;
       if (isNewProfile) {
-        console.log("POSTing new profile...");
         res = await api.post(`/api/${user.role}s`, payload, { headers });
       } else {
-        console.log("PUTting existing profile...");
         res = await api.put(`/api/${user.role}s/${user.id}`, payload, {
           headers,
         });
       }
 
-      console.log("Save success response:", res?.data);
       setSuccess(res?.data?.message || "Profile saved!");
-      setTimeout(() => setIsEditing(false), 1000);
+      setTimeout(() => setIsEditing(false), 800);
       fetchUserData();
     } catch (err) {
-      console.error("Save error:", err?.response?.data || err.message);
-      const res = err?.response?.data;
-      if (res?.errors) {
-        const errorsList = [];
-        Object.keys(res.errors).forEach((field) => {
-          res.errors[field].forEach((msg) => {
-            errorsList.push(`${field}: ${msg}`);
-          });
-        });
-        setValidationErrors(errorsList);
-      }
       setError(
-        res?.message ||
-          res?.error ||
+        err?.response?.data?.message ||
+          err?.response?.data?.error ||
           err?.message ||
           "Error saving profile."
+      );
+    }
+  };
+
+  const handleDelete = async () => {
+    try {
+      await api.delete(`/api/${user.role}s/${user.id}`, authHeader);
+      setFormData({});
+      setIsNewProfile(true);
+      setIsEditing(true);
+      setSuccess("Profile deleted successfully.");
+    } catch (err) {
+      setError(
+        err?.response?.data?.message ||
+          err?.response?.data?.error ||
+          err?.message ||
+          "Error deleting profile."
       );
     }
   };
@@ -260,7 +255,7 @@ const ProfilePage = () => {
               ? formData.profile_picture instanceof File
                 ? URL.createObjectURL(formData.profile_picture)
                 : formData.profile_picture
-              : "/assets/profile.jpg"
+              : DEFAULT_PROFILE_PIC
           }
           alt="Profile"
           className="profile-pic"
@@ -270,13 +265,6 @@ const ProfilePage = () => {
       </div>
 
       {error && <p className="error-message">{error}</p>}
-      {validationErrors.length > 0 && (
-        <ul className="error-list">
-          {validationErrors.map((err, idx) => (
-            <li key={idx}>{err}</li>
-          ))}
-        </ul>
-      )}
       {success && <p className="success-message">{success}</p>}
 
       {!isEditing ? (
@@ -291,10 +279,18 @@ const ProfilePage = () => {
               </div>
             ))
           )}
-          <button className="edit-btn" onClick={() => setIsEditing(true)}>
-            <FaEdit style={{ marginRight: 6 }} />
-            {isNewProfile ? "Create" : "Edit"}
-          </button>
+          <div className="button-group">
+            <button className="edit-btn" onClick={() => setIsEditing(true)}>
+              <FaEdit style={{ marginRight: 6 }} />
+              {isNewProfile ? "Create" : "Edit"}
+            </button>
+            {!isNewProfile && (
+              <button className="delete-btn" onClick={handleDelete}>
+                <FaTrash style={{ marginRight: 6 }} />
+                Delete
+              </button>
+            )}
+          </div>
         </div>
       ) : (
         <div className="edit-form-container">

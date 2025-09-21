@@ -4,7 +4,7 @@ namespace App\Services;
 
 use App\Models\Tutor;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
 
 class TutorService
 {
@@ -28,16 +28,22 @@ class TutorService
         return null;
     }
 
+    /** Admin list (controller already guards). Order by real PK. */
     public function getAllTutors()
     {
         return Tutor::orderByDesc('TutorID')->get();
     }
 
+    /** Fetch a single tutor profile by users.id (FK). */
     public function getTutorByUserId(int $userId): ?Tutor
     {
         return Tutor::where('user_id', $userId)->first();
     }
 
+    /**
+     * Create or update a tutor profile for a given user_id.
+     * POST /api/tutors calls this; controller has validation.
+     */
     public function upsertForUser(int $userId, array $data): Tutor
     {
         $payload = $this->onlyAllowed($data);
@@ -55,22 +61,32 @@ class TutorService
             else unset($payload['availability']);
         }
 
-        Log::debug("TutorService upsert payload", ['user_id' => $userId, 'payload' => $payload]);
+        // Handle profile picture replacement
+        if (array_key_exists('profile_picture', $payload) && $payload['profile_picture'] !== null) {
+            $existing = Tutor::where('user_id', $userId)->first();
+            if ($existing && $existing->profile_picture && $existing->profile_picture !== $payload['profile_picture']) {
+                $this->deleteFileFromStorage($existing->profile_picture);
+            }
+        }
 
         $row = DB::transaction(fn () =>
             Tutor::updateOrCreate(['user_id' => $userId], $payload)
         );
 
-        Log::debug("TutorService saved row", ['row' => $row]);
-
         return $row->fresh();
     }
 
+    /** Delete by users.id; returns number of deleted rows. */
     public function deleteByUserId(int $userId): int
     {
+        $existing = Tutor::where('user_id', $userId)->first();
+        if ($existing && $existing->profile_picture) {
+            $this->deleteFileFromStorage($existing->profile_picture);
+        }
         return Tutor::where('user_id', $userId)->delete();
     }
 
+    /** Write only real DB columns. */
     private function onlyAllowed(array $data): array
     {
         $allowed = [
@@ -95,5 +111,14 @@ class TutorService
             }
         }
         return $out;
+    }
+
+    /** Delete file safely from storage path (expects "/storage/..."). */
+    private function deleteFileFromStorage(string $publicPath): void
+    {
+        $relativePath = str_replace('/storage/', '', $publicPath);
+        if (Storage::disk('public')->exists($relativePath)) {
+            Storage::disk('public')->delete($relativePath);
+        }
     }
 }
