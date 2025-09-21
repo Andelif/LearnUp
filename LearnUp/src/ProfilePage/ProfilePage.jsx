@@ -1,3 +1,79 @@
+import { useState, useEffect, useContext } from "react";
+import { storeContext } from "../context/contextProvider";
+import { FaEdit, FaTrash } from "react-icons/fa";
+import "./ProfilePage.css";
+
+const IMMUTABLE_KEYS = [
+  "id",
+  "TutorID",
+  "LearnerID",
+  "tutor_id",
+  "learner_id",
+  "user_id",
+  "email",
+  "created_at",
+  "updated_at",
+  "email_verified_at",
+];
+
+/** Whitelist fields that match your backend validators / columns */
+const pickEditable = (role, data) => {
+  const tutorOnly = [
+    "full_name",
+    "gender",
+    "preferred_salary",
+    "qualification",
+    "experience",
+    "currently_studying_in",
+    "preferred_location",
+    "preferred_time",
+    "contact_number",
+    "address",
+    "availability",
+    "profile_picture",
+  ];
+
+  const learnerOnly = [
+    "full_name",
+    "guardian_full_name",
+    "contact_number",
+    "guardian_contact_number",
+    "gender",
+    "address",
+    "profile_picture",
+  ];
+
+  const allow = role === "tutor" ? tutorOnly : learnerOnly;
+  return allow.reduce((o, k) => (k in data ? { ...o, [k]: data[k] } : o), {});
+};
+
+const DEFAULT_LEARNER_FIELDS = {
+  full_name: "",
+  guardian_full_name: "",
+  contact_number: "",
+  guardian_contact_number: "",
+  gender: "",
+  address: "",
+  profile_picture: null,
+};
+
+const DEFAULT_TUTOR_FIELDS = {
+  full_name: "",
+  address: "",
+  contact_number: "",
+  gender: "",
+  preferred_salary: "",
+  qualification: "",
+  experience: "",
+  currently_studying_in: "",
+  preferred_location: "",
+  preferred_time: "",
+  availability: true,
+  profile_picture: null,
+};
+
+const DEFAULT_PROFILE_PIC = "/assets/profile.jpg";
+
 const ProfilePage = () => {
   const { api, user, token } = useContext(storeContext);
   const [formData, setFormData] = useState({});
@@ -11,26 +87,23 @@ const ProfilePage = () => {
   };
 
   useEffect(() => {
-    if (user?.id && user?.role && token) {
-      console.log("[FRONTEND] Fetching user data for:", user);
-      fetchUserData();
-    }
+    if (user?.id && user?.role && token) fetchUserData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user?.id, user?.role, token]);
 
   const fetchUserData = async () => {
-    console.log("[FRONTEND] fetchUserData called");
     setError("");
     setSuccess("");
     setIsNewProfile(false);
     setIsEditing(false);
 
     try {
-      const { data } = await api.get(`/api/${user.role}s/${user.id}`, authHeader);
-      console.log("[FRONTEND] fetchUserData success:", data);
+      const { data } = await api.get(
+        `/api/${user.role}s/${user.id}`,
+        authHeader
+      );
       setFormData(data || {});
     } catch (e) {
-      console.error("[FRONTEND] fetchUserData error:", e?.response || e);
       if (e?.response?.status === 404) {
         const base =
           user.role === "tutor"
@@ -49,17 +122,46 @@ const ProfilePage = () => {
     }
   };
 
+  const handleInputChange = (e) => {
+    const { name, value, type, checked, files } = e.target;
+    if (type === "file") {
+      setFormData((prev) => ({
+        ...prev,
+        [name]: files[0],
+      }));
+    } else {
+      setFormData((prev) => ({
+        ...prev,
+        [name]: type === "checkbox" ? checked : value,
+      }));
+    }
+  };
+
+  const normalizeForSubmit = (role, editable) => {
+    if (role !== "tutor") return editable;
+    const out = { ...editable };
+    if (out.preferred_salary !== undefined && out.preferred_salary !== "") {
+      const n = Number(out.preferred_salary);
+      if (!Number.isNaN(n)) out.preferred_salary = n;
+    }
+    if (out.availability !== undefined) {
+      if (typeof out.availability === "string") {
+        const s = out.availability.toLowerCase().trim();
+        if (["true", "1", "yes"].includes(s)) out.availability = true;
+        else if (["false", "0", "no"].includes(s)) out.availability = false;
+      }
+    }
+    return out;
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
     setSuccess("");
 
-    console.log("[FRONTEND] handleSubmit called with formData:", formData);
-
     try {
       let editable = pickEditable(user.role, formData);
       editable = normalizeForSubmit(user.role, editable);
-      console.log("[FRONTEND] Normalized payload:", editable);
 
       let payload;
       let headers;
@@ -76,31 +178,27 @@ const ProfilePage = () => {
           Accept: "application/json",
           "Content-Type": "multipart/form-data",
         };
-        console.log("[FRONTEND] Submitting with FormData payload");
       } else {
         payload = editable;
         headers = {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         };
-        console.log("[FRONTEND] Submitting with JSON payload:", payload);
       }
 
       let res;
       if (isNewProfile) {
-        console.log("[FRONTEND] Sending POST request to create profile");
         res = await api.post(`/api/${user.role}s`, payload, { headers });
       } else {
-        console.log("[FRONTEND] Sending PUT request to update profile");
-        res = await api.put(`/api/${user.role}s/${user.id}`, payload, { headers });
+        res = await api.put(`/api/${user.role}s/${user.id}`, payload, {
+          headers,
+        });
       }
 
-      console.log("[FRONTEND] API response:", res?.data);
       setSuccess(res?.data?.message || "Profile saved!");
       setTimeout(() => setIsEditing(false), 800);
       fetchUserData();
     } catch (err) {
-      console.error("[FRONTEND] handleSubmit error:", err?.response || err);
       setError(
         err?.response?.data?.message ||
           err?.response?.data?.error ||
@@ -111,16 +209,13 @@ const ProfilePage = () => {
   };
 
   const handleDelete = async () => {
-    console.log("[FRONTEND] handleDelete called for user_id:", user?.id);
     try {
       await api.delete(`/api/${user.role}s/${user.id}`, authHeader);
-      console.log("[FRONTEND] Profile deleted successfully");
       setFormData({});
       setIsNewProfile(true);
       setIsEditing(true);
       setSuccess("Profile deleted successfully.");
     } catch (err) {
-      console.error("[FRONTEND] handleDelete error:", err?.response || err);
       setError(
         err?.response?.data?.message ||
           err?.response?.data?.error ||
@@ -129,4 +224,134 @@ const ProfilePage = () => {
       );
     }
   };
-}
+
+  const keysForDisplay = Object.keys(formData).filter(
+    (k) => !IMMUTABLE_KEYS.includes(k)
+  );
+
+  const ensureDefaults =
+    isNewProfile && keysForDisplay.length === 0
+      ? user.role === "tutor"
+        ? Object.keys(DEFAULT_TUTOR_FIELDS)
+        : Object.keys(DEFAULT_LEARNER_FIELDS)
+      : keysForDisplay;
+
+  const displayPairs = ensureDefaults.map((key) => ({
+    key,
+    label: key.replace(/_/g, " ").replace(/([A-Z])/g, " $1").trim(),
+    value:
+      formData[key] ??
+      (user.role === "tutor"
+        ? DEFAULT_TUTOR_FIELDS[key]
+        : DEFAULT_LEARNER_FIELDS[key]),
+  }));
+
+  return (
+    <div className="profile-page">
+      <div className="profile-section">
+        <img
+          src={
+            formData.profile_picture
+              ? formData.profile_picture instanceof File
+                ? URL.createObjectURL(formData.profile_picture)
+                : formData.profile_picture
+              : DEFAULT_PROFILE_PIC
+          }
+          alt="Profile"
+          className="profile-pic"
+        />
+        <h2 style={{ textAlign: "center" }}>{user?.name}</h2>
+        <p style={{ textAlign: "center" }}>{user?.email}</p>
+      </div>
+
+      {error && <p className="error-message">{error}</p>}
+      {success && <p className="success-message">{success}</p>}
+
+      {!isEditing ? (
+        <div className="profile-info">
+          {displayPairs.length === 0 ? (
+            <p>No profile data yet.</p>
+          ) : (
+            displayPairs.map(({ key, label, value }) => (
+              <div key={key} className="info-item">
+                <strong>{label}:</strong>
+                <p>{String(value ?? "N/A")}</p>
+              </div>
+            ))
+          )}
+          <div className="button-group">
+            <button className="edit-btn" onClick={() => setIsEditing(true)}>
+              <FaEdit style={{ marginRight: 6 }} />
+              {isNewProfile ? "Create" : "Edit"}
+            </button>
+            {!isNewProfile && (
+              <button className="delete-btn" onClick={handleDelete}>
+                <FaTrash style={{ marginRight: 6 }} />
+                Delete
+              </button>
+            )}
+          </div>
+        </div>
+      ) : (
+        <div className="edit-form-container">
+          <h2>{isNewProfile ? "Create Profile" : "Edit Profile"}</h2>
+          <form onSubmit={handleSubmit}>
+            {displayPairs.map(({ key, label }) => {
+              if (user.role === "tutor" && key === "availability") {
+                return (
+                  <div key={key} className="form-group">
+                    <label>{label}:</label>
+                    <input
+                      type="checkbox"
+                      name={key}
+                      checked={!!formData[key]}
+                      onChange={handleInputChange}
+                    />
+                  </div>
+                );
+              }
+              if (key === "profile_picture") {
+                return (
+                  <div key={key} className="form-group">
+                    <label>{label}:</label>
+                    <input
+                      type="file"
+                      name={key}
+                      accept="image/*"
+                      onChange={handleInputChange}
+                    />
+                  </div>
+                );
+              }
+              return (
+                <div key={key} className="form-group">
+                  <label>{label}:</label>
+                  <input
+                    type="text"
+                    name={key}
+                    value={formData[key] ?? ""}
+                    onChange={handleInputChange}
+                  />
+                </div>
+              );
+            })}
+            <div className="button-group">
+              <button type="submit" className="save-btn">
+                Save
+              </button>
+              <button
+                type="button"
+                className="cancel-btn"
+                onClick={() => setIsEditing(false)}
+              >
+                Cancel
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
+    </div>
+  );
+};
+
+export default ProfilePage;
