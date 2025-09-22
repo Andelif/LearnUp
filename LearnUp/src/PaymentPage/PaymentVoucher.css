@@ -1,158 +1,409 @@
-/* ===== Container Styling ===== */
-.payment-voucher-container {
-    max-width: 600px;
-    margin: 40px auto;
-    padding: 30px 20px;
-    background-color: #fff;
-    border-radius: 12px;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    position: relative;
-    z-index: 1;
+/* PaymentVoucher.css */
+.pv-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.pv-header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.pv-header h1 {
+  font-size: 2.5rem;
+  color: #2c3e50;
+  margin-bottom: 10px;
+  font-weight: 700;
+}
+
+.pv-subtitle {
+  color: #7f8c8d;
+  font-size: 1.1rem;
+}
+
+.pv-card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+  padding: 30px;
+  margin-bottom: 30px;
+}
+
+.pv-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 25px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #eaeaea;
+}
+
+.voucher-id {
+  font-size: 1.1rem;
+  color: #7f8c8d;
+  font-weight: 500;
+}
+
+.status-badge {
+  padding: 6px 16px;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.status-pending {
+  background-color: #fff3cd;
+  color: #856404;
+}
+
+.status-completed {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.status-failed {
+  background-color: #f8d7da;
+  color: #721c24;
+}
+
+.status-cancelled {
+  background-color: #f8f9fa;
+  color: #6c757d;
+}
+
+.payment-summary, .payment-details {
+  margin-bottom: 30px;
+}
+
+.payment-summary h3, .payment-details h3 {
+  color: #2c3e50;
+  margin-bottom: 20px;
+  font-size: 1.4rem;
+  font-weight: 600;
+}
+
+.summary-grid, .details-grid {
+  display: grid;
+  gap: 15px;
+}
+
+.summary-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  border-left: 4px solid #3498db;
+}
+
+.summary-item.total {
+  background-color: #e3f2fd;
+  border-left-color: #1565c0;
+  font-weight: 700;
+}
+
+.summary-label {
+  color: #5a6c7d;
+  font-weight: 500;
+}
+
+.summary-value {
+  font-weight: 600;
+  color: #2c3e50;
+}
+
+.highlight {
+  color: #e74c3c;
+  font-weight: 700;
+}
+
+.detail-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 12px 0;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.detail-item:last-child {
+  border-bottom: none;
+}
+
+.detail-label {
+  color: #7f8c8d;
+  font-weight: 500;
+}
+
+.detail-value {
+  color: #2c3e50;
+  font-weight: 600;
+}
+
+.payment-form {
+  background-color: #f8f9fa;
+  padding: 25px;
+  border-radius: 10px;
+  margin-top: 25px;
+}
+
+.payment-form h3 {
+  color: #2c3e50;
+  margin-bottom: 15px;
+  font-size: 1.3rem;
+}
+
+.form-description {
+  color: #5a6c7d;
+  margin-bottom: 20px;
+  line-height: 1.5;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  color: #2c3e50;
+  font-weight: 600;
+}
+
+.label-note {
+  font-weight: 400;
+  color: #7f8c8d;
+  font-size: 0.9rem;
+  margin-left: 5px;
+}
+
+.form-control {
+  width: 100%;
+  padding: 12px 15px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: border-color 0.3s;
+}
+
+.form-control:focus {
+  outline: none;
+  border-color: #3498db;
+  box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+}
+
+.submit-btn {
+  width: 100%;
+  padding: 16px;
+  background: linear-gradient(135deg, #4b6cb7 0%, #182848 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.submit-btn:hover:not(:disabled) {
+  opacity: 0.9;
+  transform: translateY(-2px);
+}
+
+.submit-btn:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+.spinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid transparent;
+  border-top: 2px solid white;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.payment-note {
+  margin-top: 15px;
+  font-size: 0.9rem;
+  color: #7f8c8d;
+  text-align: center;
+  line-height: 1.4;
+}
+
+.payment-completed {
+  text-align: center;
+  padding: 30px;
+  background-color: #e8f5e9;
+  border-radius: 10px;
+  margin-top: 20px;
+}
+
+.completed-icon {
+  font-size: 3rem;
+  margin-bottom: 15px;
+}
+
+.payment-completed h3 {
+  color: #2e7d32;
+  margin-bottom: 10px;
+}
+
+.transaction-id {
+  margin: 15px 0;
+  padding: 10px;
+  background-color: white;
+  border-radius: 6px;
+  display: inline-block;
+}
+
+.print-btn {
+  padding: 10px 20px;
+  margin-top: 10px;
+  background-color: white;
+  color: #2e7d32;
+  border: 1px solid #2e7d32;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.3s;
+}
+
+.print-btn:hover {
+  background-color: #2e7d32;
+  color: white;
+}
+
+/* Loading state */
+.pv-loading {
+  text-align: center;
+  padding: 60px 20px;
+}
+
+.pv-loader {
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #3498db;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 20px;
+}
+
+/* Error state */
+.pv-error, .pv-not-found {
+  text-align: center;
+  padding: 40px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+}
+
+.error-icon, .not-found-icon {
+  font-size: 4rem;
+  margin-bottom: 20px;
+}
+
+.error-message {
+  color: #e74c3c;
+  margin-bottom: 20px;
+  font-weight: 500;
+}
+
+.error-suggestions, .not-found-reasons {
+  text-align: left;
+  max-width: 500px;
+  margin: 0 auto 25px;
+}
+
+.error-suggestions ul, .not-found-reasons ul {
+  text-align: left;
+  margin-top: 10px;
+}
+
+.error-suggestions li, .not-found-reasons li {
+  margin-bottom: 8px;
+  color: #5a6c7d;
+}
+
+.retry-btn, .primary-btn, .secondary-btn {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s;
+  margin: 0 10px;
+}
+
+.retry-btn, .primary-btn {
+  background-color: #3498db;
+  color: white;
+}
+
+.retry-btn:hover, .primary-btn:hover {
+  background-color: #2980b9;
+}
+
+.secondary-btn {
+  background-color: #95a5a6;
+  color: white;
+}
+
+.secondary-btn:hover {
+  background-color: #7f8c8d;
+}
+
+.not-found-actions {
+  margin-top: 25px;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .pv-container {
+    padding: 15px;
   }
   
-  /* ===== Header ===== */
-  .payment-voucher-container h2 {
-    font-size: 24px;
-    margin-bottom: 20px;
-    color: #333;
-    border-bottom: 2px solid #f0f0f0;
-    padding-bottom: 10px;
+  .pv-card {
+    padding: 20px;
   }
   
-  /* ===== Info Paragraphs ===== */
-  .payment-voucher-container p {
-    margin: 12px 0;
-    font-size: 16px;
-    color: #444;
+  .pv-card-header {
+    flex-direction: column;
+    gap: 15px;
+    align-items: flex-start;
   }
   
-  .payment-voucher-container strong {
-    color: #000;
+  .summary-item, .detail-item {
+    flex-direction: column;
+    gap: 5px;
+    align-items: flex-start;
   }
   
-  /* ===== Button Styling ===== */
-  .payment-voucher-container button {
-    margin-top: 20px;
-    padding: 10px 20px;
-    font-size: 15px;
-    background-color: #007bff;
-    color: #fff;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: background 0.3s ease-in-out;
-    position: relative;
-    z-index: 2;
+  .payment-form {
+    padding: 20px;
   }
   
-  .payment-voucher-container button:hover {
-    background-color: #0056b3;
+  .not-found-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
   }
   
-  /* ===== Loading/Error Messages ===== */
-  .payment-voucher-message {
-    max-width: 600px;
-    margin: 100px auto;
-    text-align: center;
-    font-size: 18px;
-    color: #555;
+  .primary-btn, .secondary-btn {
+    margin: 5px 0;
+    width: 100%;
   }
-  
-  /* ===== Toast Container Overrides ===== */
-  /* Ensure toast container doesn't interfere with payment voucher */
-  .Toastify__toast-container {
-    position: fixed !important;
-    z-index: 10000 !important;
-    top: 80px !important;
-    right: 20px !important;
-    width: auto !important;
-    max-width: 350px !important;
-    pointer-events: none !important;
-  }
-  
-  .Toastify__toast {
-    pointer-events: auto !important;
-    margin-bottom: 10px !important;
-    border-radius: 8px !important;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
-    position: relative !important;
-    z-index: 10001 !important;
-  }
-  
-  /* Specific toast type styling */
-  .Toastify__toast--success {
-    background-color: #28a745 !important;
-    color: white !important;
-  }
-  
-  .Toastify__toast--error {
-    background-color: #dc3545 !important;
-    color: white !important;
-  }
-  
-  .Toastify__toast--info {
-    background-color: #17a2b8 !important;
-    color: white !important;
-  }
-  
-  .Toastify__toast--warning {
-    background-color: #ffc107 !important;
-    color: #212529 !important;
-  }
-  
-  /* Toast close button */
-  .Toastify__close-button {
-    color: inherit !important;
-    opacity: 0.7 !important;
-  }
-  
-  .Toastify__close-button:hover {
-    opacity: 1 !important;
-  }
-  
-  /* Toast progress bar */
-  .Toastify__progress-bar {
-    background-color: rgba(255, 255, 255, 0.3) !important;
-  }
-  
-  /* Custom toast styling for payment voucher page */
-  .custom-toast {
-    position: fixed !important;
-    bottom: 1rem;
-    right: 1rem;
-    width: auto;
-    z-index: 10000;
-  }
-  
-  .custom-toast-body {
-    font-size: 14px;
-  }
-  
-  /* ===== Responsive ===== */
-  @media (max-width: 500px) {
-    .payment-voucher-container {
-      padding: 20px 15px;
-    }
-  
-    .payment-voucher-container h2 {
-      font-size: 20px;
-    }
-  
-    .payment-voucher-container p {
-      font-size: 15px;
-    }
-  
-    .payment-voucher-container button {
-      width: 100%;
-    }
-    
-    /* Mobile toast positioning */
-    .Toastify__toast-container {
-      top: 70px !important;
-      right: 10px !important;
-      left: 10px !important;
-      max-width: calc(100vw - 20px) !important;
-    }
-  }
-  
+}

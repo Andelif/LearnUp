@@ -42,10 +42,9 @@ const AppRoutes = () => {
     <Route path="/myTuitions" element={<MyTuitions />} />
     <Route path="/voucher/:tutionId" element={<PaymentVoucher />} />
     
+    
     <Route path="/admin/*" element={<AdminRoutes />} />
     <Route path="/inbox" element={<Inbox />} />
-    
-    <Route path="/voucher/:tutionId" element={<PaymentVoucher />} />
 
     <Route path="/forgot-password" element={<ForgotPassword />} />
     

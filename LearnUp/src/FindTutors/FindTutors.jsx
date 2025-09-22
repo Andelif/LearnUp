@@ -144,13 +144,17 @@ const FindTutors = () => {
         </label>
         <label>
           Curriculum:
-          <input
-            type="text"
+          <select
             name="curriculum"
             value={formData.curriculum}
             onChange={handleChange}
             required
-          />
+          >
+          <option value="">-- Select Curriculum --</option>
+          <option value="EV">EV</option>
+          <option value="BV">BV</option>
+          <option value="EM">EM</option>
+         </select>
         </label>
         <button type="submit">Submit</button>
       </form>

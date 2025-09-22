@@ -1,14 +1,15 @@
 import React from "react";
 import AdminSidebar from "./AdminSidebar/AdminSidebar";
 import { Outlet } from "react-router-dom";
+import "./AdminLayout.css";
 
 const AdminLayout = () => {
   return (
-    <div >
+    <div className="admin-layout">
       <AdminSidebar />
-      <div style={{ flexGrow: 1, padding: "20px", marginLeft: "220px" }}>
+      <main className="admin-main-content">
         <Outlet /> 
-      </div>
+      </main>
     </div>
   );
 };

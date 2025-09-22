@@ -27,8 +27,6 @@ const JobDetails = () => {
     }
 
     try {
-      // backend expects the body field named tuition_id (check your controller);
-      // if it actually expects tution_id, keep it as below.
       const { data } = await api.post("/api/applications", {
         tution_id: id,
       });
@@ -75,27 +73,87 @@ const JobDetails = () => {
     if (user) checkApplicationStatus();
   }, [id, user, api]);
 
-  if (loading) return <p>Loading job details...</p>;
-  if (!job) return <p>Job not found</p>;
+  if (loading) return (
+    <div className="job-details-loading">
+      <div className="loading-spinner"></div>
+      <p>Loading job details...</p>
+    </div>
+  );
+  
+  if (!job) return (
+    <div className="job-details-error">
+      <h2>Job Not Found</h2>
+      <p>The job you're looking for doesn't exist or has been removed.</p>
+    </div>
+  );
 
   return (
     <div className="job-details-container">
-      <h2>{job.subject} Tutor Needed</h2>
-      <p><strong>Class:</strong> {job.class}</p>
-      <p><strong>Subjects:</strong> {job.subjects}</p>
-      <p><strong>Location:</strong> {job.location}</p>
-      <p><strong>Salary:</strong> {job.asked_salary} BDT</p>
-      <p><strong>Curriculum:</strong> {job.curriculum}</p>
-      <p><strong>Days per Week:</strong> {job.days}</p>
-      {user?.role !== "learner" && (
-      <button
-        className="apply-btn"
-        onClick={handleApply}
-        disabled={hasApplied}
-      >
-        {hasApplied ? "Applied" : "Apply Now"}
-      </button>
-    )}
+      <div className="job-card">
+        <div className="job-header">
+          <h2 className="job-title">{job.subject || job.subjects} Tutor Needed</h2>
+          <p className="job-subtitle">{job.class} | {job.curriculum}</p>
+        </div>
+
+        <div className="job-info-grid">
+          <div className="info-item">
+            <div className="info-icon">📚</div>
+            <div className="info-content">
+              <label>Subjects</label>
+              <span>{job.subjects}</span>
+            </div>
+          </div>
+          
+          <div className="info-item">
+            <div className="info-icon">📍</div>
+            <div className="info-content">
+              <label>Location</label>
+              <span>{job.location || "Not specified"}</span>
+            </div>
+          </div>
+          
+          <div className="info-item">
+            <div className="info-icon">💰</div>
+            <div className="info-content">
+              <label>Salary</label>
+              <span>{job.asked_salary} BDT</span>
+            </div>
+          </div>
+          
+          <div className="info-item">
+            <div className="info-icon">📅</div>
+            <div className="info-content">
+              <label>Days per Week</label>
+              <span>{job.days || "Flexible"}</span>
+            </div>
+          </div>
+        </div>
+
+        {user?.role !== "learner" && (
+          <div className="apply-section">
+            <button
+              className={`apply-btn ${hasApplied ? "applied" : ""}`}
+              onClick={handleApply}
+              disabled={hasApplied}
+            >
+              {hasApplied ? (
+                <>
+                  <span className="btn-icon">✓</span>
+                  Applied Successfully
+                </>
+              ) : (
+                <>
+                  <span className="btn-icon">✏️</span>
+                  Apply Now
+                </>
+              )}
+            </button>
+            {hasApplied && (
+              <p className="application-note">Your application has been submitted successfully!</p>
+            )}
+          </div>
+        )}
+      </div>
     </div>
   );
 };

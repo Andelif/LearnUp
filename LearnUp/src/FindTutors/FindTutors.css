@@ -58,8 +58,13 @@
   -webkit-appearance: none;
   margin: 0;
 }
-.find-tutors-form input[type="number"] {
-  -moz-appearance: textfield; /* Firefox */
+/* .find-tutors-form input[type="number"] {
+  -moz-appearance: textfield; 
+} */
+.find-tutors-form select{
+  height: 40px;
+  margin-top: 10px;
+  border-radius: 10px;
 }
 
 /* Submit button spans full width of the grid */

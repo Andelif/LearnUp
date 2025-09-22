@@ -228,7 +228,7 @@ input:focus,
 }
 
 /* Status indicator (optional enhancement) */
-.job-card::after {
+/* .job-card::after {
   content: 'New';
   position: absolute;
   top: 16px;
@@ -241,4 +241,4 @@ input:focus,
   font-weight: 500;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-}
+} */

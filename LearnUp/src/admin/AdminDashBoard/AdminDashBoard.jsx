@@ -5,7 +5,7 @@ import AdminSidebar from '../AdminSidebar/AdminSidebar'
 const AdminDashBoard = () => {
   return (
     <div className="admin-container">
-      <AdminSidebar />
+      {/* <AdminSidebar /> */}
       <div className="admin-main-content">
         
         <h2>Welcome, Admin</h2>

@@ -38,6 +38,8 @@ const Dashboard = () => {
   const fetchTuitionDetails = async () => {
     try {
       const { data } = await api.get(`/api/confirmed-tuitions`, authHeader);
+      console.log("Confirmed tuitions response:", data);
+
       const first = Array.isArray(data) ? data[0] : null;
       // tolerate tution_id / tuition_id
       setTuitionId(first?.tution_id ?? first?.tuition_id ?? null);
@@ -105,7 +107,7 @@ const Dashboard = () => {
         )}
 
         {user?.role === "tutor" && tuitionId && (
-          <Link to={`/voucher/${tuitionId}`} className="btn btn-primary">
+          <Link to={`/voucher/${tuitionId}`} className="sidebar-link">
             View Payment Voucher
           </Link>
         )}
@@ -183,11 +185,11 @@ const Dashboard = () => {
         })(): "N/A"}</p>
           </div>
           <div className="info-box">
-            <FaEnvelope /> <p>03 Confirmation Letters</p>
+            <FaEnvelope /> <p>{stats.confirmedJobs} Confirmation Letters</p>
           </div>
-          <div className="info-box">
+          {/* <div className="info-box">
             <FaFileInvoice /> <p>01 Invoice Pending</p>
-          </div>
+          </div> */}
         </div>
 
         {/* You have matchedUsers state if you want to show a list later */}

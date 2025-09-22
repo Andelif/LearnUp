@@ -20,8 +20,6 @@ const SignUp = () => {
   const [success, setSuccess] = useState("");
 
   const navigate = useNavigate();
-
-  // use shared axios instance from context
   const { api } = useContext(storeContext);
 
   const handleSignIn = () => navigate("/signIn");
@@ -35,14 +33,12 @@ const SignUp = () => {
     setError("");
     setSuccess("");
 
-    // (optional client check)
     if (formData.password !== formData.password_confirmation) {
       setError("Passwords do not match.");
       return;
     }
 
     try {
-      // token-based register → backend returns { message, user, token }
       const res = await api.post("/api/register", formData, {
         headers: { "Content-Type": "application/json" },
       });
@@ -66,44 +62,50 @@ const SignUp = () => {
 
   return (
     <div className="signup-container">
-      <div className="main-content-wrapper">
-        <div className="signup-card">
-          <h2>
-            <span>Join</span> Us
-          </h2>
-          <p>Sign up to find or offer tuitions.</p>
+      <div className="signup-card">
+        <div className="signup-header">
+          <h2>Create Your Account</h2>
+          <p>Join LearnUp to find or offer tuitions</p>
+        </div>
 
-          <div className="user-selection">
-            <button
-              type="button"
-              className={`user-btn ${formData.role === "learner" ? "active" : ""}`}
-              onClick={() => setFormData((p) => ({ ...p, role: "learner" }))}
-            >
-              Learner
-            </button>
-            <button
-              type="button"
-              className={`user-btn ${formData.role === "tutor" ? "active" : ""}`}
-              onClick={() => setFormData((p) => ({ ...p, role: "tutor" }))}
-            >
-              Tutor
-            </button>
-          </div>
+        <div className="user-selection">
+          <button
+            type="button"
+            className={`user-btn ${formData.role === "learner" ? "active" : ""}`}
+            onClick={() => setFormData((p) => ({ ...p, role: "learner" }))}
+          >
+            <span className="btn-icon">🎓</span>
+            Learner
+          </button>
+          <button
+            type="button"
+            className={`user-btn ${formData.role === "tutor" ? "active" : ""}`}
+            onClick={() => setFormData((p) => ({ ...p, role: "tutor" }))}
+          >
+            <span className="btn-icon">📚</span>
+            Tutor
+          </button>
+        </div>
 
-          <div className="form-fields">
-            <form onSubmit={handleSubmit}>
-              <label className="input-label">Name</label>
+        <form onSubmit={handleSubmit} className="signup-form">
+          <div className="form-row">
+            <div className="form-group">
+              <label className="input-label">Full Name</label>
               <input
                 type="text"
                 name="name"
                 className="input-field"
-                placeholder="Enter your name"
+                placeholder="Enter your full name"
                 value={formData.name}
                 onChange={handleChange}
                 required
               />
+            </div>
+          </div>
 
-              <label className="input-label">Phone</label>
+          <div className="form-row">
+            <div className="form-group">
+              <label className="input-label">Phone Number</label>
               <input
                 type="text"
                 name="contact_number"
@@ -113,8 +115,10 @@ const SignUp = () => {
                 onChange={handleChange}
                 required
               />
-
-              <label className="input-label">Email</label>
+            </div>
+            
+            <div className="form-group">
+              <label className="input-label">Email Address</label>
               <input
                 type="email"
                 name="email"
@@ -124,7 +128,11 @@ const SignUp = () => {
                 onChange={handleChange}
                 required
               />
+            </div>
+          </div>
 
+          <div className="form-row">
+            <div className="form-group">
               <label className="input-label">Gender</label>
               <select
                 name="gender"
@@ -136,14 +144,18 @@ const SignUp = () => {
                 <option value="female">Female</option>
                 <option value="other">Other</option>
               </select>
+            </div>
+          </div>
 
+          <div className="form-row">
+            <div className="form-group">
               <label className="input-label">Password</label>
               <div className="input-group">
                 <input
                   type={passwordVisible ? "text" : "password"}
                   name="password"
                   className="input-field"
-                  placeholder="Enter your password"
+                  placeholder="Create a password"
                   value={formData.password}
                   onChange={handleChange}
                   required
@@ -157,8 +169,10 @@ const SignUp = () => {
                   {passwordVisible ? <FaEyeSlash /> : <FaEye />}
                 </span>
               </div>
-
-              <label className="input-label">Re-enter Password</label>
+            </div>
+            
+            <div className="form-group">
+              <label className="input-label">Confirm Password</label>
               <div className="input-group">
                 <input
                   type={rePasswordVisible ? "text" : "password"}
@@ -178,19 +192,20 @@ const SignUp = () => {
                   {rePasswordVisible ? <FaEyeSlash /> : <FaEye />}
                 </span>
               </div>
-
-              {error && <p className="error">{error}</p>}
-              {success && <p className="success">{success}</p>}
-
-              <button className="signup-button" type="submit">Sign Up</button>
-
-              <p className="login-option">
-                Already have an account?{" "}
-                <a href="#" onClick={handleSignIn}>Sign in</a>
-              </p>
-            </form>
+            </div>
           </div>
-        </div>
+
+          {error && <div className="error-message">{error}</div>}
+          {success && <div className="success-message">{success}</div>}
+
+          <button className="signup-button" type="submit">
+            Create Account
+          </button>
+
+          <div className="login-redirect">
+            <p>Already have an account? <span onClick={handleSignIn}>Sign in</span></p>
+          </div>
+        </form>
       </div>
     </div>
   );

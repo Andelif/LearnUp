@@ -124,14 +124,14 @@ const SignIn = () => {
                 </span>
               </div>
 
-              <div
+              {/* <div
                 className="forgot-password"
                 role="button"
                 tabIndex={0}
                 onClick={() => navigate("/forgot-password")}
               >
                 Forgot Password?
-              </div>
+              </div> */}
               
 
               {error && <p className="error">{error}</p>}

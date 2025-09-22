@@ -1,33 +1,42 @@
-/* AdminSidebar.css — responsive, non-fixed */
+/* AdminSidebar.css — fixed full-height sidebar */
 
 .admin-sidebar {
-  width: 240px;
+  width: 260px;
+  height: 100vh;
   background-color: #273a59;
   color: #fff;
-  padding: 18px;
-  border-radius: 12px;
-  box-shadow: 0 6px 18px rgba(0,0,0,0.08);
-
-  /* stays visible while scrolling on larger screens */
-  position: sticky;
-  top: 12px;
-  align-self: flex-start;     /* works inside flex parent */
+  padding: 20px;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+  box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
 }
 
 .admin-sidebar h2 {
-  margin: 0 0 16px;
+  margin: 0 0 30px;
   text-align: center;
-  font-size: 1.1rem;
+  font-size: 1.2rem;
   letter-spacing: .06em;
   color: #e6f0ff;
+  padding-bottom: 15px;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+
+.admin-sidebar nav {
+  flex: 1;
 }
 
 .admin-sidebar nav ul {
   list-style: none;
   padding: 0;
   margin: 0;
-  display: grid;
-  gap: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 .admin-sidebar nav ul li { margin: 0; }
@@ -35,46 +44,97 @@
 .admin-sidebar nav ul li a {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 10px 12px;
-  border-radius: 10px;
+  gap: 12px;
+  padding: 15px 18px;
+  border-radius: 8px;
   text-decoration: none;
   color: #ffffff;
-  background: rgba(255,255,255,0.08);
-  transition: background-color .2s ease, transform .06s ease;
+  background: rgba(255,255,255,0.05);
+  transition: all 0.3s ease;
+  font-weight: 500;
+  border: 1px solid transparent;
 }
+
 .admin-sidebar nav ul li a:hover {
-  background: rgba(255,255,255,0.16);
+  background: rgba(255,255,255,0.15);
+  border-color: rgba(255,255,255,0.2);
+  transform: translateX(5px);
 }
+
 .admin-sidebar nav ul li a:active {
-  transform: translateY(1px);
+  transform: translateX(3px) translateY(1px);
 }
+
 .admin-sidebar nav ul li a:focus-visible {
-  outline: 3px solid rgba(255,255,255,0.45);
+  outline: 2px solid rgba(255,255,255,0.6);
   outline-offset: 2px;
 }
 
+/* Active link styling */
+.admin-sidebar nav ul li a.active {
+  background: rgba(255,255,255,0.2);
+  border-color: rgba(255,255,255,0.3);
+  font-weight: 600;
+}
+
 .sidebar-icon {
-  font-size: 18px;
+  font-size: 20px;
   flex-shrink: 0;
+  opacity: 0.9;
 }
 
 /* ===== Responsive ===== */
 
-/* Tablets */
-@media (max-width: 900px) {
-  .admin-sidebar { width: 220px; padding: 16px; }
+/* Large tablets and small desktops */
+@media (max-width: 1024px) {
+  .admin-sidebar { 
+    width: 240px; 
+    padding: 18px; 
+  }
 }
 
-/* Phones (≤ ~430px) — stack sidebar on top */
-@media (max-width: 430px) {
+/* Tablets */
+@media (max-width: 768px) {
   .admin-sidebar {
     width: 100%;
-    position: static;        /* disable sticky on small screens */
-    border-radius: 12px;
-    padding: 14px;
+    height: auto;
+    position: static;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    border-radius: 0;
   }
-  .admin-sidebar h2 { margin-bottom: 12px; }
-  .admin-sidebar nav ul { gap: 8px; }
-  .admin-sidebar nav ul li a { padding: 12px; }
+  
+  .admin-sidebar h2 { 
+    margin-bottom: 20px; 
+    font-size: 1.1rem;
+  }
+  
+  .admin-sidebar nav ul { 
+    gap: 6px; 
+  }
+  
+  .admin-sidebar nav ul li a { 
+    padding: 12px 16px;
+    font-size: 14px;
+  }
+}
+
+/* Mobile phones */
+@media (max-width: 480px) {
+  .admin-sidebar {
+    padding: 15px;
+  }
+  
+  .admin-sidebar h2 { 
+    margin-bottom: 15px; 
+    font-size: 1rem;
+  }
+  
+  .admin-sidebar nav ul li a { 
+    padding: 10px 14px;
+    font-size: 13px;
+  }
+  
+  .sidebar-icon {
+    font-size: 16px;
+  }
 }
